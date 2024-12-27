@@ -222,3 +222,28 @@ def resultado_opcion1():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+@app.route('/')
+def historial():
+    # Ejemplo de historial de búsquedas
+    historial = ["Realidad", "Elemental", "Frecuencia"]
+    return render_template('historial.html', historial=historial)
+
+@app.route('/detalle/<busqueda>')
+def detalle(busqueda):
+    # Ruta del archivo JSON
+    archivo_json = os.path.join(directorio_base, "detalles_busquedas.json")
+    
+    # Cargar datos del archivo JSON
+    with open(archivo_json, "r") as file:
+        data = json.load(file)
+
+    # Buscar detalles de la búsqueda
+    detalle = data.get(busqueda, {
+        "búsqueda": busqueda,
+        "potencial": "No encontrado",
+        "lupa": "No encontrado"
+    })
+
+    # Renderizar plantilla detalle.html
+    return render_template('detalle.html', detalle=detalle)

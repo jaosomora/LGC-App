@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Búsquedas</title>
+</head>
+<body>
+    <h1>Historial de Búsquedas</h1>
+    <ul>
+        {% for item in historial %}
+        <li>
+            <a href="{{ url_for('buscar_historial', query=item) }}">{{ item }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('menu_principal') }}">Volver al Menú</a>
+</body>
+</html>
