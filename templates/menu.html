@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Menú Principal{% endblock %}
+{% block content %}
+<div class="text-center mb-4">
+    <h1 class="text-primary">Menú Principal</h1>
+    <p class="lead">Selecciona una opción para continuar</p>
+</div>
+<div class="card shadow-sm p-4">
+    <ul class="list-group">
+        <li class="list-group-item"><a href="/opcion1" class="btn btn-primary w-100">1. Calcular Palabras por Frecuencia</a></li>
+        <li class="list-group-item"><a href="/opcion2" class="btn btn-success w-100">2. Calcular Frecuencia de una Palabra</a></li>
+    </ul>
+</div>
+{% if historial %}
+<div class="mt-5">
+    <h3 class="text-secondary">Historial de Búsquedas</h3>
+    <div class="history-container">
+        <ul class="list-group">
+            {% for item in historial %}
+                <li class="list-group-item">{{ item }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

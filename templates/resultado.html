@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Resultados{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center text-success">Resultados para "{{ palabra }}"</h2>
+    <div class="card shadow-sm p-4 my-4">
+        <h3 class="text-primary">Detalle del Potencial</h3>
+        <p><strong>Valores:</strong> {{ detalle }}</p>
+        <p><strong>Suma Total:</strong> {{ potencial }}</p>
+    </div>
+    <div class="card shadow-sm p-4 my-4">
+        <h3 class="text-primary">Lupa</h3>
+        <p>{{ lupa }}</p>
+    </div>
+    <div class="card shadow-sm p-4 my-4">
+        <h3 class="text-primary">Palabras Asociadas</h3>
+        {% if palabras %}
+        <ul>
+            {% for palabra in palabras %}
+            <li>{{ palabra }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No se encontraron palabras asociadas.</p>
+        {% endif %}
+    </div>
+    <div class="card shadow-sm p-4 my-4">
+        <h3 class="text-primary">Resonancia Geográfica</h3>
+        {% if territorios %}
+        <ul>
+            {% for territorio in territorios %}
+            <li>Código Territorial: +{{ territorio['codigo'] }} - País: {{ territorio['pais'] }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No se encontraron coincidencias geográficas.</p>
+        {% endif %}
+    </div>
+    <div class="card shadow-sm p-4 my-4">
+        <h3 class="text-primary">Resonancia Elemental</h3>
+        {% if elementos %}
+        <ul>
+            {% for elemento in elementos %}
+            <li>{{ elemento }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No se encontraron elementos químicos asociados.</p>
+        {% endif %}
+    </div>
+    <a href="/" class="btn btn-secondary">Volver al Menú Principal</a>
+</div>
+{% endblock %}

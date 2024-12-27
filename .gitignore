@@ -1,0 +1,6 @@
+__pycache__/
+.DS_Store
+__MACOSX/
+*.log
+*.sqlite3
+

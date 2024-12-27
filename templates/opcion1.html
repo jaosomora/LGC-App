@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Búsqueda por Frecuencia{% endblock %}
+{% block content %}
+<div class="text-center mb-4">
+    <h2 class="text-primary">Búsqueda por Frecuencia</h2>
+    <form action="/resultado_opcion1" method="post" class="mt-4">
+        <div class="mb-3">
+            <label for="frecuencia" class="form-label">Ingresa la frecuencia:</label>
+            <input type="number" name="frecuencia" id="frecuencia" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Buscar</button>
+    </form>
+</div>
+{% endblock %}
