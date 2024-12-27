@@ -1,17 +1,19 @@
-# Entornos virtuales
-env/
+# Ignorar archivos y carpetas innecesarias
 
-# Archivos comprimidos
-*.zip
-
-# Archivos generados por el sistema operativo
-.DS_Store
-
-# Archivos compilados de Python
-__pycache__/
+# Archivos Python compilados
 *.pyc
 *.pyo
+__pycache__/
 
-# Archivos de configuración del sistema
+# Archivos específicos del entorno
+venv/
+.env
+
+# Archivos o datos sensibles
 *.log
+*.sqlite3
 
+# Archivos específicos del proyecto
+potencial.py.DS_Store
+Archivo.zip
+env/
