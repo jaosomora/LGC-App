@@ -17,3 +17,5 @@ venv/
 potencial.py.DS_Store
 Archivo.zip
 env/
+.DS_Store
+potencial.py
