@@ -1,6 +1,17 @@
-__pycache__/
+# Entornos virtuales
+env/
+
+# Archivos comprimidos
+*.zip
+
+# Archivos generados por el sistema operativo
 .DS_Store
-__MACOSX/
+
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos de configuración del sistema
 *.log
-*.sqlite3
 
