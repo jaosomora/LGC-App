@@ -15,7 +15,7 @@ venv/
 
 # Archivos específicos del proyecto
 potencial.py.DS_Store
-Archivo.zip
+*.zip
 env/
 .DS_Store
 potencial.py
