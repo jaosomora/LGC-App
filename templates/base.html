@@ -11,12 +11,13 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #F5F8FB;
-            height: 100%; /* Asegura que el body ocupe toda la altura disponible */
-            overflow: auto; /* Habilita el scroll global */
+            height: 100%;
+            overflow: auto;
+            margin: 0;
         }
 
         .navbar {
-            background-color: #4A90E2;
+            background-color: #4A90E2; /* Azul principal */
         }
 
         .navbar-brand {
@@ -29,23 +30,32 @@
             color: #F5F8FB !important;
         }
 
+        /* Hero Section con los colores de la paleta */
         .hero-section {
-            background: linear-gradient(45deg, #4A90E2, #F1C40F);
+            background: linear-gradient(135deg, #4A90E2, #25567B); /* Fondo degradado con los tonos principales */
             color: white;
-            padding: 50px 20px;
+            padding: 60px 20px;
             text-align: center;
-            border-radius: 10px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 0px; /* Eliminar bordes */
+            box-shadow: none;
+            transition: all 0.3s ease; /* Suavizar animaciones */
+            margin: 0;
         }
 
         .hero-section h1 {
             font-size: 3rem;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: transform 0.3s ease; /* Animación al entrar */
         }
 
         .hero-section p {
             font-size: 1.2rem;
             margin: 20px 0;
+            line-height: 1.5;
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .card {
@@ -62,7 +72,7 @@
         }
 
         footer {
-            background-color: #25567B;
+            background-color: #25567B; /* Azul oscuro */
             color: white;
             padding: 10px;
             bottom: 0;
@@ -70,23 +80,23 @@
         }
 
         .btn-primary {
-            background-color: #4A90E2;
+            background-color: #4A90E2; /* Azul principal */
             border: none;
             transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
-            background-color: #25567B;
+            background-color: #25567B; /* Azul oscuro */
         }
 
         .btn-success {
-            background-color: #50B5E9;
+            background-color: #50B5E9; /* Azul más claro */
             border: none;
             transition: all 0.3s ease;
         }
 
         .btn-success:hover {
-            background-color: #4A90E2;
+            background-color: #4A90E2; /* Azul principal */
         }
 
         .lead {
@@ -124,13 +134,13 @@
         }
 
         .result-title {
-            color: #4A90E2;
+            color: #4A90E2; /* Azul principal */
             font-weight: 700;
             margin-bottom: 15px;
         }
 
         .result-card {
-            border: 1px solid #4A90E2;
+            border: 1px solid #4A90E2; /* Azul principal */
             border-radius: 10px;
             margin-bottom: 15px;
             padding: 15px;
@@ -138,7 +148,7 @@
 
         .result-card h5 {
             font-size: 1.2rem;
-            color: #4A90E2;
+            color: #4A90E2; /* Azul principal */
         }
 
         .result-card p {
@@ -155,7 +165,6 @@
             background-color: #fff;
         }
 
-        /* New CSS to ensure the scroll works properly */
         html, body {
             height: 100%;
             margin: 0;
