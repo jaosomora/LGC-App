@@ -2,18 +2,18 @@
 {% block title %}Resultados{% endblock %}
 {% block content %}
 <div class="container py-5">
-    <h2 class="text-center text-success">Resultados para "{{ palabra }}"</h2>
+    <h2 class="text-center text-success">Despliegue del Potencial para la palabra "{{ palabra }}"</h2>
     <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Detalle del Potencial</h3>
-        <p><strong>Valores:</strong> {{ detalle }}</p>
-        <p><strong>Suma Total:</strong> {{ potencial }}</p>
+        <h3 class="text-primary">Potencial Lógico de "{{ palabra }}"</h3>
+        <p><strong>Frecuencia por letra:</strong> {{ detalle }}</p>
+        <p><strong>Frecuencia total (suma):</strong> {{ potencial }}</p>
     </div>
     <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Lupa</h3>
-        <p>{{ lupa }}</p>
+        <h3 class="text-primary">Lupa: Frecuencia Amplificada</h3>
+        <p><strong>Frecuencia amplificada por el factor de 1.21</strong>: {{ lupa }}</p>
     </div>
     <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Palabras Asociadas</h3>
+        <h3 class="text-primary">Resonancias de Palabras Relacionadas</h3>
         {% if palabras %}
         <ul>
             {% for palabra in palabras %}
@@ -37,15 +37,15 @@
         {% endif %}
     </div>
     <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Resonancia Elemental</h3>
+        <h3 class="text-primary"><strong>Resonancia Elemental</strong></h3>
         {% if elementos %}
         <ul>
             {% for elemento in elementos %}
-            <li>{{ elemento }}</li>
+            <li>{{ elemento|safe }}</li>
             {% endfor %}
         </ul>
         {% else %}
-        <p>No se encontraron elementos químicos asociados.</p>
+        <p><strong>No se encontraron elementos químicos asociados.</strong></p>
         {% endif %}
     </div>
     <a href="/" class="btn btn-secondary">Volver al Menú Principal</a>

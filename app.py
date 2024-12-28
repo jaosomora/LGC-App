@@ -80,9 +80,9 @@ def buscar_elementos_por_potencial(tabla_periodica, potencial_objetivo, lupa_obj
         potencial_simbolo = calcular_potencial(simbolo)
 
         if potencial_nombre == potencial_objetivo:
-            resultados.append(f"Elemento: {nombre} ({simbolo}) - Coincidencia: Potencial del nombre ({potencial_nombre})")
+            resultados.append(f"<strong>Elemento:</strong> {nombre} ({simbolo}) - <strong>Coincidencia:</strong> Potencial del nombre ({potencial_nombre})")
         elif numero_atomico == potencial_objetivo:
-            resultados.append(f"Elemento: {nombre} ({simbolo}) - Coincidencia: Número atómico ({numero_atomico})")
+            resultados.append(f"<strong>Elemento:</strong> {nombre} ({simbolo}) - <strong>Coincidencia:</strong> Número atómico ({numero_atomico})")
     return resultados
 
 def cargar_palabras(archivo):
