@@ -247,3 +247,4 @@ def detalle(busqueda):
 
     # Renderizar plantilla detalle.html
     return render_template('detalle.html', detalle=detalle)
+
