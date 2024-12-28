@@ -220,8 +220,11 @@ def resultado_opcion1():
 
     return render_template('resultado.html', frecuencia=frecuencia, lupa=lupa, territorios=territorios_encontrados, palabras=palabras_encontradas, elementos=elementos)
 
+#if __name__ == '__main__':
+ #   app.run(debug=True)
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0', port=8080)
 
 @app.route('/')
 def historial():
