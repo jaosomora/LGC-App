@@ -6,17 +6,20 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, render_template, session
 from flask_cors import CORS  # Asegúrate de importar CORS
 
+# Configuración inicial de la aplicación Flask y sus componentes
+
 # Obtener la ruta del directorio donde está ubicado el script
 directorio_base = os.path.dirname(os.path.abspath(__file__))
 
 # Definir las rutas absolutas de los archivos
-archivo_territorios = os.path.join(directorio_base, "territorios.json")  # Añadido correctamente
-archivo_tabla_periodica = os.path.join(directorio_base, "tabla_periodica.json")
-archivo_ranking = os.path.join(directorio_base, "ranking.txt")
+archivo_territorios = os.path.join(directorio_base, "territorios.json")  # Archivo con códigos de territorios
+archivo_tabla_periodica = os.path.join(directorio_base, "tabla_periodica.json")  # Archivo con datos de la tabla periódica
+archivo_ranking = os.path.join(directorio_base, "ranking.txt")  # Archivo con palabras y su ranking
 
 # Inicializar Flask
 app = Flask(__name__)
 
+# Configuración de la base de datos SQLite
 # Usar almacenamiento persistente en Render para la base de datos
 db_path = os.path.join('/mnt/data', 'palabras.db')  # Ruta persistente en Render
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
@@ -37,20 +40,26 @@ app.secret_key = os.getenv('SECRET_KEY', 'clave-secreta-por-defecto')
 with app.app_context():
     db.create_all()  # Esto crea las tablas en la base de datos si no existen
 
-# Definición de la clase Palabra (ubicada antes de la función que la usa)
+# Modelo de datos para representar palabras en la base de datos
 class Palabra(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    palabra = db.Column(db.String(100), unique=True, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)  # Identificador único
+    palabra = db.Column(db.String(100), unique=True, nullable=False)  # Palabra única, no nula
 
     def __repr__(self):
         return f'<Palabra {self.palabra}>'
 
 # Validar que una palabra sea alfabética
 def es_palabra_valida(palabra):
+    """
+    Verifica que una palabra contenga solo caracteres alfabéticos.
+    """
     return palabra.isalpha()
 
-# Modificar guardar_palabra para evitar duplicados y validar palabras
+# Guardar palabras en la base de datos con validación y prevención de duplicados
 def guardar_palabra(palabra):
+    """
+    Guarda una palabra en la base de datos si es válida y no existe previamente.
+    """
     try:
         # Validar que sea una palabra válida
         if not es_palabra_valida(palabra):
@@ -71,6 +80,9 @@ def guardar_palabra(palabra):
 
 # Limpieza de la base de datos para eliminar duplicados o palabras irrelevantes
 def limpiar_base_datos():
+    """
+    Limpia la base de datos eliminando duplicados y palabras no válidas.
+    """
     try:
         palabras = Palabra.query.all()
         palabras_validas = set()
@@ -89,9 +101,12 @@ def limpiar_base_datos():
     except Exception as e:
         print(f"Error al limpiar la base de datos: {e}")
 
-# Crear rutas para limpiar la base de datos (opcional y protegida)
+# Ruta para limpiar la base de datos manualmente (protegida)
 @app.route('/limpiar_base', methods=['POST'])
 def limpiar_base_route():
+    """
+    Endpoint para ejecutar la limpieza de la base de datos.
+    """
     limpiar_base_datos()
     return "Base de datos limpiada exitosamente.", 200
 
@@ -104,6 +119,9 @@ valores_letras = {
 
 # Funciones para cálculos y procesamiento de datos
 def normalizar_palabra_con_espacios(palabra):
+    """
+    Normaliza una palabra eliminando acentos y caracteres no alfabéticos.
+    """
     palabra = ''.join(
         char for char in unicodedata.normalize('NFD', palabra)
         if unicodedata.category(char) != 'Mn'
@@ -112,18 +130,31 @@ def normalizar_palabra_con_espacios(palabra):
     return palabra
 
 def calcular_potencial(palabra):
+    """
+    Calcula el potencial de una palabra sumando los valores de sus letras.
+    """
     palabra_normalizada = normalizar_palabra_con_espacios(palabra)
     return sum(valores_letras[letra] for letra in palabra_normalizada if letra != " ")
 
 def calcular_lupa(potencial):
+    """
+    Calcula el valor amplificado del potencial (factor de 1.21).
+    """
     return round(potencial * 1.21, 2)
 
 def detalle_potencial(palabra):
+    """
+    Devuelve una lista de valores numéricos para cada letra de la palabra.
+    """
     palabra_normalizada = normalizar_palabra_con_espacios(palabra)
     valores = [valores_letras[letra] for letra in palabra_normalizada if letra != " "]
     return valores
 
+# Funciones para manejo de datos externos
 def cargar_codigos_territorios(archivo):
+    """
+    Carga datos de territorios desde un archivo JSON.
+    """
     try:
         with open(archivo, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -133,6 +164,9 @@ def cargar_codigos_territorios(archivo):
         return []
 
 def buscar_codigo_territorio(codigos, valor_objetivo):
+    """
+    Busca territorios que coincidan con un valor objetivo.
+    """
     resultados = []
     valor_objetivo = str(valor_objetivo)  # Convertir a cadena para comparaciones
     for territorio in codigos:
@@ -142,6 +176,9 @@ def buscar_codigo_territorio(codigos, valor_objetivo):
     return resultados
 
 def cargar_tabla_periodica(archivo):
+    """
+    Carga datos de elementos químicos desde un archivo JSON.
+    """
     try:
         with open(archivo, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -149,6 +186,9 @@ def cargar_tabla_periodica(archivo):
         return []
 
 def buscar_elementos_por_potencial(tabla_periodica, potencial_objetivo, lupa_objetivo=None):
+    """
+    Busca elementos químicos en la tabla periódica según el potencial o lupa.
+    """
     resultados = []
     for elemento in tabla_periodica:
         nombre = elemento["nombre"]
@@ -165,6 +205,9 @@ def buscar_elementos_por_potencial(tabla_periodica, potencial_objetivo, lupa_obj
     return resultados
 
 def cargar_ranking(archivo):
+    """
+    Carga un ranking de palabras desde un archivo de texto.
+    """
     try:
         with open(archivo, "r", encoding="utf-8") as f:
             palabras = {}
@@ -178,6 +221,9 @@ def cargar_ranking(archivo):
         return []
 
 def buscar_palabras_por_potencial(palabras, potencial_objetivo):
+    """
+    Busca palabras en la base de datos que coincidan con un potencial dado.
+    """
     resultados = []
     for palabra in palabras:
         if calcular_potencial(palabra) == potencial_objetivo:
@@ -186,31 +232,49 @@ def buscar_palabras_por_potencial(palabras, potencial_objetivo):
 
 # Función para cargar las palabras desde la base de datos
 def cargar_palabras():
+    """
+    Devuelve una lista de todas las palabras almacenadas en la base de datos.
+    """
     palabras = Palabra.query.all()
     return [p.palabra for p in palabras]
 
 # Rutas para la aplicación Flask
 @app.route('/')
 def menu_principal():
+    """
+    Muestra el menú principal con opciones disponibles.
+    """
     print("Historial desde /:", session.get('historial', []))  # Log para verificar el historial
     historial = session.get('historial', ["Realidad", "Elemental", "Frecuencia"])
     return render_template('menu.html', historial=historial)
 
 @app.route('/opcion1')
 def opcion1():
+    """
+    Carga la página de la primera opción para calcular frecuencias.
+    """
     return render_template('opcion1.html')
 
 @app.route('/opcion2')
 def opcion2():
+    """
+    Carga la página de la segunda opción para calcular potenciales.
+    """
     return render_template('opcion2.html')
 
 @app.route('/ranking')
 def mostrar_ranking():
+    """
+    Muestra el ranking de palabras basado en un archivo de texto.
+    """
     ranking = cargar_ranking(archivo_ranking)
     return render_template('ranking.html', ranking=ranking)
 
 @app.route('/resultado_opcion2', methods=['POST'])
 def resultado_opcion2():
+    """
+    Procesa la palabra ingresada en la opción 2 y genera los resultados.
+    """
     palabra = request.form.get('palabra')
     potencial = calcular_potencial(palabra)
     lupa = calcular_lupa(potencial)
@@ -238,6 +302,9 @@ def resultado_opcion2():
 
 @app.route('/resultado_opcion1', methods=['POST'])
 def resultado_opcion1():
+    """
+    Procesa la frecuencia ingresada en la opción 1 y genera los resultados.
+    """
     frecuencia = int(request.form.get('frecuencia'))
     lupa = calcular_lupa(frecuencia)
 
@@ -261,9 +328,15 @@ def resultado_opcion1():
 
 @app.route('/embed_page')
 def embed_page():
+    """
+    Carga una página embebida con el historial del usuario.
+    """
     print("Historial desde /embed_page:", session.get('historial', []))  # Log para verificar el historial
     historial = session.get('historial', ["Realidad", "Elemental", "Frecuencia"])
     return render_template('embed.html', historial=historial)
 
 if __name__ == '__main__':
+    """
+    Ejecuta la aplicación Flask en modo de producción.
+    """
     app.run(debug=False, host='0.0.0.0', port=8080)
