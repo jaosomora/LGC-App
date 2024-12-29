@@ -1,12 +1,11 @@
 import unicodedata
 import os
 import json
-import time
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, render_template, session
 from flask_cors import CORS  # Asegúrate de importar CORS
 
-# Inicializar Flask
+# Inicializar la aplicación
 app = Flask(__name__)
 
 # Usar almacenamiento persistente en Render para la base de datos
@@ -18,31 +17,30 @@ db = SQLAlchemy(app)
 # Configurar CORS para permitir el acceso desde julianosoriom.com
 CORS(app, origins=["https://www.julianosoriom.com"])
 
-#app.secret_key = 'tu_clave_secreta'  # Clave para manejar sesiones
-app.secret_key = os.getenv('SECRET_KEY', 'clave-secreta-por-defecto')
-
 # Configurar cookies para trabajar en iframes
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Permitir compartir cookies en iframes
 app.config['SESSION_COOKIE_SECURE'] = True      # HTTPS obligatorio en producción
 
+# Definir la clase para la tabla Palabra
+class Palabra(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    palabra = db.Column(db.String(100), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Palabra {self.palabra}>'
+
 # Crear las tablas automáticamente al iniciar la aplicación
-with app.app_context():
-    db.create_all()  # Esto crea las tablas en la base de datos si no existen
+# Esto garantiza que las tablas se creen correctamente al iniciar
+def crear_tablas():
+    with app.app_context():
+        try:
+            db.create_all()  # Esto crea las tablas en la base de datos si no existen
+            print("Base de datos y tablas creadas correctamente.")
+        except Exception as e:
+            print(f"Error al crear las tablas: {e}")
 
-# Obtener la ruta del directorio donde está ubicado el script
-directorio_base = os.path.dirname(os.path.abspath(__file__))
-
-# Definir las rutas absolutas de los archivos
-archivo_territorios = os.path.join(directorio_base, "territorios.json")
-archivo_tabla_periodica = os.path.join(directorio_base, "tabla_periodica.json")
-archivo_ranking = os.path.join(directorio_base, "ranking.txt")
-
-# Mapeo personalizado de valores de letras según la tabla
-valores_letras = {
-    "A": 1, "B": 2, "C": 3, "D": 4, "E": 5, "F": 6, "G": 7, "H": 8, "I": 9,
-    "J": 10, "K": 11, "L": 12, "M": 13, "N": 14, "Ñ": 15, "O": 16, "P": 17, "Q": 18,
-    "R": 19, "S": 20, "T": 21, "U": 22, "V": 23, "W": 24, "X": 25, "Y": 26, "Z": 27
-}
+# Ejecutar la creación de las tablas antes de iniciar la aplicación
+crear_tablas()
 
 # Funciones para cálculos y procesamiento de datos
 def normalizar_palabra_con_espacios(palabra):
@@ -125,14 +123,6 @@ def buscar_palabras_por_potencial(palabras, potencial_objetivo):
         if calcular_potencial(palabra) == potencial_objetivo:
             resultados.append(palabra)
     return resultados
-
-# Base de datos: definición de la clase Palabra
-class Palabra(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    palabra = db.Column(db.String(100), unique=True, nullable=False)
-
-    def __repr__(self):
-        return f'<Palabra {self.palabra}>'
 
 # Función para guardar palabras en la base de datos
 def guardar_palabra(palabra):
