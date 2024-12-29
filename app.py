@@ -9,6 +9,9 @@ app = Flask(__name__)
 #app.secret_key = 'tu_clave_secreta'  # Clave para manejar sesiones
 app.secret_key = os.getenv('SECRET_KEY', 'clave-secreta-por-defecto')
 
+# Configurar cookies para trabajar en iframes
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Permitir compartir cookies en iframes
+app.config['SESSION_COOKIE_SECURE'] = True      # HTTPS obligatorio en producción
 
 # Obtener la ruta del directorio donde está ubicado el script
 directorio_base = os.path.dirname(os.path.abspath(__file__))
@@ -145,6 +148,7 @@ def guardar_en_ranking(archivo, palabra):
 # Rutas para la aplicación Flask
 @app.route('/')
 def menu_principal():
+    print("Historial desde /:", session.get('historial', []))  # Log para verificar el historial
     historial = session.get('historial', ["Realidad", "Elemental", "Frecuencia"])
     return render_template('menu.html', historial=historial)
 
@@ -225,8 +229,9 @@ def resultado_opcion1():
 
 @app.route('/embed_page')
 def embed_page():
-    timestamp = int(time.time())  # Genera un timestamp actual
-    return render_template('embed.html', timestamp=timestamp)
+    print("Historial desde /embed_page:", session.get('historial', []))  # Log para verificar el historial
+    historial = session.get('historial', ["Realidad", "Elemental", "Frecuencia"])
+    return render_template('embed.html', historial=historial)
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=8080)
