@@ -289,11 +289,11 @@ def resultado_opcion2():
     palabras = cargar_palabras()
     palabras_encontradas = buscar_palabras_por_potencial(palabras, potencial)
     palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))
+    palabras_encontradas = [p for p in palabras_encontradas if p.lower() != palabra.lower()]  # Excluir la palabra buscada
     palabras_encontradas = [p for p in palabras_encontradas if p != palabra]  # Excluir la palabra buscada  # Eliminar duplicados normalizando
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     guardar_palabra(palabra)
-
 
     if 'historial' not in session:
         session['historial'] = []
