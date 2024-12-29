@@ -9,6 +9,9 @@ from flask_cors import CORS  # Asegúrate de importar CORS
 # Obtener la ruta del directorio donde está ubicado el script
 directorio_base = os.path.dirname(os.path.abspath(__file__))
 
+# Configuración de la clave secreta para sesiones
+app.secret_key = os.getenv('SECRET_KEY', 'clave-secreta-por-defecto')
+
 # Definir las rutas absolutas de los archivos
 archivo_territorios = os.path.join(directorio_base, "territorios.json")  # Añadido correctamente
 archivo_tabla_periodica = os.path.join(directorio_base, "tabla_periodica.json")
