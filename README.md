@@ -43,7 +43,7 @@ LGC-App es una aplicación web interactiva desarrollada con Flask que permite re
    FLASK_APP=app.py
    FLASK_ENV=development
    SECRET_KEY=tu_clave_secreta
-   REDIS_HOST=redis://localhost:6379
+   SECRET_KEY=tu_clave_secreta
    ```
 
 5. **Inicia la aplicación:**
