@@ -1,0 +1,21 @@
+<!-- agregar_palabra.html -->
+{% extends "base.html" %}
+
+{% block title %}Agregar Palabra{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2>Agregar una nueva palabra</h2>
+        <form method="POST">
+            <div class="form-group">
+                <label for="palabra">Palabra</label>
+                <input type="text" id="palabra" name="palabra" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar</button>
+        </form>
+        {% if mensaje %}
+            <div class="alert alert-info mt-3">{{ mensaje }}</div>
+        {% endif %}
+    </div>
+{% endblock %}
+
