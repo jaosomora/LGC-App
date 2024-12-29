@@ -245,7 +245,7 @@ def menu_principal():
     Muestra el menú principal con opciones disponibles.
     """
     print("Historial desde /:", session.get('historial', []))  # Log para verificar el historial
-    historial = session.get('historial', ["Realidad", "Elemental", "Frecuencia"])
+    historial = session.get('historial', [])
     return render_template('menu.html', historial=historial)
 
 @app.route('/opcion1')
@@ -345,7 +345,7 @@ def embed_page():
     Carga una página embebida con el historial del usuario.
     """
     print("Historial desde /embed_page:", session.get('historial', []))  # Log para verificar el historial
-    historial = session.get('historial', ["Realidad", "Elemental", "Frecuencia"])
+    historial = session.get('historial', [])
     return render_template('embed.html', historial=historial)
 
 if __name__ == '__main__':
