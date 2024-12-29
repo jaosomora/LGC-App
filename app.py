@@ -5,7 +5,9 @@ from flask import Flask, request, render_template, session
 
 # Inicializar Flask
 app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta'  # Clave para manejar sesiones
+#app.secret_key = 'tu_clave_secreta'  # Clave para manejar sesiones
+app.secret_key = os.getenv('SECRET_KEY', 'clave-secreta-por-defecto')
+
 
 # Obtener la ruta del directorio donde está ubicado el script
 directorio_base = os.path.dirname(os.path.abspath(__file__))
