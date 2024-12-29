@@ -1,6 +1,3 @@
-Mis disculpas por el malentendido. Aquí tienes el contenido completo del **`README.md`** en **salida estándar** para que puedas copiarlo y pegarlo directamente en tu archivo:
-
-```
 # LGC-App
 
 ## Descripción General
@@ -83,6 +80,14 @@ La aplicación ahora utiliza **SQLite** para almacenar las palabras que se ingre
 
 Este comando creará la base de datos **`palabras.db`** y la tabla **`palabra`** si no existen ya.
 
+### Configuración Automática de Entorno
+
+Ahora la aplicación detecta automáticamente si se ejecuta en Render o en un entorno local:
+- **Render:** Utiliza la ruta `/mnt/data/palabras.db` para la base de datos.
+- **Local:** Utiliza la base de datos en el directorio actual (`palabras.db`).
+
+Este cambio elimina la necesidad de modificar manualmente la configuración para diferentes ambientes.
+
 ## Despliegue en Render
 
 1. **Sube el proyecto a GitHub:**
@@ -91,9 +96,9 @@ Este comando creará la base de datos **`palabras.db`** y la tabla **`palabra`**
 2. **Configura el servicio en Render:**
    - Ve a [Render](https://render.com) y crea un nuevo servicio web.
    - Selecciona tu repositorio y configura los siguientes valores:
-     - **Branch**: `main` (o la rama correspondiente).
-     - **Build Command**: `pip install -r requirements.txt`.
-     - **Start Command**: `gunicorn app:app`.
+     - **Branch:** `main` (o la rama correspondiente).
+     - **Build Command:** `pip install -r requirements.txt`.
+     - **Start Command:** `gunicorn app:app`.
 
 3. **Configura Redis en Render:**
    - Ve a la sección **Add a New Database** en Render y selecciona Redis.
@@ -151,6 +156,7 @@ proyecto/
 
 ## Cambios Recientes
 
+- **Nueva lógica de configuración automática:** La aplicación detecta el entorno (Render o local) y ajusta la ruta de la base de datos automáticamente.
 - **Nueva ruta `/embed_page`:** Permite renderizar un iframe con timestamp dinámico para evitar problemas de caché.
 - **Sesiones persistentes con Redis:** Configuración añadida para manejar sesiones robustas en producción.
 - **Incrustación optimizada:** Ejemplo implementado para Systeme.io.
