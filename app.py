@@ -9,9 +9,6 @@ from flask_cors import CORS  # Asegúrate de importar CORS
 # Obtener la ruta del directorio donde está ubicado el script
 directorio_base = os.path.dirname(os.path.abspath(__file__))
 
-# Configuración de la clave secreta para sesiones
-app.secret_key = os.getenv('SECRET_KEY', 'clave-secreta-por-defecto')
-
 # Definir las rutas absolutas de los archivos
 archivo_territorios = os.path.join(directorio_base, "territorios.json")  # Añadido correctamente
 archivo_tabla_periodica = os.path.join(directorio_base, "tabla_periodica.json")
@@ -33,6 +30,13 @@ CORS(app, origins=["https://www.julianosoriom.com"])
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Permitir compartir cookies en iframes
 app.config['SESSION_COOKIE_SECURE'] = True      # HTTPS obligatorio en producción
 
+# Configuración de la clave secreta para sesiones
+app.secret_key = os.getenv('SECRET_KEY', 'clave-secreta-por-defecto')
+
+# Crear las tablas automáticamente al iniciar la aplicación
+with app.app_context():
+    db.create_all()  # Esto crea las tablas en la base de datos si no existen
+
 # Definición de la clase Palabra (ubicada antes de la función que la usa)
 class Palabra(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,9 +45,6 @@ class Palabra(db.Model):
     def __repr__(self):
         return f'<Palabra {self.palabra}>'
 
-# Crear las tablas automáticamente al iniciar la aplicación
-with app.app_context():
-    db.create_all()  # Esto crea las tablas en la base de datos si no existen
 
 # Mapeo personalizado de valores de letras según la tabla
 valores_letras = {
