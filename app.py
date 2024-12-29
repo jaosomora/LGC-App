@@ -332,7 +332,7 @@ def resultado_opcion1():
     session['historial'].append(f"Frecuencia: {frecuencia} -> Lupa: {lupa}")
     session.modified = True
 
-    return render_template('resultado.html', frecuencia=frecuencia, lupa=lupa, territorios=territorios_encontrados, palabras=palabras_encontradas, elementos=elementos)
+    return render_template('resultado.html', palabra=str(frecuencia), frecuencia=frecuencia, lupa=lupa, territorios=territorios_encontrados, palabras=palabras_encontradas, elementos=elementos)
 
 @app.route('/embed_page')
 def embed_page():
