@@ -6,9 +6,6 @@ from flask import Flask, request, render_template, session
 
 from flask_cors import CORS  # Asegúrate de importar CORS
 
-# Inicializar Flask
-app = Flask(__name__)
-
 # Configurar CORS para permitir el acceso desde julianosoriom.com
 CORS(app, origins=["https://www.julianosoriom.com"])
 
