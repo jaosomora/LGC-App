@@ -9,8 +9,8 @@ from flask_cors import CORS  # Asegúrate de importar CORS
 # Inicializar Flask
 app = Flask(__name__)
 
-# Configuración de la base de datos con ruta absoluta
-db_path = os.path.join(os.getcwd(), 'palabras.db')
+# Usar almacenamiento persistente en Render para la base de datos
+db_path = os.path.join('/mnt/data', 'palabras.db')  # Ruta persistente en Render
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Evitar advertencias innecesarias
 db = SQLAlchemy(app)
