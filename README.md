@@ -1,3 +1,6 @@
+Mis disculpas por el malentendido. Aquí tienes el contenido completo del **`README.md`** en **salida estándar** para que puedas copiarlo y pegarlo directamente en tu archivo:
+
+```
 # LGC-App
 
 ## Descripción General
@@ -54,6 +57,32 @@ LGC-App es una aplicación web interactiva desarrollada con **Flask** que permit
 6. **Accede a la interfaz web:**
    Abre tu navegador y visita [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
+## Base de Datos: **SQLite**
+
+### Descripción de la base de datos:
+La aplicación ahora utiliza **SQLite** para almacenar las palabras que se ingresan a través de las diferentes opciones. En lugar de usar un archivo **`palabras.txt`**, los datos se guardan en una base de datos llamada **`palabras.db`**.
+
+- **Tabla `palabra`**: Almacena las palabras ingresadas en la aplicación, asegurando que no se repitan.
+
+### Crear la base de datos:
+
+1. Abre una terminal y navega al directorio del proyecto.
+2. Inicia una sesión de Python con el siguiente comando:
+
+   ```bash
+   python
+   ```
+
+3. Ejecuta los siguientes comandos para crear las tablas de la base de datos:
+
+   ```python
+   from app import app, db
+   with app.app_context():
+       db.create_all()  # Crear las tablas en la base de datos
+   ```
+
+Este comando creará la base de datos **`palabras.db`** y la tabla **`palabra`** si no existen ya.
+
 ## Despliegue en Render
 
 1. **Sube el proyecto a GitHub:**
@@ -105,7 +134,7 @@ proyecto/
 ├── app.py                 # Archivo principal de la aplicación Flask
 ├── requirements.txt       # Dependencias del proyecto
 ├── ranking.txt            # Datos de términos y puntuaciones
-├── palabras.txt           # Archivo de palabras y frases clave
+├── palabras.db            # Base de datos SQLite con las palabras
 ├── tabla_periodica.json   # Datos JSON de la tabla periódica
 ├── territorios.json       # Datos JSON de territorios y códigos
 ├── static/                # Archivos estáticos
