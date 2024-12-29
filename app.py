@@ -1,6 +1,7 @@
 import unicodedata
 import os
 import json
+import time
 from flask import Flask, request, render_template, session
 
 # Inicializar Flask
@@ -222,5 +223,11 @@ def resultado_opcion1():
 
     return render_template('resultado.html', frecuencia=frecuencia, lupa=lupa, territorios=territorios_encontrados, palabras=palabras_encontradas, elementos=elementos)
 
+@app.route('/embed_page')
+def embed_page():
+    timestamp = int(time.time())  # Genera un timestamp actual
+    return render_template('embed.html', timestamp=timestamp)
+
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=8080)
+
