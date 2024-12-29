@@ -30,6 +30,14 @@ CORS(app, origins=["https://www.julianosoriom.com"])
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Permitir compartir cookies en iframes
 app.config['SESSION_COOKIE_SECURE'] = True      # HTTPS obligatorio en producción
 
+# Definición de la clase Palabra (ubicada antes de la función que la usa)
+class Palabra(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    palabra = db.Column(db.String(100), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Palabra {self.palabra}>'
+
 # Crear las tablas automáticamente al iniciar la aplicación
 with app.app_context():
     db.create_all()  # Esto crea las tablas en la base de datos si no existen
