@@ -2,21 +2,23 @@
 
 ## Descripción General
 
-Este proyecto es una aplicación web desarrollada con Flask que permite analizar datos semánticos, gestionar territorios internacionales, y explorar información química básica de la tabla periódica. Su diseño modular y su enfoque en datos JSON lo hacen ideal para aplicaciones educativas, analíticas o interactivas.
+LGC-App es una aplicación web interactiva desarrollada con Flask que permite realizar análisis semánticos avanzados, gestionar información territorial y explorar datos químicos de la tabla periódica. La aplicación está diseñada para ser altamente modular y fácil de integrar, ofreciendo una experiencia de usuario fluida y profesional.
 
 ## Características
 
-- **Análisis semántico**: Procesa palabras y frases clave para su evaluación.
-- **Gestión de territorios**: Proporciona información detallada sobre países y códigos internacionales.
-- **Exploración química**: Consulta datos básicos sobre elementos de la tabla periódica.
-- **Interfaz web interactiva**: Diseñada con Flask para una experiencia de usuario accesible.
+- **Análisis semántico avanzado**: Calcula el "potencial" de palabras y frases basándose en frecuencias lógicas.
+- **Gestión de territorios**: Proporciona información detallada sobre códigos de país y territorios asociados.
+- **Exploración química**: Consulta datos clave sobre elementos químicos de la tabla periódica.
+- **Interfaz profesional**: Optimizada para una experiencia de usuario limpia y eficiente, eliminando elementos visuales innecesarios como el Hero y barras redundantes.
+- **Compatibilidad para despliegue**: Diseñada para integrarse fácilmente con servicios como Render y otras plataformas de hosting.
 
 ## Requisitos Previos
 
 - **Python 3.8 o superior**
 - Administrador de paquetes `pip`
+- Cuenta en [Render](https://render.com) para despliegue (opcional)
 
-## Instalación
+## Instalación Local
 
 1. **Clona el repositorio:**
    ```bash
@@ -36,26 +38,41 @@ Este proyecto es una aplicación web desarrollada con Flask que permite analizar
    ```
 
 4. **Configura las variables de entorno:**
-   Asegúrate de establecer la clave secreta para Flask en un archivo `.env` o directamente en el entorno:
-   ```bash
-   export FLASK_APP=app.py
-   export FLASK_ENV=development
+   Crea un archivo `.env` en el directorio raíz con el siguiente contenido:
+   ```env
+   FLASK_APP=app.py
+   FLASK_ENV=development
+   SECRET_KEY=tu_clave_secreta
    ```
 
-## Uso
-
-1. **Inicia la aplicación:**
+5. **Inicia la aplicación:**
    ```bash
    flask run
    ```
 
-2. **Accede a la interfaz web:**
-   Abre tu navegador y ve a [http://127.0.0.1:5000](http://127.0.0.1:5000).
+6. **Accede a la interfaz web:**
+   Abre tu navegador y visita [http://127.0.0.1:5000](http://127.0.0.1:5000).
 
-3. **Explora las funcionalidades:**
-   - **Análisis de palabras:** Carga archivos personalizados para procesar términos.
-   - **Información territorial:** Consulta códigos de país y sus nombres asociados.
-   - **Tabla periódica:** Accede a datos detallados sobre elementos químicos.
+## Despliegue en Render
+
+1. **Sube el proyecto a GitHub:**
+   Asegúrate de tener el proyecto actualizado en un repositorio público o privado en GitHub.
+
+2. **Configura el servicio en Render:**
+   - Ve a [Render](https://render.com) y crea un nuevo servicio web.
+   - Selecciona tu repositorio y configura los siguientes valores:
+     - **Branch**: `main` (o la rama correspondiente).
+     - **Build Command**: `pip install -r requirements.txt`.
+     - **Start Command**: `gunicorn app:app`.
+
+3. **Despliegue automático:**
+   Render generará una URL pública para tu aplicación (por ejemplo: `https://lgc-app.onrender.com`).
+
+4. **Incrustación en Systeme.io:**
+   Utiliza un iframe en tu página de Systeme.io para mostrar la aplicación:
+   ```html
+   <iframe src="https://lgc-app.onrender.com" width="100%" height="800px" frameborder="0"></iframe>
+   ```
 
 ## Estructura del Proyecto
 
@@ -70,7 +87,7 @@ proyecto/
 ├── static/                # Archivos estáticos
 │   └── styles.css         # Hojas de estilo
 ├── templates/             # Plantillas HTML
-│   ├── base.html          # Plantilla base
+│   ├── base.html          # Plantilla base (modificada: Hero y barras eliminadas)
 │   ├── menu.html          # Menú principal
 │   ├── opcion1.html       # Opción 1
 │   ├── opcion2.html       # Opción 2
@@ -78,9 +95,30 @@ proyecto/
 │   └── test.html          # Página de prueba
 ```
 
+## Cambios Recientes
+
+- **Eliminación del Hero**: Se eliminó la sección Hero para mejorar la usabilidad y simplificar el diseño.
+- **Actualización de la barra de navegación y footer**: Eliminados para proporcionar un diseño más limpio.
+- **Compatibilidad optimizada con Render**: Instrucciones detalladas añadidas para facilitar el despliegue.
+
 ## Contribuciones
 
-¡Contribuciones son bienvenidas! Por favor, abre un issue o envía un pull request con tus sugerencias.
+¡Las contribuciones son bienvenidas! Si deseas colaborar, sigue estos pasos:
+
+1. Haz un fork del repositorio.
+2. Crea una rama para tu función o corrección:
+   ```bash
+   git checkout -b nombre-de-tu-rama
+   ```
+3. Realiza tus cambios y realiza un commit claro:
+   ```bash
+   git commit -m "Descripción de los cambios realizados"
+   ```
+4. Sube tus cambios a tu fork:
+   ```bash
+   git push origin nombre-de-tu-rama
+   ```
+5. Abre un Pull Request en el repositorio principal.
 
 ## Licencia
 
