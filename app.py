@@ -45,6 +45,55 @@ class Palabra(db.Model):
     def __repr__(self):
         return f'<Palabra {self.palabra}>'
 
+# Validar que una palabra sea alfabética
+def es_palabra_valida(palabra):
+    return palabra.isalpha()
+
+# Modificar guardar_palabra para evitar duplicados y validar palabras
+def guardar_palabra(palabra):
+    try:
+        # Validar que sea una palabra válida
+        if not es_palabra_valida(palabra):
+            print(f"La palabra '{palabra}' no es válida.")
+            return
+
+        palabra_normalizada = normalizar_palabra_con_espacios(palabra)
+        existing_word = Palabra.query.filter_by(palabra=palabra_normalizada).first()
+        if not existing_word:
+            new_palabra = Palabra(palabra=palabra_normalizada)
+            db.session.add(new_palabra)
+            db.session.commit()
+            print(f"La palabra '{palabra}' ha sido guardada correctamente.")
+        else:
+            print(f"La palabra '{palabra}' ya existe en la base de datos.")
+    except Exception as e:
+        print(f"Error al guardar la palabra '{palabra}': {e}")
+
+# Limpieza de la base de datos para eliminar duplicados o palabras irrelevantes
+def limpiar_base_datos():
+    try:
+        palabras = Palabra.query.all()
+        palabras_validas = set()
+
+        for palabra in palabras:
+            if es_palabra_valida(palabra.palabra):
+                if palabra.palabra not in palabras_validas:
+                    palabras_validas.add(palabra.palabra)
+                else:
+                    db.session.delete(palabra)
+            else:
+                db.session.delete(palabra)
+
+        db.session.commit()
+        print("Base de datos limpiada exitosamente.")
+    except Exception as e:
+        print(f"Error al limpiar la base de datos: {e}")
+
+# Crear rutas para limpiar la base de datos (opcional y protegida)
+@app.route('/limpiar_base', methods=['POST'])
+def limpiar_base_route():
+    limpiar_base_datos()
+    return "Base de datos limpiada exitosamente.", 200
 
 # Mapeo personalizado de valores de letras según la tabla
 valores_letras = {
@@ -134,18 +183,6 @@ def buscar_palabras_por_potencial(palabras, potencial_objetivo):
         if calcular_potencial(palabra) == potencial_objetivo:
             resultados.append(palabra)
     return resultados
-
-# Función para guardar palabras en la base de datos
-def guardar_palabra(palabra):
-    try:
-        palabra_normalizada = normalizar_palabra_con_espacios(palabra)
-        existing_word = Palabra.query.filter_by(palabra=palabra_normalizada).first()
-        if not existing_word:
-            new_palabra = Palabra(palabra=palabra_normalizada)
-            db.session.add(new_palabra)
-            db.session.commit()
-    except Exception as e:
-        print(f"Error al guardar la palabra '{palabra}': {e}")
 
 # Función para cargar las palabras desde la base de datos
 def cargar_palabras():
