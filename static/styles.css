@@ -133,6 +133,11 @@ footer {
     color: #333;
 }
 
+/* Estilo global para títulos en negrita */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
 /* Estilo para el scrollbar */
 .history-container {
     max-height: 300px;
