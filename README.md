@@ -43,6 +43,7 @@ LGC-App es una aplicación web interactiva desarrollada con Flask que permite re
    FLASK_APP=app.py
    FLASK_ENV=development
    SECRET_KEY=tu_clave_secreta
+   REDIS_HOST=redis://localhost:6379
    ```
 
 5. **Inicia la aplicación:**
@@ -65,14 +66,37 @@ LGC-App es una aplicación web interactiva desarrollada con Flask que permite re
      - **Build Command**: `pip install -r requirements.txt`.
      - **Start Command**: `gunicorn app:app`.
 
-3. **Despliegue automático:**
+3. **Configura Redis en Render:**
+   - Ve a la sección **Add a New Database** en Render y selecciona Redis.
+   - Toma nota de la URL proporcionada y configúrala como variable de entorno:
+     ```env
+     REDIS_HOST=<URL de tu Redis en Render>
+     ```
+
+4. **Despliegue automático:**
    Render generará una URL pública para tu aplicación (por ejemplo: `https://lgc-app.onrender.com`).
 
-4. **Incrustación en Systeme.io:**
-   Utiliza un iframe en tu página de Systeme.io para mostrar la aplicación:
-   ```html
-   <iframe src="https://lgc-app.onrender.com" width="100%" height="800px" frameborder="0"></iframe>
-   ```
+## Incrustación en Systeme.io
+
+Para incrustar tu aplicación en Systeme.io con un timestamp dinámico:
+
+```html
+<div style="width: 100%; height: 100vh; overflow: hidden;">
+    <iframe 
+        id="dynamicIframe"
+        style="width: 100%; height: 100%; border: none;" 
+        allowfullscreen>
+    </iframe>
+</div>
+
+<script>
+    // Genera un timestamp dinámico
+    const timestamp = new Date().getTime();
+    // Construye la URL con el parámetro nocache
+    const iframe = document.getElementById('dynamicIframe');
+    iframe.src = `https://lgc-app.onrender.com/?nocache=${timestamp}`;
+</script>
+```
 
 ## Estructura del Proyecto
 
@@ -92,14 +116,15 @@ proyecto/
 │   ├── opcion1.html       # Opción 1
 │   ├── opcion2.html       # Opción 2
 │   ├── resultado.html     # Resultados
+│   ├── embed.html         # Página para incrustación con timestamp dinámico
 │   └── test.html          # Página de prueba
 ```
 
 ## Cambios Recientes
 
-- **Eliminación del Hero**: Se eliminó la sección Hero para mejorar la usabilidad y simplificar el diseño.
-- **Actualización de la barra de navegación y footer**: Eliminados para proporcionar un diseño más limpio.
-- **Compatibilidad optimizada con Render**: Instrucciones detalladas añadidas para facilitar el despliegue.
+- **Nueva ruta `/embed_page`:** Permite renderizar un iframe con timestamp dinámico para evitar problemas de caché.
+- **Sesiones persistentes con Redis:** Configuración añadida para manejar sesiones robustas en producción.
+- **Incrustación optimizada:** Ejemplo implementado para Systeme.io.
 
 ## Contribuciones
 
