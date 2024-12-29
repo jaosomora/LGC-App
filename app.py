@@ -142,7 +142,7 @@ def guardar_en_ranking(archivo, palabra):
 # Rutas para la aplicación Flask
 @app.route('/')
 def menu_principal():
-    historial = session.get('historial', [])
+    historial = session.get('historial', ["Realidad", "Elemental", "Frecuencia"])
     return render_template('menu.html', historial=historial)
 
 @app.route('/opcion1')
@@ -220,34 +220,5 @@ def resultado_opcion1():
 
     return render_template('resultado.html', frecuencia=frecuencia, lupa=lupa, territorios=territorios_encontrados, palabras=palabras_encontradas, elementos=elementos)
 
-#if __name__ == '__main__':
- #   app.run(debug=True)
-
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=8080)
-
-@app.route('/')
-def historial():
-    # Ejemplo de historial de búsquedas
-    historial = ["Realidad", "Elemental", "Frecuencia"]
-    return render_template('historial.html', historial=historial)
-
-@app.route('/detalle/<busqueda>')
-def detalle(busqueda):
-    # Ruta del archivo JSON
-    archivo_json = os.path.join(directorio_base, "detalles_busquedas.json")
-    
-    # Cargar datos del archivo JSON
-    with open(archivo_json, "r") as file:
-        data = json.load(file)
-
-    # Buscar detalles de la búsqueda
-    detalle = data.get(busqueda, {
-        "búsqueda": busqueda,
-        "potencial": "No encontrado",
-        "lupa": "No encontrado"
-    })
-
-    # Renderizar plantilla detalle.html
-    return render_template('detalle.html', detalle=detalle)
-
