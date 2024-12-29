@@ -310,6 +310,9 @@ def resultado_opcion1():
     frecuencia = int(request.form.get('frecuencia'))
     lupa = calcular_lupa(frecuencia)
 
+    # Detalles para la frecuencia ingresada
+    detalle = [frecuencia]  # Frecuencia por letra sería el número en sí mismo para esta opción
+
     # Cargar datos geográficos
     territorios = cargar_codigos_territorios(archivo_territorios)
     territorios_encontrados = buscar_codigo_territorio(territorios, frecuencia)
@@ -324,7 +327,7 @@ def resultado_opcion1():
 
     # Asegurar que las palabras estén normalizadas y eliminar duplicados
     palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))
-    palabras_encontradas = [p for p in palabras_encontradas if calcular_potencial(p) == frecuencia]  # Confirmar potencial exacto
+    palabras_encontradas = [p for p in palabras_encontradas if calcular_potencial(p) == frecuencia]
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     if 'historial' not in session:
@@ -332,7 +335,9 @@ def resultado_opcion1():
     session['historial'].append(f"Frecuencia: {frecuencia} -> Lupa: {lupa}")
     session.modified = True
 
-    return render_template('resultado.html', palabra=str(frecuencia), frecuencia=frecuencia, lupa=lupa, territorios=territorios_encontrados, palabras=palabras_encontradas, elementos=elementos)
+    return render_template('resultado.html', palabra=str(frecuencia), frecuencia=frecuencia, lupa=lupa,
+                           detalle=detalle, territorios=territorios_encontrados,
+                           palabras=palabras_encontradas, elementos=elementos)
 
 @app.route('/embed_page')
 def embed_page():
