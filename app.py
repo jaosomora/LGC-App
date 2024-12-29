@@ -18,13 +18,13 @@ db = SQLAlchemy(app)
 # Configurar CORS para permitir el acceso desde julianosoriom.com
 CORS(app, origins=["https://www.julianosoriom.com"])
 
-#app.secret_key = 'tu_clave_secreta'  # Clave para manejar sesiones
-app.secret_key = os.getenv('SECRET_KEY', 'clave-secreta-por-defecto')
-
-
 # Configurar cookies para trabajar en iframes
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'  # Permitir compartir cookies en iframes
 app.config['SESSION_COOKIE_SECURE'] = True      # HTTPS obligatorio en producción
+
+# Crear las tablas automáticamente al iniciar la aplicación
+with app.app_context():
+    db.create_all()  # Esto crea las tablas si no existen
 
 # Obtener la ruta del directorio donde está ubicado el script
 directorio_base = os.path.dirname(os.path.abspath(__file__))
