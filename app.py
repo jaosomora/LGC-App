@@ -171,18 +171,6 @@ def mostrar_ranking():
     ranking = cargar_ranking(archivo_ranking)
     return render_template('ranking.html', ranking=ranking)
 
-@app.route('/agregar_palabra', methods=['GET', 'POST'])
-def agregar_palabra():
-    if request.method == 'POST':
-        nueva_palabra = request.form.get('palabra', '').strip()
-        if nueva_palabra:
-            guardar_palabra(archivo_palabras, nueva_palabra)
-            mensaje = f"Palabra '{nueva_palabra}' guardada con éxito."
-        else:
-            mensaje = "No se pudo guardar una palabra vacía."
-        return render_template('agregar_palabra.html', mensaje=mensaje)
-    return render_template('agregar_palabra.html')
-
 @app.route('/resultado_opcion2', methods=['POST'])
 def resultado_opcion2():
     palabra = request.form.get('palabra')
@@ -241,14 +229,3 @@ def embed_page():
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=8080)
-
-# Función para guardar la palabra en el archivo palabras.txt
-def guardar_palabra(archivo, palabra):
-    try:
-        palabra_normalizada = normalizar_palabra_con_espacios(palabra)
-        palabras_existentes = cargar_palabras(archivo)
-        if palabra_normalizada not in palabras_existentes:
-            with open(archivo, "a", encoding="utf-8") as f:
-                f.write(palabra + "\n")
-    except Exception as e:
-        print(f"Error al guardar la palabra '{palabra}': {e}")
