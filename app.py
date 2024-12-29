@@ -20,8 +20,12 @@ archivo_ranking = os.path.join(directorio_base, "ranking.txt")  # Archivo con pa
 app = Flask(__name__)
 
 # Configuración de la base de datos SQLite
-# Usar almacenamiento persistente en Render para la base de datos
-db_path = os.path.join('/mnt/data', 'palabras.db')  # Ruta persistente en Render
+# Detectar el ambiente: Render o Local
+if os.getenv("RENDER"):
+    db_path = os.path.join('/mnt/data', 'palabras.db')  # Ruta persistente en Render
+else:
+    db_path = os.path.join(directorio_base, 'palabras.db')  # Ruta en local
+
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Evitar advertencias innecesarias
 db = SQLAlchemy(app)
