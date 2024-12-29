@@ -2,10 +2,11 @@
 
 ## Descripción General
 
-LGC-App es una aplicación web interactiva desarrollada con Flask que permite realizar análisis semánticos avanzados, gestionar información territorial y explorar datos químicos de la tabla periódica. La aplicación está diseñada para ser altamente modular y fácil de integrar, ofreciendo una experiencia de usuario fluida y profesional.
+LGC-App es una aplicación web interactiva desarrollada con **Flask** que permite realizar análisis semánticos avanzados, gestionar información territorial y explorar datos químicos de la tabla periódica. La aplicación está diseñada para ser altamente modular y fácil de integrar, ofreciendo una experiencia de usuario fluida y profesional.
 
-## Características
+**LGC-App** está orientada a ofrecer análisis lógicos y semánticos de palabras, así como información clave sobre territorios y elementos químicos.
 
+### Características principales:
 - **Análisis semántico avanzado**: Calcula el "potencial" de palabras y frases basándose en frecuencias lógicas.
 - **Gestión de territorios**: Proporciona información detallada sobre códigos de país y territorios asociados.
 - **Exploración química**: Consulta datos clave sobre elementos químicos de la tabla periódica.
@@ -42,7 +43,6 @@ LGC-App es una aplicación web interactiva desarrollada con Flask que permite re
    ```env
    FLASK_APP=app.py
    FLASK_ENV=development
-   SECRET_KEY=tu_clave_secreta
    SECRET_KEY=tu_clave_secreta
    ```
 
@@ -126,7 +126,7 @@ proyecto/
 - **Sesiones persistentes con Redis:** Configuración añadida para manejar sesiones robustas en producción.
 - **Incrustación optimizada:** Ejemplo implementado para Systeme.io.
 
-## Contribuciones
+## Guía de Contribución
 
 ¡Las contribuciones son bienvenidas! Si deseas colaborar, sigue estos pasos:
 
@@ -145,10 +145,16 @@ proyecto/
    ```
 5. Abre un Pull Request en el repositorio principal.
 
+### Buenas Prácticas para Contribuir
+
+- Usa **Issues** para reportar problemas o proponer nuevas características.
+- Asegúrate de seguir las convenciones de codificación de Python (PEP 8) y de añadir comentarios en el código donde sea necesario.
+- Realiza pruebas antes de enviar tus Pull Requests. Si hay pruebas automatizadas, asegúrate de que todas pasen.
+
 ## Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
 
 ## Soporte
 
-Si tienes dudas o problemas, no dudes en abrir un issue en el repositorio o contactarme directamente en [info@julianosoriom.com](mailto:info@julianosoriom.com).
+Si tienes dudas o problemas, no dudes en abrir un **issue** en el repositorio o contactarme directamente en [info@julianosoriom.com](mailto:info@julianosoriom.com).
