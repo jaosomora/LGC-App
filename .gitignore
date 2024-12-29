@@ -19,3 +19,8 @@ potencial.py.DS_Store
 env/
 .DS_Store
 potencial.py
+
+
+*.db
+*.txt
+

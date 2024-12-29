@@ -2,11 +2,18 @@ import unicodedata
 import os
 import json
 import time
+from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, render_template, session
 from flask_cors import CORS  # Asegúrate de importar CORS
 
 # Inicializar Flask
 app = Flask(__name__)
+
+# Configuración de la base de datos con ruta absoluta
+db_path = os.path.join(os.getcwd(), 'palabras.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Evitar advertencias innecesarias
+db = SQLAlchemy(app)
 
 # Configurar CORS para permitir el acceso desde julianosoriom.com
 CORS(app, origins=["https://www.julianosoriom.com"])
@@ -24,7 +31,6 @@ directorio_base = os.path.dirname(os.path.abspath(__file__))
 
 # Definir las rutas absolutas de los archivos
 archivo_territorios = os.path.join(directorio_base, "territorios.json")
-archivo_palabras = os.path.join(directorio_base, "palabras.txt")
 archivo_tabla_periodica = os.path.join(directorio_base, "tabla_periodica.json")
 archivo_ranking = os.path.join(directorio_base, "ranking.txt")
 
@@ -97,13 +103,6 @@ def buscar_elementos_por_potencial(tabla_periodica, potencial_objetivo, lupa_obj
             resultados.append(f"<strong>Elemento:</strong> {nombre} ({simbolo}) - <strong>Coincidencia:</strong> Número atómico ({numero_atomico})")
     return resultados
 
-def cargar_palabras(archivo):
-    try:
-        with open(archivo, "r", encoding="utf-8") as f:
-            return [line.strip() for line in f.readlines()]
-    except FileNotFoundError:
-        return []
-
 def cargar_ranking(archivo):
     try:
         with open(archivo, "r", encoding="utf-8") as f:
@@ -124,32 +123,30 @@ def buscar_palabras_por_potencial(palabras, potencial_objetivo):
             resultados.append(palabra)
     return resultados
 
-def guardar_palabra(archivo, palabra):
+# Base de datos: definición de la clase Palabra
+class Palabra(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    palabra = db.Column(db.String(100), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f'<Palabra {self.palabra}>'
+
+# Función para guardar palabras en la base de datos
+def guardar_palabra(palabra):
     try:
         palabra_normalizada = normalizar_palabra_con_espacios(palabra)
-        palabras_existentes = cargar_palabras(archivo)
-        if palabra_normalizada not in [normalizar_palabra_con_espacios(p) for p in palabras_existentes]:
-            with open(archivo, "a", encoding="utf-8") as f:
-                f.write(palabra + "\n")
-            guardar_en_ranking(archivo_ranking, palabra)
+        existing_word = Palabra.query.filter_by(palabra=palabra_normalizada).first()
+        if not existing_word:
+            new_palabra = Palabra(palabra=palabra_normalizada)
+            db.session.add(new_palabra)
+            db.session.commit()
     except Exception as e:
         print(f"Error al guardar la palabra '{palabra}': {e}")
 
-def guardar_en_ranking(archivo, palabra):
-    try:
-        palabra_normalizada = normalizar_palabra_con_espacios(palabra)
-        ranking = cargar_ranking(archivo)
-        palabras = {k: v for k, v in ranking}
-        if palabra_normalizada in palabras:
-            palabras[palabra_normalizada] += 1
-        else:
-            palabras[palabra_normalizada] = 1
-        palabras_ordenadas = sorted(palabras.items(), key=lambda x: x[1], reverse=True)
-        with open(archivo, "w", encoding="utf-8") as f:
-            for p, puntuacion in palabras_ordenadas:
-                f.write(f"{p}:{puntuacion}\n")
-    except Exception as e:
-        print(f"Error al guardar en ranking: {e}")
+# Función para cargar las palabras desde la base de datos
+def cargar_palabras():
+    palabras = Palabra.query.all()
+    return [p.palabra for p in palabras]
 
 # Rutas para la aplicación Flask
 @app.route('/')
@@ -184,12 +181,12 @@ def resultado_opcion2():
     tabla_periodica = cargar_tabla_periodica(archivo_tabla_periodica)
     elementos = buscar_elementos_por_potencial(tabla_periodica, potencial, lupa)
 
-    palabras = cargar_palabras(archivo_palabras)
+    palabras = cargar_palabras()
     palabras_encontradas = buscar_palabras_por_potencial(palabras, potencial)
     palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))  # Eliminar duplicados normalizando
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
-    guardar_palabra(archivo_palabras, palabra)
+    guardar_palabra(palabra)
 
     if 'historial' not in session:
         session['historial'] = []
@@ -209,7 +206,7 @@ def resultado_opcion1():
     tabla_periodica = cargar_tabla_periodica(archivo_tabla_periodica)
     elementos = buscar_elementos_por_potencial(tabla_periodica, frecuencia, lupa)
 
-    palabras = cargar_palabras(archivo_palabras)
+    palabras = cargar_palabras()
     palabras_encontradas = buscar_palabras_por_potencial(palabras, frecuencia)
     palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))  # Eliminar duplicados normalizando
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
