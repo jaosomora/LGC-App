@@ -310,15 +310,21 @@ def resultado_opcion1():
     frecuencia = int(request.form.get('frecuencia'))
     lupa = calcular_lupa(frecuencia)
 
+    # Cargar datos geográficos
     territorios = cargar_codigos_territorios(archivo_territorios)
     territorios_encontrados = buscar_codigo_territorio(territorios, frecuencia)
 
+    # Cargar elementos de la tabla periódica
     tabla_periodica = cargar_tabla_periodica(archivo_tabla_periodica)
     elementos = buscar_elementos_por_potencial(tabla_periodica, frecuencia, lupa)
 
+    # Cargar palabras desde la base de datos y buscar coincidencias por potencial
     palabras = cargar_palabras()
     palabras_encontradas = buscar_palabras_por_potencial(palabras, frecuencia)
-    palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))  # Eliminar duplicados normalizando
+
+    # Asegurar que las palabras estén normalizadas y eliminar duplicados
+    palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))
+    palabras_encontradas = [p for p in palabras_encontradas if calcular_potencial(p) == frecuencia]  # Confirmar potencial exacto
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     if 'historial' not in session:
