@@ -15,11 +15,7 @@
     <div class="card shadow-sm p-4 my-4">
         <h3 class="text-primary">Resonancias de Palabras Relacionadas</h3>
         {% if palabras %}
-        <ul>
-            {% for palabra in palabras %}
-            <li>{{ palabra }}</li>
-            {% endfor %}
-        </ul>
+        <p><i>{{ palabras | join(', ') }}</i></p>
         {% else %}
         <p>No se encontraron palabras asociadas.</p>
         {% endif %}
