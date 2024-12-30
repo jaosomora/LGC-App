@@ -83,12 +83,18 @@ def guardar_palabra(palabra):
     except Exception as e:
         print(f"Error al guardar la palabra '{palabra}': {e}")
 
+import os
+
 def inicializar_tablas():
     """
     Crea la tabla 'ranking' en la base de datos si no existe.
     """
     try:
-        print(f"Intentando inicializar tablas en la base de datos: {db_path}")
+        if not os.path.exists(db_path):
+            print(f"La base de datos no existe en {db_path}. Creando un nuevo archivo.")
+        else:
+            print(f"Base de datos encontrada en {db_path}.")
+        
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute('''
@@ -305,9 +311,13 @@ def menu_principal():
     ranking_dict = {palabra: puntuacion for palabra, puntuacion in ranking} if ranking else {}
 
     # Ordenar el historial según la puntuación en el ranking (descendente)
-    historial_ordenado = sorted(historial, key=lambda x: ranking_dict.get(x.split(":")[1].strip().split(" ")[0], 0), reverse=True)
+    historial_ordenado = sorted(
+        historial,
+        key=lambda x: ranking_dict.get(x.split(":")[1].strip().split(" ")[0].lower(), 0),  # Normalizar palabras
+        reverse=True
+    )
 
-    return render_template('menu.html', historial=historial_ordenado)
+    return render_template('menu.html', historial=historial_ordenado, ranking=ranking_dict)
 
 @app.route('/opcion1')
 def opcion1():
@@ -424,8 +434,6 @@ def embed_page():
     return render_template('embed.html', historial=historial)
 
 if __name__ == '__main__':
-    """
-    Ejecuta la aplicación Flask en modo de producción.
-    """
+    print("Inicializando tablas...")
     inicializar_tablas()  # Inicializar tablas necesarias
     app.run(debug=False, host='0.0.0.0', port=8080)

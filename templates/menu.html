@@ -19,8 +19,10 @@
             {% for item in historial %}
                 <li class="list-group-item">
                     {{ item }}
-                    {% if ranking and item.split(":")[1].strip().split(" ")[0] in ranking %}
-                    <span class="badge bg-primary ms-2">Puntuación: {{ ranking[item.split(":")[1].strip().split(" ")[0]] }}</span>
+                    {% if ranking and item.split(":")[1].strip().split(" ")[0].lower() in ranking %}
+                    <span class="badge bg-primary ms-2">Puntuación: {{ ranking[item.split(":")[1].strip().split(" ")[0].lower()] }}</span>
+                    {% else %}
+                    <span class="badge bg-secondary ms-2">Sin puntuación</span>
                     {% endif %}
                 </li>
             {% endfor %}
