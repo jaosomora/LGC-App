@@ -83,6 +83,27 @@ def guardar_palabra(palabra):
     except Exception as e:
         print(f"Error al guardar la palabra '{palabra}': {e}")
 
+def inicializar_tablas():
+    """
+    Crea la tabla 'ranking' en la base de datos si no existe.
+    """
+    try:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS ranking (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                palabra TEXT NOT NULL UNIQUE,
+                puntuacion INTEGER NOT NULL
+            )
+        ''')
+        connection.commit()
+        print("Tabla 'ranking' inicializada correctamente.")
+    except sqlite3.Error as e:
+        print(f"Error al inicializar las tablas: {e}")
+    finally:
+        connection.close()
+
 # Limpieza de la base de datos para eliminar duplicados o palabras irrelevantes
 def limpiar_base_datos():
     """
