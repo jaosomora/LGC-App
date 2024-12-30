@@ -154,6 +154,27 @@ def detalle_potencial(palabra):
     valores = [valores_letras[letra] for letra in palabra_normalizada if letra != " "]
     return valores
 
+# Función para calcular la frecuencia por palabra
+def calcular_frecuencia_por_palabra(frase):
+    """
+    Calcula la frecuencia por letra y la suma para cada palabra en una frase.
+    Retorna un diccionario con los resultados por palabra y la suma total.
+    """
+    palabras = frase.upper().split()  # Divide la frase en palabras y convierte a mayúsculas
+    resultado = {}
+    suma_total = 0
+
+    for palabra in palabras:
+        frecuencias = [valores_letras[letra] for letra in palabra if letra.isalpha()]  # Calcula para cada letra
+        suma_palabra = sum(frecuencias)
+        resultado[palabra] = {
+            "frecuencia_por_letra": frecuencias,
+            "suma": suma_palabra,
+        }
+        suma_total += suma_palabra
+
+    return resultado, suma_total
+
 # Funciones para manejo de datos externos
 def cargar_codigos_territorios(archivo):
     """

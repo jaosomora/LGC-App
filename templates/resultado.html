@@ -9,6 +9,18 @@
         <p><strong>Frecuencia total (suma):</strong> {{ potencial }}</p>
     </div>
     <div class="card shadow-sm p-4 my-4">
+        <h3 class="text-primary">Frecuencia por Palabra</h3>
+        {% if frecuencias_por_palabra %}
+        <ul>
+            {% for palabra, data in frecuencias_por_palabra.items() %}
+            <li><strong>{{ palabra }}</strong>: {{ data["frecuencia_por_letra"] }} = {{ data["suma"] }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No se pudo calcular la frecuencia por palabra.</p>
+        {% endif %}
+    </div>
+    <div class="card shadow-sm p-4 my-4">
         <h3 class="text-primary">Lupa: Frecuencia Amplificada</h3>
         <p>{{ lupa }}</p>
     </div>
