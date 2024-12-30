@@ -88,6 +88,7 @@ def inicializar_tablas():
     Crea la tabla 'ranking' en la base de datos si no existe.
     """
     try:
+        print("Intentando inicializar tablas...")
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute('''
