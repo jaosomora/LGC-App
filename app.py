@@ -302,7 +302,7 @@ def menu_principal():
 
     # Cargar el ranking desde la base de datos
     ranking = cargar_ranking_desde_bd()
-    ranking_dict = {palabra: puntuacion for palabra, puntuacion in ranking}
+    ranking_dict = {palabra: puntuacion for palabra, puntuacion in ranking} if ranking else {}
 
     # Ordenar el historial según la puntuación en el ranking (descendente)
     historial_ordenado = sorted(historial, key=lambda x: ranking_dict.get(x.split(":")[1].strip().split(" ")[0], 0), reverse=True)

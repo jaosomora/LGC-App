@@ -19,8 +19,8 @@
             {% for item in historial %}
                 <li class="list-group-item">
                     {{ item }}
-                    {% if ranking[item.split(":")[1].strip().split(" ")[0]] is not none %}
-                        <span class="badge bg-primary ms-2">Puntuación: {{ ranking[item.split(":")[1].strip().split(" ")[0]] }}</span>
+                    {% if ranking and item.split(":")[1].strip().split(" ")[0] in ranking %}
+                    <span class="badge bg-primary ms-2">Puntuación: {{ ranking[item.split(":")[1].strip().split(" ")[0]] }}</span>
                     {% endif %}
                 </li>
             {% endfor %}
