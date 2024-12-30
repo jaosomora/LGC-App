@@ -154,7 +154,6 @@ def detalle_potencial(palabra):
     valores = [valores_letras[letra] for letra in palabra_normalizada if letra != " "]
     return valores
 
-# Función para calcular la frecuencia por palabra
 def calcular_frecuencia_por_palabra(frase):
     """
     Calcula la frecuencia por letra y la suma para cada palabra en una frase.
@@ -165,7 +164,12 @@ def calcular_frecuencia_por_palabra(frase):
     suma_total = 0
 
     for palabra in palabras:
-        frecuencias = [valores_letras[letra] for letra in palabra if letra.isalpha()]  # Calcula para cada letra
+        # Normalizar cada palabra para eliminar acentos
+        palabra_normalizada = ''.join(
+            char for char in unicodedata.normalize('NFD', palabra)
+            if unicodedata.category(char) != 'Mn'
+        )
+        frecuencias = [valores_letras[letra] for letra in palabra_normalizada if letra.isalpha()]  # Calcula para cada letra
         suma_palabra = sum(frecuencias)
         resultado[palabra] = {
             "frecuencia_por_letra": frecuencias,
