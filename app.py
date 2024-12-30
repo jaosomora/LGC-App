@@ -278,6 +278,28 @@ def cargar_ranking_desde_bd():
         print(f"Error al cargar el ranking desde la base de datos: {e}")
         return []
 
+def actualizar_ranking(palabra):
+    """
+    Inserta la palabra en el ranking con una puntuación inicial o incrementa su puntuación si ya existe.
+    """
+    try:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        # Si la palabra ya existe, incrementa su puntuación
+        cursor.execute('''
+            INSERT INTO ranking (palabra, puntuacion)
+            VALUES (?, ?)
+            ON CONFLICT(palabra)
+            DO UPDATE SET puntuacion = puntuacion + 1
+        ''', (palabra.lower(), 1))  # Convertimos la palabra a minúsculas
+        connection.commit()
+        print(f"Ranking actualizado para la palabra: {palabra}")
+    except sqlite3.Error as e:
+        print(f"Error al actualizar el ranking: {e}")
+    finally:
+        connection.close()
+
+
 def buscar_palabras_por_potencial(palabras, potencial_objetivo):
     """
     Busca palabras en la base de datos que coincidan con un potencial dado.
@@ -419,6 +441,10 @@ def resultado_opcion1():
         session['historial'] = []
     session['historial'].append(f"Frecuencia: {frecuencia} -> Lupa: {lupa}")
     session.modified = True
+
+    # Actualizar ranking basado en palabras encontradas
+    for palabra in palabras_encontradas:
+        actualizar_ranking(palabra)  # Incrementa la puntuación en el Ranking
 
     return render_template('resultado.html', palabra=str(frecuencia), frecuencia=frecuencia, lupa=lupa,
                            detalle=detalle, territorios=territorios_encontrados,
