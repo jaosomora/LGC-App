@@ -2,6 +2,7 @@ import unicodedata
 import os
 import json
 import time
+import sqlite3
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, render_template, session
 from flask_cors import CORS  # Asegúrate de importar CORS
@@ -233,20 +234,20 @@ def buscar_elementos_por_potencial(tabla_periodica, potencial_objetivo, lupa_obj
             resultados.append(f"<strong>Elemento:</strong> {nombre} ({simbolo}) - <strong>Coincidencia:</strong> Número atómico ({numero_atomico})")
     return resultados
 
-def cargar_ranking(archivo):
+def cargar_ranking_desde_bd():
     """
-    Carga un ranking de palabras desde un archivo de texto.
+    Carga el ranking de palabras desde la base de datos.
+    Retorna una lista de tuplas (palabra, puntuacion) ordenadas por puntuacion descendente.
     """
     try:
-        with open(archivo, "r", encoding="utf-8") as f:
-            palabras = {}
-            for line in f:
-                palabra, puntuacion = line.strip().split(":")
-                palabra_normalizada = normalizar_palabra_con_espacios(palabra)
-                palabras[palabra_normalizada] = int(puntuacion)
-            ranking = sorted(palabras.items(), key=lambda x: x[1], reverse=True)
-            return ranking
-    except FileNotFoundError:
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        cursor.execute("SELECT palabra, puntuacion FROM ranking ORDER BY puntuacion DESC")
+        ranking = cursor.fetchall()  # Lista de tuplas
+        connection.close()
+        return ranking
+    except sqlite3.Error as e:
+        print(f"Error al cargar el ranking desde la base de datos: {e}")
         return []
 
 def buscar_palabras_por_potencial(palabras, potencial_objetivo):
@@ -272,10 +273,19 @@ def cargar_palabras():
 def menu_principal():
     """
     Muestra el menú principal con opciones disponibles.
+    Ordena el historial de búsquedas según el ranking.
     """
     print("Historial desde /:", session.get('historial', []))  # Log para verificar el historial
     historial = session.get('historial', [])
-    return render_template('menu.html', historial=historial)
+
+    # Cargar el ranking desde la base de datos
+    ranking = cargar_ranking_desde_bd()
+    ranking_dict = {palabra: puntuacion for palabra, puntuacion in ranking}
+
+    # Ordenar el historial según la puntuación en el ranking (descendente)
+    historial_ordenado = sorted(historial, key=lambda x: ranking_dict.get(x.split(":")[1].strip().split(" ")[0], 0), reverse=True)
+
+    return render_template('menu.html', historial=historial_ordenado)
 
 @app.route('/opcion1')
 def opcion1():
