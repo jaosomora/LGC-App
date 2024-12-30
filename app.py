@@ -88,7 +88,7 @@ def inicializar_tablas():
     Crea la tabla 'ranking' en la base de datos si no existe.
     """
     try:
-        print("Intentando inicializar tablas...")
+        print(f"Intentando inicializar tablas en la base de datos: {db_path}")
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute('''
@@ -427,4 +427,5 @@ if __name__ == '__main__':
     """
     Ejecuta la aplicación Flask en modo de producción.
     """
+    inicializar_tablas()  # Inicializar tablas necesarias
     app.run(debug=False, host='0.0.0.0', port=8080)
