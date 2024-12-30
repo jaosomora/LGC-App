@@ -298,12 +298,15 @@ def mostrar_ranking():
 @app.route('/resultado_opcion2', methods=['POST'])
 def resultado_opcion2():
     """
-    Procesa la palabra ingresada en la opción 2 y genera los resultados.
+    Procesa la palabra o frase ingresada en la opción 2 y genera los resultados.
     """
     palabra = request.form.get('palabra')
     potencial = calcular_potencial(palabra)
     lupa = calcular_lupa(potencial)
     detalle = detalle_potencial(palabra)
+
+    # Calcular frecuencia por palabra en caso de que sea una frase
+    frecuencias_por_palabra, suma_total = calcular_frecuencia_por_palabra(palabra)
 
     territorios = cargar_codigos_territorios(archivo_territorios)
     territorios_encontrados = buscar_codigo_territorio(territorios, potencial)
@@ -315,7 +318,7 @@ def resultado_opcion2():
     palabras_encontradas = buscar_palabras_por_potencial(palabras, potencial)
     palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))
     palabras_encontradas = [p for p in palabras_encontradas if p.lower() != palabra.lower()]  # Excluir la palabra buscada
-    palabras_encontradas = [p for p in palabras_encontradas if p != palabra]  # Excluir la palabra buscada  # Eliminar duplicados normalizando
+    palabras_encontradas = [p for p in palabras_encontradas if p != palabra]  # Eliminar duplicados normalizando
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     guardar_palabra(palabra)
@@ -325,7 +328,18 @@ def resultado_opcion2():
     session['historial'].append(f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}")
     session.modified = True
 
-    return render_template('resultado.html', palabra=palabra, potencial=potencial, lupa=lupa, detalle=detalle, territorios=territorios_encontrados, palabras=palabras_encontradas, elementos=elementos)
+    return render_template(
+        'resultado.html',
+        palabra=palabra,
+        potencial=potencial,
+        lupa=lupa,
+        detalle=detalle,
+        frecuencias_por_palabra=frecuencias_por_palabra,
+        suma_total=suma_total,
+        territorios=territorios_encontrados,
+        palabras=palabras_encontradas,
+        elementos=elementos
+    )
 
 @app.route('/resultado_opcion1', methods=['POST'])
 def resultado_opcion1():
