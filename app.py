@@ -538,7 +538,8 @@ def embed_page():
     return render_template('embed.html', historial=historial)
 
 if __name__ == '__main__':
-    print("Verificando e inicializando base de datos...")
-    from init_db import main as init_db_main
-    init_db_main()  # Llamar al script de inicialización
+    print("Inicializando base de datos y tablas...")
+    with app.app_context():
+        db.create_all()  # Crear todas las tablas definidas en los modelos SQLAlchemy
+        print("Tablas creadas exitosamente.")
     app.run(debug=False, host='0.0.0.0', port=8080)
