@@ -401,7 +401,17 @@ def resultado_opcion2():
 
     if 'historial' not in session:
         session['historial'] = []
-    session['historial'].append(f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}")
+    
+    # Crear la nueva entrada
+    nueva_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
+
+    # Verificar si ya existe en el historial
+    if nueva_entrada not in session['historial']:
+        session['historial'].append(nueva_entrada)
+        print(f"Nueva entrada agregada al historial: {nueva_entrada}")
+    else:
+        print(f"Entrada duplicada no agregada: {nueva_entrada}")
+
     session.modified = True
 
     return render_template(
