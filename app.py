@@ -296,10 +296,28 @@ def cargar_ranking_desde_bd():
     try:
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
+        
+        # Verificar si la tabla existe
+        cursor.execute("""
+            SELECT name FROM sqlite_master WHERE type='table' AND name='ranking';
+        """)
+        if not cursor.fetchone():
+            print("La tabla 'ranking' no existe. Creándola ahora.")
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS ranking (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    palabra TEXT NOT NULL UNIQUE,
+                    puntuacion INTEGER NOT NULL
+                )
+            ''')
+            connection.commit()
+
+        # Cargar datos del ranking
         cursor.execute("SELECT palabra, puntuacion FROM ranking ORDER BY puntuacion DESC")
-        ranking = cursor.fetchall()  # Lista de tuplas
+        ranking = cursor.fetchall()
         connection.close()
         return ranking
+
     except sqlite3.Error as e:
         print(f"Error al cargar el ranking desde la base de datos: {e}")
         return []
