@@ -69,9 +69,9 @@ class Palabra(db.Model):
 
 def es_palabra_valida(palabra):
     """
-    Verifica que una palabra o frase contenga solo caracteres alfabéticos y espacios.
+    Verifica que una palabra o frase contenga solo caracteres alfabéticos, espacios o números.
     """
-    return all(letra.isalpha() or letra.isspace() for letra in palabra)
+    return all(letra.isalpha() or letra.isspace() or letra.isdigit() for letra in palabra)
 
 def inicializar_base_datos():
     """
@@ -88,8 +88,9 @@ def guardar_palabra(palabra):
         # Normalizar palabra o frase
         palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
         if not es_palabra_valida(palabra_normalizada):
-            print(f"La palabra o frase '{palabra}' no es válida.")
+            print(f"La entrada '{palabra}' no es válida. Solo se permiten letras, espacios o números.")
             return
+
 
         # Verificar si ya existe
         # Permitir que las frecuencias también sean tratadas como entradas válidas
@@ -391,7 +392,9 @@ def menu_principal():
     for entry in historial:
         palabra_original = entry.split(":")[1].strip().split("->")[0].strip()
         palabra_normalizada = normalizar_palabra_con_espacios(palabra_original)
-        historial_normalizado[palabra_normalizada] = entry
+        palabra_key = normalizar_palabra_con_espacios(entry.split(":")[1].strip().split("->")[0].strip().lower())
+        historial_normalizado[palabra_key] = entry
+
 
     # Convertir a lista ordenada y única
     historial_unico = list(historial_normalizado.values())
@@ -539,9 +542,10 @@ def resultado_opcion1():
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     # Normalizar la frecuencia y tratarla como palabra para el ranking
-    frecuencia_normalizada = f"frecuencia-{frecuencia}"
+    frecuencia_normalizada = normalizar_palabra_con_espacios(str(frecuencia))
     guardar_palabra(frecuencia_normalizada)
     actualizar_ranking(frecuencia_normalizada)
+
 
     if 'historial' not in session:
         session['historial'] = []
