@@ -431,7 +431,16 @@ def resultado_opcion2():
 
     # Verificar si la palabra contiene caracteres válidos (alfabéticos y espacios)
     if not palabra or not all(char.isalpha() or char.isspace() for char in palabra):
-        return "La palabra contiene caracteres no válidos. Por favor, ingrese solo letras y espacios.", 400
+        # Si la palabra no es válida, retorna al formulario con un mensaje de error
+        return render_template(
+            'opcion2.html',
+            error="La palabra contiene caracteres no válidos. Por favor, ingrese solo letras y espacios."
+        )
+
+    # Continúa el procesamiento solo si la palabra es válida
+    potencial = calcular_potencial(palabra)
+    lupa = calcular_lupa(potencial)
+    detalle = detalle_potencial(palabra)
 
     # Calcular potencial, lupa y detalle
     potencial = calcular_potencial(palabra)
@@ -458,19 +467,13 @@ def resultado_opcion2():
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     if palabras_encontradas:
-        print(f"Palabras encontradas para actualizar ranking: {palabras_encontradas}")
         for palabra_encontrada in palabras_encontradas:
             palabra_normalizada = normalizar_palabra_con_espacios(palabra_encontrada).lower()
             actualizar_ranking(palabra_normalizada)
-            print(f"Actualizando ranking para palabra normalizada: {palabra_normalizada}")
-    else:
-        print("No se encontraron palabras para actualizar ranking.")
 
     # Normalizar la palabra antes de guardar o actualizar
     palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
-
     guardar_palabra(palabra_normalizada)
-    print(f"Llamando a actualizar_ranking con la palabra ingresada: {palabra_normalizada}")
     actualizar_ranking(palabra_normalizada)
 
     if 'historial' not in session:
@@ -480,9 +483,6 @@ def resultado_opcion2():
     nueva_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
     if nueva_entrada.lower() not in [entry.lower() for entry in session['historial']]:
         session['historial'].append(nueva_entrada)
-        print(f"Nueva entrada agregada al historial: {nueva_entrada}")
-    else:
-        print(f"Entrada duplicada no agregada: {nueva_entrada}")
 
     session.modified = True
 

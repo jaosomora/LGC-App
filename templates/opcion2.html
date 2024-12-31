@@ -3,6 +3,14 @@
 {% block content %}
 <div class="text-center mb-4">
     <h2 class="text-success">Cálculo de Frecuencia</h2>
+    
+    <!-- Mostrar mensaje de error si existe -->
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+    {% endif %}
+    
     <form action="/resultado_opcion2" method="post" class="mt-4">
         <div class="mb-3">
             <label for="palabra" class="form-label">Ingresa la palabra o frase:</label>
