@@ -153,13 +153,17 @@ valores_letras = {
 # Funciones para cálculos y procesamiento de datos
 def normalizar_palabra_con_espacios(palabra):
     """
-    Normaliza una palabra eliminando acentos y caracteres no alfabéticos.
+    Normaliza palabras o frases:
+    - Convierte a minúsculas
+    - Elimina tildes
+    - Reemplaza espacios múltiples por uno solo
     """
+    import unicodedata
+    palabra = palabra.strip().lower()
+    palabra = ' '.join(palabra.split())  # Reemplaza múltiples espacios por uno
     palabra = ''.join(
-        char for char in unicodedata.normalize('NFD', palabra)
-        if unicodedata.category(char) != 'Mn'
-    )
-    palabra = ''.join(char for char in palabra.upper() if char in valores_letras or char == " ")
+        (c for c in unicodedata.normalize('NFD', palabra) if unicodedata.category(c) != 'Mn')
+    )  # Elimina tildes
     return palabra
 
 def calcular_potencial(palabra):
@@ -279,22 +283,38 @@ def cargar_ranking_desde_bd():
         return []
 
 def actualizar_ranking(palabra):
+    """
+    Actualiza el ranking para una palabra o frase.
+    Si la palabra ya existe, incrementa su puntuación.
+    Si no existe, la agrega al ranking con puntuación inicial de 1.
+    """
     try:
-        print(f"Intentando actualizar ranking para: {palabra.lower()}")  # Log de entrada
+        # Normalizar la palabra o frase ingresada
+        palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
+        print(f"Intentando actualizar ranking para: {palabra_normalizada}")
+        
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
-        cursor.execute('''
-            INSERT INTO ranking (palabra, puntuacion)
-            VALUES (?, ?)
-            ON CONFLICT(palabra)
-            DO UPDATE SET puntuacion = puntuacion + 1
-        ''', (palabra.lower(), 1))
+
+        # Verificar si la palabra ya existe en la tabla ranking
+        cursor.execute("SELECT puntuacion FROM ranking WHERE palabra = ?", (palabra_normalizada,))
+        resultado = cursor.fetchone()
+
+        if resultado:
+            # Si existe, incrementa la puntuación
+            nueva_puntuacion = resultado[0] + 1
+            cursor.execute("UPDATE ranking SET puntuacion = ? WHERE palabra = ?", (nueva_puntuacion, palabra_normalizada))
+            print(f"Ranking actualizado exitosamente para: {palabra_normalizada} -> Nueva puntuación: {nueva_puntuacion}")
+        else:
+            # Si no existe, agrégala con puntuación inicial de 1
+            cursor.execute("INSERT INTO ranking (palabra, puntuacion) VALUES (?, ?)", (palabra_normalizada, 1))
+            print(f"Nueva palabra/frase añadida al ranking: {palabra_normalizada}")
+
         connection.commit()
-        print(f"Ranking actualizado exitosamente para la palabra: {palabra.lower()}")  # Log de éxito
+        connection.close()
+
     except sqlite3.Error as e:
         print(f"Error al actualizar el ranking: {e}")
-    finally:
-        connection.close()
 
 
 def buscar_palabras_por_potencial(palabras, potencial_objetivo):
@@ -327,16 +347,23 @@ def menu_principal():
 
     # Cargar el ranking desde la base de datos
     ranking = cargar_ranking_desde_bd()
-    ranking_dict = {palabra: puntuacion for palabra, puntuacion in ranking} if ranking else {}
+    ranking_dict = {normalizar_palabra_con_espacios(palabra): puntuacion for palabra, puntuacion in ranking} if ranking else {}
 
     # Ordenar el historial según la puntuación en el ranking (descendente)
     historial_ordenado = sorted(
         historial,
-        key=lambda x: ranking_dict.get(x.split(":")[1].strip().split(" ")[0].lower(), 0),  # Normalizar palabras
+        key=lambda x: ranking_dict.get(
+            normalizar_palabra_con_espacios(x.split(":")[1].strip().split(" ")[0]).lower(), 0
+        ),
         reverse=True
     )
 
-    return render_template('menu.html', historial=historial_ordenado, ranking=ranking_dict)
+    # Eliminar duplicados en el historial después de ordenar
+    historial_unico = list(dict.fromkeys(historial_ordenado))
+    print(f"Historial único y ordenado: {historial_unico}")
+
+    return render_template('menu.html', historial=historial_unico, ranking=ranking_dict)
+
 
 @app.route('/opcion1')
 def opcion1():
@@ -389,14 +416,19 @@ def resultado_opcion2():
     if palabras_encontradas:
         print(f"Palabras encontradas para actualizar ranking: {palabras_encontradas}")
         for palabra_encontrada in palabras_encontradas:
-            actualizar_ranking(palabra_encontrada)
-            print(f"Actualizando ranking para palabra encontrada: {palabra_encontrada.lower()}")
+            palabra_normalizada = normalizar_palabra_con_espacios(palabra_encontrada).lower()
+            actualizar_ranking(palabra_normalizada)
+            print(f"Actualizando ranking para palabra normalizada: {palabra_normalizada}")
     else:
         print("No se encontraron palabras para actualizar ranking.")
 
-    guardar_palabra(palabra)
-    print(f"Llamando a actualizar_ranking con la palabra ingresada: {palabra}")
-    actualizar_ranking(palabra)
+    
+    # Normalizar la palabra antes de guardar o actualizar
+    palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
+
+    guardar_palabra(palabra_normalizada)
+    print(f"Llamando a actualizar_ranking con la palabra ingresada: {palabra_normalizada}")
+    actualizar_ranking(palabra_normalizada)
 
 
     if 'historial' not in session:
