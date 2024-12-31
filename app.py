@@ -384,22 +384,18 @@ def menu_principal():
     ranking = cargar_ranking_desde_bd()
     ranking_dict = {normalizar_palabra_con_espacios(palabra): puntuacion for palabra, puntuacion in ranking} if ranking else {}
 
-    # Ordenar el historial según la puntuación en el ranking (descendente)
+    # Normalizar las palabras en el historial para evitar duplicados
     historial_normalizado = {}
     for entry in historial:
         palabra_original = entry.split(":")[1].strip().split("->")[0].strip()
         palabra_normalizada = normalizar_palabra_con_espacios(palabra_original)
         historial_normalizado[palabra_normalizada] = entry
-    
+
     # Convertir a lista ordenada y única
     historial_unico = list(historial_normalizado.values())
     historial_unico.sort(key=lambda x: ranking_dict.get(
-    normalizar_palabra_con_espacios(x.split(":")[1].strip().split("->")[0]).lower(), 0
+        normalizar_palabra_con_espacios(x.split(":")[1].strip().split("->")[0]).lower(), 0
     ), reverse=True)
-
-    # Eliminar duplicados en el historial después de ordenar
-    historial_unico = list(dict.fromkeys(historial_ordenado))
-    print(f"Historial único y ordenado: {historial_unico}")
 
     return render_template('menu.html', historial=historial_unico, ranking=ranking_dict)
 
