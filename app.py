@@ -21,11 +21,17 @@ archivo_ranking = os.path.join(directorio_base, "ranking.txt")  # Archivo con pa
 app = Flask(__name__)
 
 # Configuración de la base de datos SQLite
-# Detectar el ambiente: Render o Local
 if os.getenv("RENDER"):
+    if not os.path.exists('/mnt/data'):
+        os.makedirs('/mnt/data')  # Crear el directorio si no existe
     db_path = os.path.join('/mnt/data', 'palabras.db')  # Ruta persistente en Render
 else:
     db_path = os.path.join(directorio_base, 'palabras.db')  # Ruta en local
+
+# Crear el archivo de base de datos si no existe
+if not os.path.exists(db_path):
+    print(f"Creando archivo de base de datos en: {db_path}")
+    open(db_path, 'w').close()
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # Evitar advertencias innecesarias
@@ -90,11 +96,11 @@ def inicializar_tablas():
     Crea la tabla 'ranking' en la base de datos si no existe.
     """
     try:
+        print(f"Verificando base de datos en: {db_path}")
         if not os.path.exists(db_path):
-            print(f"La base de datos no existe en {db_path}. Creando un nuevo archivo.")
-        else:
-            print(f"Base de datos encontrada en {db_path}.")
-        
+            print(f"Base de datos no encontrada. Creando un nuevo archivo en: {db_path}")
+            open(db_path, 'w').close()
+
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         cursor.execute('''
@@ -524,6 +530,6 @@ def embed_page():
     return render_template('embed.html', historial=historial)
 
 if __name__ == '__main__':
-    print("Inicializando tablas...")
+    print("Inicializando base de datos y tablas...")
     inicializar_tablas()  # Inicializar tablas necesarias
     app.run(debug=False, host='0.0.0.0', port=8080)
