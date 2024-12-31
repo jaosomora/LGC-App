@@ -279,21 +279,18 @@ def cargar_ranking_desde_bd():
         return []
 
 def actualizar_ranking(palabra):
-    """
-    Inserta la palabra en el ranking con una puntuación inicial o incrementa su puntuación si ya existe.
-    """
     try:
+        print(f"Intentando actualizar ranking para: {palabra.lower()}")  # Log de entrada
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
-        # Si la palabra ya existe, incrementa su puntuación
         cursor.execute('''
             INSERT INTO ranking (palabra, puntuacion)
             VALUES (?, ?)
             ON CONFLICT(palabra)
             DO UPDATE SET puntuacion = puntuacion + 1
-        ''', (palabra.lower(), 1))  # Convertimos la palabra a minúsculas
+        ''', (palabra.lower(), 1))
         connection.commit()
-        print(f"Ranking actualizado para la palabra: {palabra}")
+        print(f"Ranking actualizado exitosamente para la palabra: {palabra.lower()}")  # Log de éxito
     except sqlite3.Error as e:
         print(f"Error al actualizar el ranking: {e}")
     finally:
@@ -389,7 +386,18 @@ def resultado_opcion2():
     palabras_encontradas = [p for p in palabras_encontradas if p != palabra]  # Eliminar duplicados normalizando
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
+    if palabras_encontradas:
+        print(f"Palabras encontradas para actualizar ranking: {palabras_encontradas}")
+        for palabra_encontrada in palabras_encontradas:
+            actualizar_ranking(palabra_encontrada)
+            print(f"Actualizando ranking para palabra encontrada: {palabra_encontrada.lower()}")
+    else:
+        print("No se encontraron palabras para actualizar ranking.")
+
     guardar_palabra(palabra)
+    print(f"Llamando a actualizar_ranking con la palabra ingresada: {palabra}")
+    actualizar_ranking(palabra)
+
 
     if 'historial' not in session:
         session['historial'] = []
@@ -443,8 +451,13 @@ def resultado_opcion1():
     session.modified = True
 
     # Actualizar ranking basado en palabras encontradas
-    for palabra in palabras_encontradas:
-        actualizar_ranking(palabra)  # Incrementa la puntuación en el Ranking
+    if palabras_encontradas:
+        print(f"Palabras encontradas para actualizar ranking: {palabras_encontradas}")
+        for palabra in palabras_encontradas:
+            actualizar_ranking(palabra)  # Incrementa la puntuación en el Ranking
+            print(f"Actualizando ranking para: {palabra.lower()}")
+    else:
+        print("No se encontraron palabras para actualizar ranking.")        
 
     return render_template('resultado.html', palabra=str(frecuencia), frecuencia=frecuencia, lupa=lupa,
                            detalle=detalle, territorios=territorios_encontrados,
