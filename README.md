@@ -2,16 +2,17 @@
 
 ## Descripción General
 
-LGC-App es una aplicación web interactiva desarrollada con **Flask** que permite realizar análisis semánticos avanzados, gestionar información territorial y explorar datos químicos de la tabla periódica. La aplicación está diseñada para ser altamente modular y fácil de integrar, ofreciendo una experiencia de usuario fluida y profesional.
-
-**LGC-App** está orientada a ofrecer análisis lógicos y semánticos de palabras, así como información clave sobre territorios y elementos químicos.
+LGC-App es una aplicación web interactiva desarrollada con **Flask** que permite realizar análisis semánticos avanzados, gestionar información territorial y explorar datos químicos de la tabla periódica. Diseñada para ser modular y fácilmente desplegable, la aplicación ofrece una experiencia profesional y optimizada.
 
 ### Características principales:
-- **Análisis semántico avanzado**: Calcula el "potencial" de palabras y frases basándose en frecuencias lógicas.
+
+- **Análisis semántico avanzado**: Calcula el "potencial" de palabras y frases basándose en frecuencias.
 - **Gestión de territorios**: Proporciona información detallada sobre códigos de país y territorios asociados.
 - **Exploración química**: Consulta datos clave sobre elementos químicos de la tabla periódica.
-- **Interfaz profesional**: Optimizada para una experiencia de usuario limpia y eficiente, eliminando elementos visuales innecesarios como el Hero y barras redundantes.
-- **Compatibilidad para despliegue**: Diseñada para integrarse fácilmente con servicios como Render y otras plataformas de hosting.
+- **Validación de entradas**: Verifica que las palabras ingresadas contengan solo caracteres válidos (alfabéticos y espacios).
+- **Compatibilidad para despliegue**: Diseñada para integrarse con plataformas como Render, soportando configuraciones automáticas para entornos local y de producción.
+
+---
 
 ## Requisitos Previos
 
@@ -19,177 +20,194 @@ LGC-App es una aplicación web interactiva desarrollada con **Flask** que permit
 - Administrador de paquetes `pip`
 - Cuenta en [Render](https://render.com) para despliegue (opcional)
 
+---
+
 ## Instalación Local
 
 1. **Clona el repositorio:**
+
    ```bash
    git clone https://github.com/usuario/proyecto.git
    cd proyecto
    ```
 
 2. **Crea un entorno virtual:**
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # En Windows: venv\Scripts\activate
    ```
 
 3. **Instala las dependencias:**
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Configura las variables de entorno:**
    Crea un archivo `.env` en el directorio raíz con el siguiente contenido:
+
    ```env
-   FLASK_APP=app.py
+   FLASK_APP=wsgi.py
    FLASK_ENV=development
    SECRET_KEY=tu_clave_secreta
+   ENV=DEVELOPMENT
    ```
 
-5. **Inicia la aplicación:**
+5. **Inicializa la base de datos:**
+   Ejecuta el script de inicialización:
+
+   ```bash
+   python init_db.py
+   ```
+
+6. **Inicia la aplicación:**
+
    ```bash
    flask run
    ```
 
-6. **Accede a la interfaz web:**
+7. **Accede a la interfaz web:**
    Abre tu navegador y visita [http://127.0.0.1:5000](http://127.0.0.1:5000).
+
+---
 
 ## Base de Datos: **SQLite**
 
-### Descripción de la base de datos:
-La aplicación ahora utiliza **SQLite** para almacenar las palabras que se ingresan a través de las diferentes opciones. En lugar de usar un archivo **`palabras.txt`**, los datos se guardan en una base de datos llamada **`palabras.db`**.
+### Descripción:
 
-- **Tabla `palabra`**: Almacena las palabras ingresadas en la aplicación, asegurando que no se repitan.
+La aplicación utiliza **SQLite** para almacenar las palabras y datos ingresados.
 
-### Crear la base de datos:
+- **Tabla `palabra`**: Almacena palabras únicas ingresadas por los usuarios.
+- **Tabla `ranking`**: Almacena las palabras junto con su puntuación basada en el potencial calculado.
 
-1. Abre una terminal y navega al directorio del proyecto.
-2. Inicia una sesión de Python con el siguiente comando:
+### Inicialización Automática:
+
+1. El archivo `init_db.py` se encarga de verificar y crear las tablas necesarias durante el despliegue o en la ejecución local.
 
    ```bash
-   python
+   python init_db.py
    ```
 
-3. Ejecuta los siguientes comandos para crear las tablas de la base de datos:
+2. Durante el despliegue en Render, el comando de inicio incluye este script de forma automática.
 
-   ```python
-   from app import app, db
-   with app.app_context():
-       db.create_all()  # Crear las tablas en la base de datos
-   ```
+### Configuración Automática por Entorno:
 
-Este comando creará la base de datos **`palabras.db`** y la tabla **`palabra`** si no existen ya.
+- **Producción en Render:**
+  La base de datos utiliza una ruta persistente en `/mnt/data/palabras.db`.
+- **Desarrollo Local:**
+  La base de datos utiliza la ruta `./palabras.db` en el directorio del proyecto.
 
-### Configuración Automática de Entorno
+Esto asegura compatibilidad y configuración sin necesidad de ajustes manuales.
 
-Ahora la aplicación detecta automáticamente si se ejecuta en Render o en un entorno local:
-- **Render:** Utiliza la ruta `/mnt/data/palabras.db` para la base de datos.
-- **Local:** Utiliza la base de datos en el directorio actual (`palabras.db`).
+---
 
-Este cambio elimina la necesidad de modificar manualmente la configuración para diferentes ambientes.
+## Validación de Entradas
+
+Las palabras ingresadas son validadas para garantizar que contengan solo caracteres alfabéticos y espacios. Si se detectan caracteres no válidos, se muestra un mensaje de error amigable al usuario sin procesar la solicitud.
+
+### Ejemplo de error mostrado:
+
+"La palabra contiene caracteres no válidos. Por favor, ingrese solo letras y espacios."
+
+---
 
 ## Despliegue en Render
 
 1. **Sube el proyecto a GitHub:**
-   Asegúrate de tener el proyecto actualizado en un repositorio público o privado en GitHub.
+   Asegúrate de tener el proyecto actualizado en un repositorio.
 
 2. **Configura el servicio en Render:**
+
    - Ve a [Render](https://render.com) y crea un nuevo servicio web.
    - Selecciona tu repositorio y configura los siguientes valores:
-     - **Branch:** `main` (o la rama correspondiente).
+     - **Branch:** `develop` o `main` según el entorno.
      - **Build Command:** `pip install -r requirements.txt`.
-     - **Start Command:** `gunicorn app:app`.
+     - **Start Command:** `gunicorn wsgi:app`.
 
-3. **Configura Redis en Render:**
-   - Ve a la sección **Add a New Database** en Render y selecciona Redis.
-   - Toma nota de la URL proporcionada y configúrala como variable de entorno:
+3. **Configura las variables de entorno en Render:**
+
+   - Agrega las siguientes variables:
      ```env
-     REDIS_HOST=<URL de tu Redis en Render>
+     FLASK_ENV=production
+     SECRET_KEY=tu_clave_secreta
+     ENV=PRODUCTION
      ```
 
-4. **Despliegue automático:**
-   Render generará una URL pública para tu aplicación (por ejemplo: `https://lgc-app.onrender.com`).
+4. **Despliegue:**
+   Una vez configurado, Render generará una URL pública para tu aplicación.
 
-## Incrustación en Systeme.io
+---
 
-Para incrustar tu aplicación en Systeme.io con un timestamp dinámico:
+## Nuevos Archivos
 
-```html
-<div style="width: 100%; height: 100vh; overflow: hidden;">
-    <iframe 
-        id="dynamicIframe"
-        style="width: 100%; height: 100%; border: none;" 
-        allowfullscreen>
-    </iframe>
-</div>
+- **`init_db.py`**: Script para inicializar y verificar la base de datos.
+- **`wsgi.py`**: Archivo de entrada para Gunicorn.
 
-<script>
-    // Genera un timestamp dinámico
-    const timestamp = new Date().getTime();
-    // Construye la URL con el parámetro nocache
-    const iframe = document.getElementById('dynamicIframe');
-    iframe.src = `https://lgc-app.onrender.com/?nocache=${timestamp}`;
-</script>
-```
+---
 
 ## Estructura del Proyecto
 
 ```plaintext
 proyecto/
-├── app.py                 # Archivo principal de la aplicación Flask
+├── app.py                 # Lógica principal de la aplicación Flask
+├── init_db.py             # Script para inicializar la base de datos
+├── wsgi.py                # Archivo de entrada para Gunicorn
 ├── requirements.txt       # Dependencias del proyecto
-├── ranking.txt            # Datos de términos y puntuaciones
-├── palabras.db            # Base de datos SQLite con las palabras
+├── palabras.db            # Base de datos SQLite
 ├── tabla_periodica.json   # Datos JSON de la tabla periódica
-├── territorios.json       # Datos JSON de territorios y códigos
+├── territorios.json       # Datos JSON de territorios
 ├── static/                # Archivos estáticos
 │   └── styles.css         # Hojas de estilo
 ├── templates/             # Plantillas HTML
-│   ├── base.html          # Plantilla base (modificada: Hero y barras eliminadas)
+│   ├── base.html          # Plantilla base
 │   ├── menu.html          # Menú principal
 │   ├── opcion1.html       # Opción 1
 │   ├── opcion2.html       # Opción 2
 │   ├── resultado.html     # Resultados
-│   ├── embed.html         # Página para incrustación con timestamp dinámico
-│   └── test.html          # Página de prueba
+│   └── embed.html         # Para incrustación con timestamp
 ```
+
+---
 
 ## Cambios Recientes
 
-- **Nueva lógica de configuración automática:** La aplicación detecta el entorno (Render o local) y ajusta la ruta de la base de datos automáticamente.
-- **Nueva ruta `/embed_page`:** Permite renderizar un iframe con timestamp dinámico para evitar problemas de caché.
-- **Sesiones persistentes con Redis:** Configuración añadida para manejar sesiones robustas en producción.
-- **Incrustación optimizada:** Ejemplo implementado para Systeme.io.
+- **Validación de entradas:**
+  La aplicación ahora valida caracteres en las palabras ingresadas.
+- **Inicialización de base de datos:**
+  Automatizada para entornos local y de producción.
+- **Script `init_db.py`:**
+  Nuevo archivo para garantizar que las tablas de la base de datos estén creadas antes del inicio del servidor.
+- **Archivo `wsgi.py`:**
+  Añadido para manejar Gunicorn en despliegues de producción.
+
+---
 
 ## Guía de Contribución
 
-¡Las contribuciones son bienvenidas! Si deseas colaborar, sigue estos pasos:
-
-1. Haz un fork del repositorio.
-2. Crea una rama para tu función o corrección:
+1. **Haz un fork del repositorio.**
+2. **Crea una rama para tus cambios:**
    ```bash
-   git checkout -b nombre-de-tu-rama
+   git checkout -b mi-funcion
    ```
-3. Realiza tus cambios y realiza un commit claro:
+3. **Realiza tus cambios y un commit claro:**
    ```bash
-   git commit -m "Descripción de los cambios realizados"
+   git commit -m "Descripción clara del cambio"
    ```
-4. Sube tus cambios a tu fork:
+4. **Envía tus cambios al repositorio remoto:**
    ```bash
-   git push origin nombre-de-tu-rama
+   git push origin mi-funcion
    ```
-5. Abre un Pull Request en el repositorio principal.
+5. **Abre un Pull Request.**
 
-### Buenas Prácticas para Contribuir
-
-- Usa **Issues** para reportar problemas o proponer nuevas características.
-- Asegúrate de seguir las convenciones de codificación de Python (PEP 8) y de añadir comentarios en el código donde sea necesario.
-- Realiza pruebas antes de enviar tus Pull Requests. Si hay pruebas automatizadas, asegúrate de que todas pasen.
+---
 
 ## Licencia
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo `LICENSE` para más detalles.
 
+---
+
 ## Soporte
 
-Si tienes dudas o problemas, no dudes en abrir un **issue** en el repositorio o contactarme directamente en [info@julianosoriom.com](mailto:info@julianosoriom.com).
+Si tienes dudas o problemas, abre un **issue** en el repositorio o contacta a [info@julianosoriom.com](mailto:info@julianosoriom.com).
