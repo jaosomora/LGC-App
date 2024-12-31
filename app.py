@@ -63,12 +63,9 @@ def es_palabra_valida(palabra):
 
 # Guardar palabras en la base de datos con validación y prevención de duplicados
 def guardar_palabra(palabra):
-    """
-    Guarda una palabra o frase en la base de datos si es válida y no existe previamente.
-    """
     try:
         # Normalizar palabra o frase
-        palabra_normalizada = normalizar_palabra_con_espacios(palabra)
+        palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
         if not es_palabra_valida(palabra_normalizada):
             print(f"La palabra o frase '{palabra}' no es válida.")
             return
@@ -84,6 +81,7 @@ def guardar_palabra(palabra):
             print(f"La palabra o frase '{palabra_normalizada}' ya existe en la base de datos.")
     except Exception as e:
         print(f"Error al guardar la palabra o frase '{palabra}': {e}")
+
 
 import os
 
@@ -286,9 +284,6 @@ def cargar_ranking_desde_bd():
         return []
 
 def actualizar_ranking(palabra):
-    """
-    Actualiza el ranking para una palabra o frase.
-    """
     try:
         # Normalizar palabra o frase
         palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
@@ -433,8 +428,9 @@ def resultado_opcion2():
 
     if 'historial' not in session:
         session['historial'] = []
-    
-    # Crear la nueva entrada
+
+    # Crear la nueva entrada con normalización
+    palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
     nueva_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
 
     if nueva_entrada.lower() not in [entry.lower() for entry in session['historial']]:
@@ -443,7 +439,8 @@ def resultado_opcion2():
     else:
         print(f"Entrada duplicada no agregada: {nueva_entrada}")
 
-    session.modified = True
+session.modified = True
+
 
     return render_template(
         'resultado.html',
