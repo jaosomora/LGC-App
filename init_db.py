@@ -1,15 +1,13 @@
-import os
-from app import db, inicializar_tablas
+from app import db, app
 
-def main():
+def inicializar_tablas():
     """
-    Inicializa la base de datos y crea las tablas necesarias.
+    Crea las tablas necesarias en la base de datos si no existen.
     """
-    print("Iniciando la configuración de la base de datos...")
-    inicializar_tablas()  # Crear tabla 'ranking' si no existe
-    with db.app.app_context():
-        db.create_all()  # Crear las tablas definidas en los modelos SQLAlchemy
-    print("Base de datos configurada exitosamente.")
+    print("Inicializando tablas en la base de datos...")
+    with app.app_context():  # Aseguramos que 'db' use el contexto de 'app'
+        db.create_all()  # Crear todas las tablas definidas
+    print("Tablas creadas exitosamente.")
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    inicializar_tablas()
