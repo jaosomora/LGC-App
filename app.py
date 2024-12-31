@@ -538,8 +538,8 @@ def embed_page():
     return render_template('embed.html', historial=historial)
 
 if __name__ == '__main__':
-    print("Inicializando base de datos y tablas...")
+    print("Verificando e inicializando tablas...")
     with app.app_context():
-        db.create_all()  # Crear todas las tablas definidas en los modelos SQLAlchemy
-        print("Tablas creadas exitosamente.")
+        db.create_all()  # Crear todas las tablas definidas
+        print("✅ Tablas creadas exitosamente en el contexto de Flask.")
     app.run(debug=False, host='0.0.0.0', port=8080)
