@@ -53,35 +53,37 @@ class Palabra(db.Model):
     def __repr__(self):
         return f'<Palabra {self.palabra}>'
 
-# Validar que una palabra sea alfabética
 def es_palabra_valida(palabra):
     """
-    Verifica que una palabra contenga solo caracteres alfabéticos.
+    Verifica que una palabra o frase contenga solo caracteres alfabéticos y espacios.
     """
-    return palabra.isalpha()
+    return all(letra.isalpha() or letra.isspace() for letra in palabra)
+
+
 
 # Guardar palabras en la base de datos con validación y prevención de duplicados
 def guardar_palabra(palabra):
     """
-    Guarda una palabra en la base de datos si es válida y no existe previamente.
+    Guarda una palabra o frase en la base de datos si es válida y no existe previamente.
     """
     try:
-        # Validar que sea una palabra válida
-        if not es_palabra_valida(palabra):
-            print(f"La palabra '{palabra}' no es válida.")
+        # Normalizar palabra o frase
+        palabra_normalizada = normalizar_palabra_con_espacios(palabra)
+        if not es_palabra_valida(palabra_normalizada):
+            print(f"La palabra o frase '{palabra}' no es válida.")
             return
 
-        palabra_normalizada = normalizar_palabra_con_espacios(palabra)
+        # Verificar si ya existe
         existing_word = Palabra.query.filter_by(palabra=palabra_normalizada).first()
         if not existing_word:
             new_palabra = Palabra(palabra=palabra_normalizada)
             db.session.add(new_palabra)
             db.session.commit()
-            print(f"La palabra '{palabra}' ha sido guardada correctamente.")
+            print(f"La palabra o frase '{palabra_normalizada}' ha sido guardada correctamente.")
         else:
-            print(f"La palabra '{palabra}' ya existe en la base de datos.")
+            print(f"La palabra o frase '{palabra_normalizada}' ya existe en la base de datos.")
     except Exception as e:
-        print(f"Error al guardar la palabra '{palabra}': {e}")
+        print(f"Error al guardar la palabra o frase '{palabra}': {e}")
 
 import os
 
@@ -286,36 +288,33 @@ def cargar_ranking_desde_bd():
 def actualizar_ranking(palabra):
     """
     Actualiza el ranking para una palabra o frase.
-    Si la palabra ya existe, incrementa su puntuación.
-    Si no existe, la agrega al ranking con puntuación inicial de 1.
     """
     try:
-        # Normalizar la palabra o frase ingresada
+        # Normalizar palabra o frase
         palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
         print(f"Intentando actualizar ranking para: {palabra_normalizada}")
-        
+
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
 
-        # Verificar si la palabra ya existe en la tabla ranking
+        # Verificar si ya existe en el ranking
         cursor.execute("SELECT puntuacion FROM ranking WHERE palabra = ?", (palabra_normalizada,))
         resultado = cursor.fetchone()
 
         if resultado:
-            # Si existe, incrementa la puntuación
+            # Incrementar puntuación
             nueva_puntuacion = resultado[0] + 1
             cursor.execute("UPDATE ranking SET puntuacion = ? WHERE palabra = ?", (nueva_puntuacion, palabra_normalizada))
-            print(f"Ranking actualizado exitosamente para: {palabra_normalizada} -> Nueva puntuación: {nueva_puntuacion}")
+            print(f"Ranking actualizado para '{palabra_normalizada}' -> Nueva puntuación: {nueva_puntuacion}")
         else:
-            # Si no existe, agrégala con puntuación inicial de 1
+            # Agregar nueva palabra o frase
             cursor.execute("INSERT INTO ranking (palabra, puntuacion) VALUES (?, ?)", (palabra_normalizada, 1))
-            print(f"Nueva palabra/frase añadida al ranking: {palabra_normalizada}")
+            print(f"'{palabra_normalizada}' añadida al ranking con puntuación inicial de 1.")
 
         connection.commit()
         connection.close()
-
     except sqlite3.Error as e:
-        print(f"Error al actualizar el ranking: {e}")
+        print(f"Error al actualizar el ranking para '{palabra}': {e}")
 
 
 def buscar_palabras_por_potencial(palabras, potencial_objetivo):
@@ -438,8 +437,7 @@ def resultado_opcion2():
     # Crear la nueva entrada
     nueva_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
 
-    # Verificar si ya existe en el historial
-    if nueva_entrada not in session['historial']:
+    if nueva_entrada.lower() not in [entry.lower() for entry in session['historial']]:
         session['historial'].append(nueva_entrada)
         print(f"Nueva entrada agregada al historial: {nueva_entrada}")
     else:
