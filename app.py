@@ -172,7 +172,7 @@ def calcular_potencial(palabra):
     Convierte las letras a mayúsculas para buscar en el diccionario `valores_letras`.
     """
     palabra_normalizada = normalizar_palabra_con_espacios(palabra).upper()  # Convertir a mayúsculas
-    return sum(valores_letras[letra] for letra in palabra_normalizada if letra != " ")
+    return sum(valores_letras[letra] for letra in palabra_normalizada if letra.isalpha())
 
 def calcular_lupa(potencial):
     """
@@ -485,7 +485,16 @@ def resultado_opcion1():
 
     # Asegurar que las palabras estén normalizadas y eliminar duplicados
     palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))
-    palabras_encontradas = [p for p in palabras_encontradas if calcular_potencial(p) == frecuencia]
+
+    # Filtrar palabras no válidas
+    palabras_encontradas = [
+        p for p in palabras_encontradas 
+        if calcular_potencial(p) == frecuencia and all(letra.isalpha() for letra in p)
+    ]
+
+    if not palabras_encontradas:
+        print("No se encontraron palabras válidas después de filtrar caracteres no alfabéticos.")
+    
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     if 'historial' not in session:
@@ -497,14 +506,18 @@ def resultado_opcion1():
     if palabras_encontradas:
         print(f"Palabras encontradas para actualizar ranking: {palabras_encontradas}")
         for palabra in palabras_encontradas:
-            actualizar_ranking(palabra)  # Incrementa la puntuación en el Ranking
-            print(f"Actualizando ranking para: {palabra.lower()}")
+            if all(letra.isalpha() for letra in palabra):
+                actualizar_ranking(palabra)
+                print(f"Actualizando ranking para: {palabra.lower()}")
+            else:
+                print(f"Palabra ignorada por contener caracteres no válidos: {palabra}")
     else:
-        print("No se encontraron palabras para actualizar ranking.")        
+        print("No se encontraron palabras para actualizar ranking.")
 
     return render_template('resultado.html', palabra=str(frecuencia), frecuencia=frecuencia, lupa=lupa,
                            detalle=detalle, territorios=territorios_encontrados,
                            palabras=palabras_encontradas, elementos=elementos)
+
 
 @app.route('/embed_page')
 def embed_page():
