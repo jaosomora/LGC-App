@@ -204,9 +204,10 @@ def calcular_lupa(potencial):
 def detalle_potencial(palabra):
     """
     Devuelve una lista de valores numéricos para cada letra de la palabra.
+    Filtra caracteres no alfabéticos antes de procesarlos.
     """
     palabra_normalizada = normalizar_palabra_con_espacios(palabra)
-    valores = [valores_letras[letra.upper()] for letra in palabra_normalizada if letra != " "]
+    valores = [valores_letras[letra.upper()] for letra in palabra_normalizada if letra.isalpha()]
     return valores
 
 def calcular_frecuencia_por_palabra(frase):
@@ -427,6 +428,12 @@ def resultado_opcion2():
     Procesa la palabra o frase ingresada en la opción 2 y genera los resultados.
     """
     palabra = request.form.get('palabra')
+
+    # Verificar si la palabra contiene caracteres válidos (alfabéticos y espacios)
+    if not palabra or not all(char.isalpha() or char.isspace() for char in palabra):
+        return "La palabra contiene caracteres no válidos. Por favor, ingrese solo letras y espacios.", 400
+
+    # Calcular potencial, lupa y detalle
     potencial = calcular_potencial(palabra)
     lupa = calcular_lupa(potencial)
     detalle = detalle_potencial(palabra)
@@ -434,12 +441,15 @@ def resultado_opcion2():
     # Calcular frecuencia por palabra en caso de que sea una frase
     frecuencias_por_palabra, suma_total = calcular_frecuencia_por_palabra(palabra)
 
+    # Cargar y buscar territorios
     territorios = cargar_codigos_territorios(archivo_territorios)
     territorios_encontrados = buscar_codigo_territorio(territorios, potencial)
 
+    # Cargar y buscar elementos químicos
     tabla_periodica = cargar_tabla_periodica(archivo_tabla_periodica)
     elementos = buscar_elementos_por_potencial(tabla_periodica, potencial, lupa)
 
+    # Cargar palabras y buscar coincidencias
     palabras = cargar_palabras()
     palabras_encontradas = buscar_palabras_por_potencial(palabras, potencial)
     palabras_encontradas = list(set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas))
@@ -456,7 +466,6 @@ def resultado_opcion2():
     else:
         print("No se encontraron palabras para actualizar ranking.")
 
-    
     # Normalizar la palabra antes de guardar o actualizar
     palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
 
@@ -464,14 +473,11 @@ def resultado_opcion2():
     print(f"Llamando a actualizar_ranking con la palabra ingresada: {palabra_normalizada}")
     actualizar_ranking(palabra_normalizada)
 
-
     if 'historial' not in session:
         session['historial'] = []
 
     # Crear la nueva entrada con normalización
-    palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
     nueva_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
-
     if nueva_entrada.lower() not in [entry.lower() for entry in session['historial']]:
         session['historial'].append(nueva_entrada)
         print(f"Nueva entrada agregada al historial: {nueva_entrada}")
@@ -479,7 +485,6 @@ def resultado_opcion2():
         print(f"Entrada duplicada no agregada: {nueva_entrada}")
 
     session.modified = True
-
 
     return render_template(
         'resultado.html',
