@@ -21,12 +21,20 @@ archivo_ranking = os.path.join(directorio_base, "ranking.txt")  # Archivo con pa
 app = Flask(__name__)
 
 # Configuración de la base de datos SQLite
-if os.getenv("RENDER"):
+if os.getenv("RENDER") and os.getenv("ENV") == "PRODUCTION":
+    # Producción: utilizar ruta persistente en Render
     if not os.path.exists('/mnt/data'):
         os.makedirs('/mnt/data')  # Crear el directorio si no existe
     db_path = os.path.join('/mnt/data', 'palabras.db')  # Ruta persistente en Render
 else:
+    # Desarrollo: utilizar la ruta local
     db_path = os.path.join(directorio_base, 'palabras.db')  # Ruta en local
+
+# Crear el archivo de base de datos si no existe
+if not os.path.exists(db_path):
+    print(f"Creando archivo de base de datos en: {db_path}")
+    open(db_path, 'w').close()
+
 
 # Crear el archivo de base de datos si no existe
 if not os.path.exists(db_path):
