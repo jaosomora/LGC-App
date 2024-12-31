@@ -92,7 +92,7 @@ def guardar_palabra(palabra):
             return
 
         # Verificar si ya existe
-        existing_word = Palabra.query.filter_by(palabra=palabra_normalizada).first()
+        existing_word = Palabra.query.filter_by(palabra=normalizar_palabra_con_espacios(palabra).lower()).first()
         if not existing_word:
             new_palabra = Palabra(palabra=palabra_normalizada)
             db.session.add(new_palabra)
@@ -385,13 +385,17 @@ def menu_principal():
     ranking_dict = {normalizar_palabra_con_espacios(palabra): puntuacion for palabra, puntuacion in ranking} if ranking else {}
 
     # Ordenar el historial según la puntuación en el ranking (descendente)
-    historial_ordenado = sorted(
-        historial,
-        key=lambda x: ranking_dict.get(
-            normalizar_palabra_con_espacios(x.split(":")[1].strip().split(" ")[0]).lower(), 0
-        ),
-        reverse=True
-    )
+    historial_normalizado = {}
+    for entry in historial:
+        palabra_original = entry.split(":")[1].strip().split("->")[0].strip()
+        palabra_normalizada = normalizar_palabra_con_espacios(palabra_original)
+        historial_normalizado[palabra_normalizada] = entry
+    
+    # Convertir a lista ordenada y única
+    historial_unico = list(historial_normalizado.values())
+    historial_unico.sort(key=lambda x: ranking_dict.get(
+    normalizar_palabra_con_espacios(x.split(":")[1].strip().split("->")[0]).lower(), 0
+    ), reverse=True)
 
     # Eliminar duplicados en el historial después de ordenar
     historial_unico = list(dict.fromkeys(historial_ordenado))
