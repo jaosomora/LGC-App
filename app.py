@@ -92,7 +92,9 @@ def guardar_palabra(palabra):
             return
 
         # Verificar si ya existe
-        existing_word = Palabra.query.filter_by(palabra=normalizar_palabra_con_espacios(palabra).lower()).first()
+        # Permitir que las frecuencias también sean tratadas como entradas válidas
+        palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
+        existing_word = Palabra.query.filter_by(palabra=palabra_normalizada).first()
         if not existing_word:
             new_palabra = Palabra(palabra=palabra_normalizada)
             db.session.add(new_palabra)
@@ -536,10 +538,18 @@ def resultado_opcion1():
     
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
+    # Normalizar la frecuencia y tratarla como palabra para el ranking
+    frecuencia_normalizada = f"frecuencia-{frecuencia}"
+    guardar_palabra(frecuencia_normalizada)
+    actualizar_ranking(frecuencia_normalizada)
+
     if 'historial' not in session:
         session['historial'] = []
-    session['historial'].append(f"Frecuencia: {frecuencia} -> Lupa: {lupa}")
+    nueva_entrada = f"Frecuencia: {frecuencia} -> Lupa: {lupa}"
+    if nueva_entrada.lower() not in [entry.lower() for entry in session['historial']]:
+        session['historial'].append(nueva_entrada)
     session.modified = True
+    
 
     # Actualizar ranking basado en palabras encontradas
     if palabras_encontradas:
