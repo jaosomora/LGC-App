@@ -439,7 +439,7 @@ def resultado_opcion2():
     else:
         print(f"Entrada duplicada no agregada: {nueva_entrada}")
 
-session.modified = True
+    session.modified = True
 
 
     return render_template(
