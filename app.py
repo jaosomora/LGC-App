@@ -169,8 +169,9 @@ def normalizar_palabra_con_espacios(palabra):
 def calcular_potencial(palabra):
     """
     Calcula el potencial de una palabra sumando los valores de sus letras.
+    Convierte las letras a mayúsculas para buscar en el diccionario `valores_letras`.
     """
-    palabra_normalizada = normalizar_palabra_con_espacios(palabra)
+    palabra_normalizada = normalizar_palabra_con_espacios(palabra).upper()  # Convertir a mayúsculas
     return sum(valores_letras[letra] for letra in palabra_normalizada if letra != " ")
 
 def calcular_lupa(potencial):
@@ -184,7 +185,7 @@ def detalle_potencial(palabra):
     Devuelve una lista de valores numéricos para cada letra de la palabra.
     """
     palabra_normalizada = normalizar_palabra_con_espacios(palabra)
-    valores = [valores_letras[letra] for letra in palabra_normalizada if letra != " "]
+    valores = [valores_letras[letra.upper()] for letra in palabra_normalizada if letra != " "]
     return valores
 
 def calcular_frecuencia_por_palabra(frase):
