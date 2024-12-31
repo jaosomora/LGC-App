@@ -538,6 +538,7 @@ def embed_page():
     return render_template('embed.html', historial=historial)
 
 if __name__ == '__main__':
-    print("Inicializando base de datos y tablas...")
-    inicializar_tablas()  # Inicializar tablas necesarias
+    print("Verificando e inicializando base de datos...")
+    from init_db import main as init_db_main
+    init_db_main()  # Llamar al script de inicialización
     app.run(debug=False, host='0.0.0.0', port=8080)
