@@ -73,7 +73,14 @@ def es_palabra_valida(palabra):
     """
     return all(letra.isalpha() or letra.isspace() for letra in palabra)
 
-
+def inicializar_base_datos():
+    """
+    Garantiza que todas las tablas estén creadas antes de iniciar el servidor.
+    """
+    print("Inicializando tablas en la base de datos...")
+    with app.app_context():
+        db.create_all()
+    print("✅ Tablas creadas exitosamente.")
 
 # Guardar palabras en la base de datos con validación y prevención de duplicados
 def guardar_palabra(palabra):
