@@ -168,10 +168,14 @@
     </style>
 </head>
 <body>
-        {% block content %}
+    <main class="container mx-auto px-4 py-6">    
+    {% block content %}
+</main>
         <div class="menu-container">
             <div class="menu-item">
-                <a href="/opcion1" class="btn btn-primary menu-card">Explorar Frecuencia Lógica de una Palabra</a>
+                <a href="/opcion1" class="block w-full bg-blue-500 text-white py-3 px-4 rounded-lg shadow hover:bg-blue-600 hover:shadow-lg transition">
+                    Explorar Frecuencia Lógica de una Palabra
+                 </a>
                 <p>"Descubre cómo cada palabra resuena en su contexto, a través de su frecuencia numérica."</p>
             </div>
             <div class="menu-item">
@@ -181,10 +185,10 @@
         </div>
         <div class="result-section">
             <h2 class="result-title">Resultados Recientes</h2>
-            <div class="result-card">
-                <h5>Potencial Calculado</h5>
-                <p class="highlight">42</p>
-            </div>
+            <div class="border border-blue-500 rounded-lg p-4 shadow hover:shadow-lg transition">
+                <h5 class="text-blue-500 font-bold">Potencial Calculado</h5>
+                <p class="text-gray-700">42</p>
+            </div>            
             <div class="result-card">
                 <h5>Frecuencia Encontrada</h5>
                 <p class="highlight">88</p>
@@ -193,11 +197,13 @@
         <div class="history-section mt-4">
             <h3 class="text-primary">Historial de Búsquedas</h3>
             <div class="history-container">
-                <ul class="list-group">
+                <ul class="divide-y divide-gray-200">
                     {% for item in historial %}
-                        <li class="list-group-item">{{ item }}</li>
+                    <li class="py-2 hover:bg-gray-100 transition">
+                        {{ item }}
+                    </li>
                     {% endfor %}
-                </ul>
+                </ul>                
             </div>
         </div>
         {% endblock %}

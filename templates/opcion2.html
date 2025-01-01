@@ -1,37 +1,28 @@
 {% extends "base.html" %}
 {% block title %}Cálculo de Frecuencia{% endblock %}
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="text-center">
-        <h2 class="text-3xl font-extrabold text-gray-900">
-            Cálculo de Frecuencia
-        </h2>
-        <p class="mt-4 text-gray-600">
-            Ingresa una palabra o frase para calcular su frecuencia
-        </p>
-    </div>
-
-    <div class="mt-10 bg-white shadow rounded-lg p-6">
-        <form action="/resultado_opcion2" method="post" class="space-y-6">
-            {% if error %}
-            <div class="mt-4 text-red-600">
-                La palabra contiene caracteres no válidos. Por favor, ingrese solo letras y espacios.
+<h1 class="text-3xl font-bold text-gray-900 mb-6">Cálculo de Frecuencia</h1>
+<p class="text-gray-600 mb-6">Ingresa una palabra o frase para calcular su frecuencia.</p>
+<div class="bg-white shadow rounded-lg p-6">
+    <form action="/resultado_opcion2" method="post" class="space-y-6">
+        {% if error %}
+        <div class="mt-4 text-red-600">
+            La palabra contiene caracteres no válidos. Por favor, ingrese solo letras y espacios.
+        </div>
+        {% endif %}
+        <div>
+            <label for="palabra" class="block text-sm font-medium text-gray-700">
+                Palabra o frase
+            </label>
+            <div class="mt-1">
+                <input type="text" name="palabra" id="palabra" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
             </div>
-            {% endif %}
-            <div>
-                <label for="palabra" class="block text-sm font-medium text-gray-700">
-                    Palabra o frase
-                </label>
-                <div class="mt-1">
-                    <input type="text" name="palabra" id="palabra" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
-                </div>
-            </div>
-            <div>
-                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg shadow hover:bg-blue-600">
-                    Calcular
-                </button>
-            </div>
-        </form>
-    </div>
+        </div>
+        <div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg shadow hover:bg-blue-600">
+                Calcular
+            </button>
+        </div>
+    </form>
 </div>
 {% endblock %}
