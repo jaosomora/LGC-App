@@ -5,10 +5,10 @@
     <h1 class="text-primary">Menú Principal</h1>
     <p class="lead">Selecciona una opción para continuar</p>
 </div>
-<div class="card shadow-lg p-4 rounded-lg hover:shadow-2xl transform hover:scale-105 transition duration-300">
+<div class="card shadow-lg p-4 rounded-lg border border-primary hover:bg-light transform hover:scale-105 transition duration-300">
     <ul class="list-group">
-        <li class="list-group-item"><a href="/opcion1" class="btn btn-primary w-100 shadow hover:shadow-lg transform hover:scale-105 transition duration-300">1. Calcular Palabras por Frecuencia</a></li>
-        <li class="list-group-item"><a href="/opcion2" class="btn btn-success w-100 shadow hover:shadow-lg transform hover:scale-105 transition duration-300">2. Calcular Frecuencia de una Palabra</a></li>
+        <li class="list-group-item"><a href="/opcion1" class="btn w-100 shadow transform hover:scale-105 transition duration-300" style="background: linear-gradient(90deg, #4A90E2, #50B5E9); color: white;">1. Calcular Palabras por Frecuencia</a></li>
+        <li class="list-group-item"><a href="/opcion2" class="btn w-100 shadow transform hover:scale-105 transition duration-300" style="background: linear-gradient(90deg, #50B5E9, #4A90E2); color: white;">2. Calcular Frecuencia de una Palabra</a></li>
     </ul>
 </div>
 {% if historial %}
@@ -17,7 +17,7 @@
     <div class="history-container">
         <ul class="list-group">
             {% for item in historial %}
-                <li class="list-group-item d-flex justify-content-between align-items-center shadow-sm hover:shadow-md transform hover:scale-105 transition duration-300">
+                <li class="list-group-item d-flex justify-content-between align-items-center shadow-sm border border-secondary rounded bg-light transform hover:scale-105 transition duration-300">
                     <i class="bi bi-bar-chart-fill me-2 text-primary"></i> {{ item }}
                     {% if ranking and item.split(":")[1].strip().split(" ")[0].lower() in ranking %}
                     <span class="badge bg-primary ms-2">Puntuación: {{ ranking[item.split(":")[1].strip().split(" ")[0].lower()] }}</span>
