@@ -7,23 +7,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          primary: '#4A90E2',
-          secondary: '#50B5E9',
-          accent: '#25567B',
-          light: '#F5F8FB',
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#4A90E2',
+              secondary: '#50B5E9',
+              accent: '#25567B',
+              light: '#F5F8FB',
+            },
+            fontFamily: {
+              sans: ['Poppins', 'Roboto', 'sans-serif'],
+            },
+          },
         },
-        fontFamily: {
-          sans: ['Poppins', 'Roboto', 'sans-serif'],
-        },
-      },
-    },
-  }
-</script>
+      }
+    </script>
 
     <title>{% block title %}Explora el Potencial y la Frecuencia de las Palabras{% endblock %}</title>
     <style>
@@ -102,18 +102,17 @@
         }
 
         .menu-item {
-            flex: 1 1 calc(33% - 40px);
-            max-width: calc(33% - 40px);
+            flex: 1 1 calc(50% - 20px); /* Ajusta el ancho en pantallas pequeñas */
+            max-width: calc(50% - 20px);
             min-width: 250px;
             text-align: center;
         }
 
-        .menu-item a {
-            text-decoration: none;
-        }
-
-        .menu-item a:hover {
-            color: #fff;
+        @media (max-width: 640px) {
+            .menu-item {
+                flex: 1 1 100%; /* Ocupa toda la fila en móviles */
+                max-width: 100%;
+            }
         }
 
         .result-section {
@@ -155,60 +154,52 @@
             border-radius: 10px;
             background-color: #fff;
         }
-
-        html, body {
-            height: 100%;
-            margin: 0;
-            overflow: auto;
-        }
-
-        main {
-            min-height: 100%;
-        }
     </style>
 </head>
 <body>
-    <main class="container mx-auto px-4 py-6">    
-    {% block content %}
-</main>
-        <div class="menu-container">
-            <div class="menu-item">
-                <a href="/opcion1" class="block w-full bg-blue-500 text-white py-3 px-4 rounded-lg shadow hover:bg-blue-600 hover:shadow-lg transition">
+    <main class="container mx-auto px-4 py-6">
+        {% block content %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition">
+                <a href="/opcion1" class="block w-full bg-blue-500 text-white py-3 rounded-lg shadow hover:bg-blue-600 transition">
                     Explorar Frecuencia Lógica de una Palabra
-                 </a>
-                <p>"Descubre cómo cada palabra resuena en su contexto, a través de su frecuencia numérica."</p>
+                </a>
+                <p class="mt-4 text-gray-600 text-sm">"Descubre cómo cada palabra resuena en su contexto, a través de su frecuencia numérica."</p>
             </div>
-            <div class="menu-item">
-                <a href="/opcion2" class="btn btn-success menu-card">Ralentizar Potencial en Expresión Concreta</a>
-                <p>"Convierte números abstractos en palabras, conectando con su despliegue lógico en el espacio-tiempo."</p>
-            </div>
-        </div>
-        <div class="result-section">
-            <h2 class="result-title">Resultados Recientes</h2>
-            <div class="border border-blue-500 rounded-lg p-4 shadow hover:shadow-lg transition">
-                <h5 class="text-blue-500 font-bold">Potencial Calculado</h5>
-                <p class="text-gray-700">42</p>
-            </div>            
-            <div class="result-card">
-                <h5>Frecuencia Encontrada</h5>
-                <p class="highlight">88</p>
+            <div class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition">
+                <a href="/opcion2" class="block w-full bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600 transition">
+                    Ralentizar Potencial en Expresión Concreta
+                </a>
+                <p class="mt-4 text-gray-600 text-sm">"Convierte números abstractos en palabras, conectando con su despliegue lógico en el espacio-tiempo."</p>
             </div>
         </div>
-        <div class="history-section mt-4">
-            <h3 class="text-primary">Historial de Búsquedas</h3>
-            <div class="history-container">
+        <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition">
+                <h5 class="text-lg font-semibold text-blue-500">Potencial Calculado</h5>
+                <p class="text-gray-700 mt-2">42</p>
+            </div>
+            <div class="bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition">
+                <h5 class="text-lg font-semibold text-blue-500">Frecuencia Encontrada</h5>
+                <p class="text-gray-700 mt-2">88</p>
+            </div>
+        </div>
+        <div class="history-section mt-6">
+            <h3 class="text-lg font-semibold text-gray-900">Historial de Búsquedas</h3>
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
                 <ul class="divide-y divide-gray-200">
                     {% for item in historial %}
-                    <li class="py-2 hover:bg-gray-100 transition">
-                        {{ item }}
+                    <li class="py-4 px-4 hover:bg-gray-50 transition">
+                        <p class="text-gray-900">{{ item }}</p>
                     </li>
                     {% endfor %}
-                </ul>                
+                </ul>
             </div>
         </div>
         {% endblock %}
     </main>
-    
+    <footer class="bg-gray-800 text-white text-center py-4">
+        &copy; 2024 LGC App. Todos los derechos reservados.
+    </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
