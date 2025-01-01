@@ -2,33 +2,31 @@
 {% block title %}Resultados{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="text-center">
-        <h2 class="text-3xl font-extrabold text-gray-900">
-            Resultados para "{{ palabra }}"
-        </h2>
-        <p class="mt-4 text-gray-600">
-            Explora las métricas obtenidas para "{{ palabra }}"
-        </p>
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-900">Resultados para "{{ palabra }}"</h2>
+        <p class="mt-2 text-gray-600">Explora las métricas obtenidas para "{{ palabra }}"</p>
     </div>
 
-    <!-- Sección: Potencial Lógico -->
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        <!-- Resonancias de Palabras Relacionadas -->
+    <!-- Métricas principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Potencial Lógico -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
-            ...
+            <h3 class="text-lg font-semibold text-gray-900">Potencial Lógico</h3>
+            <p class="mt-4 text-gray-700">
+                <strong>Frecuencia por letra:</strong> {{ detalle }}
+            </p>
+            <p class="text-gray-700">
+                <strong>Frecuencia total:</strong> {{ potencial }}
+            </p>
         </div>
-        <!-- Resonancia Geográfica -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
-            ...
-        </div>
-        <!-- Resonancia Elemental -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg col-span-2">
-            ...
-        </div>
-    </div>
-    
 
-        <!-- Sección: Frecuencia por Palabra -->
+        <!-- Lupa -->
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
+            <h3 class="text-lg font-semibold text-gray-900">Lupa</h3>
+            <p class="mt-4 text-gray-700">{{ lupa }}</p>
+        </div>
+
+        <!-- Frecuencia por Palabra -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
             <h3 class="text-lg font-semibold text-gray-900">Frecuencia por Palabra</h3>
             {% if frecuencias_por_palabra %}
@@ -43,27 +41,19 @@
             <p class="mt-4 text-gray-500">No se pudo calcular la frecuencia por palabra.</p>
             {% endif %}
         </div>
-
-        <!-- Sección: Lupa -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
-            <h3 class="text-lg font-semibold text-gray-900">Lupa</h3>
-            <p class="mt-4 text-gray-700">{{ lupa }}</p>
-        </div>
     </div>
 
-    <!-- Secciones Adicionales -->
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Resonancias -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <!-- Resonancias de Palabras Relacionadas -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
-            <h3 class="text-lg font-semibold text-gray-900">Potencial Lógico</h3>
-            <p class="mt-4 text-gray-700">
-                <strong>Frecuencia por letra:</strong> {{ detalle }}
-            </p>
-            <p class="text-gray-700">
-                <strong>Frecuencia total:</strong> {{ potencial }}
-            </p>
+            <h3 class="text-lg font-semibold text-gray-900">Resonancias de Palabras Relacionadas</h3>
+            {% if palabras %}
+            <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
+            {% else %}
+            <p class="mt-4 text-gray-500">No se encontraron palabras asociadas.</p>
+            {% endif %}
         </div>
-        ...
-    </div>    
 
         <!-- Resonancia Geográfica -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
@@ -78,25 +68,11 @@
             <p class="mt-4 text-gray-500">No se encontraron coincidencias geográficas.</p>
             {% endif %}
         </div>
-
-        <!-- Resonancia Elemental -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg col-span-2">
-            <h3 class="text-lg font-semibold text-gray-900">Resonancia Elemental</h3>
-            {% if elementos %}
-            <ul class="mt-4 space-y-2">
-                {% for elemento in elementos %}
-                <li>{{ elemento|safe }}</li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p class="mt-4 text-gray-500">No se encontraron elementos químicos asociados.</p>
-            {% endif %}
-        </div>
     </div>
 
     <!-- Botón de Regreso -->
     <div class="mt-12 text-center">
-        <a href="/" class="inline-block bg-blue-500 text-white font-medium py-3 px-6 rounded-lg shadow hover:bg-blue-600 transition">
+        <a href="/" class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600">
             Volver al Menú Principal
         </a>
     </div>

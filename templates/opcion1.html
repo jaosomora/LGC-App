@@ -2,21 +2,16 @@
 {% block title %}Búsqueda por Frecuencia{% endblock %}
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="text-center">
-        <h2 class="text-3xl font-extrabold text-gray-900">
-            Búsqueda por Frecuencia
-        </h2>
-        <p class="mt-4 text-gray-600">
-            Ingresa un número para calcular su frecuencia asociada
-        </p>
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-extrabold text-gray-900">Búsqueda por Frecuencia</h2>
+        <p class="mt-2 text-gray-600">Ingresa un número para calcular su frecuencia asociada.</p>
     </div>
 
-    <div class="mt-10 bg-white shadow rounded-lg p-6">
+    <!-- Formulario -->
+    <div class="bg-white shadow-md rounded-lg p-6">
         <form action="/resultado_opcion1" method="post" class="space-y-6">
             <div>
-                <label for="frecuencia" class="block text-sm font-medium text-gray-700">
-                    Ingresa la frecuencia
-                </label>
+                <label for="frecuencia" class="block text-sm font-medium text-gray-700">Ingresa la frecuencia</label>
                 <div class="mt-1">
                     <input type="number" name="frecuencia" id="frecuencia" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
                 </div>
@@ -27,6 +22,74 @@
                 </button>
             </div>
         </form>
+    </div>
+
+    <!-- Resultados -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Potencial Lógico -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900">Potencial Lógico</h3>
+            <p class="mt-4 text-gray-700">
+                <strong>Frecuencia por letra:</strong> {{ detalle }}
+            </p>
+            <p class="text-gray-700">
+                <strong>Frecuencia total:</strong> {{ potencial }}
+            </p>
+        </div>
+
+        <!-- Lupa -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900">Lupa</h3>
+            <p class="mt-4 text-gray-700">{{ lupa }}</p>
+        </div>
+
+        <!-- Resonancia Geográfica -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900">Resonancia Geográfica</h3>
+            {% if territorios %}
+            <ul class="mt-4 space-y-2">
+                {% for territorio in territorios %}
+                <li>Código Territorial: +{{ territorio['codigo'] }} - País: {{ territorio['pais'] }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="mt-4 text-gray-500">No se encontraron coincidencias geográficas.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sección de Resonancias -->
+    <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Resonancias de Palabras Relacionadas -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900">Resonancias de Palabras Relacionadas</h3>
+            {% if palabras %}
+            <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
+            {% else %}
+            <p class="mt-4 text-gray-500">No se encontraron palabras asociadas.</p>
+            {% endif %}
+        </div>
+
+        <!-- Resonancia Elemental -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900">Resonancia Elemental</h3>
+            {% if elementos %}
+            <ul class="mt-4 space-y-2">
+                {% for elemento in elementos %}
+                <li>{{ elemento|safe }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="mt-4 text-gray-500">No se encontraron elementos químicos asociados.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botón de Regreso -->
+    <div class="mt-12 text-center">
+        <a href="/" class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600">
+            Volver al Menú Principal
+        </a>
     </div>
 </div>
 {% endblock %}
