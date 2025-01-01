@@ -27,10 +27,16 @@
                             {{ item }}
                         </td>
                         <td class="px-6 py-4 text-right">
-                            <a href="{{ url_for('buscar_historial', query=item) }}" class="text-blue-500 hover:underline">
-                                Ver Detalles
-                            </a>
-                        </td>
+                            {% if ranking and item in ranking %}
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                Puntuación: {{ ranking[item] }}
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                Sin puntuación
+                            </span>
+                            {% endif %}
+                        </td>                        
                     </tr>
                     {% endfor %}
                 </tbody>
