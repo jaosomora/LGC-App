@@ -1,61 +1,50 @@
 {% extends "base.html" %}
 {% block title %}Resultados{% endblock %}
 {% block content %}
-<div class="container py-5">
-    <h2 class="text-center text-success">Despliegue del Potencial para la palabra "{{ palabra }}"</h2>
-    <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Potencial Lógico de "{{ palabra }}"</h3>
-        <p><strong>Frecuencia por letra:</strong> {{ detalle }}</p>
-        <p><strong>Frecuencia total (suma):</strong> {{ potencial }}</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-gray-900">
+            Resultados para "{{ palabra }}"
+        </h2>
+        <p class="mt-4 text-gray-600">
+            Explora las métricas obtenidas para tu búsqueda
+        </p>
     </div>
-    <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Frecuencia por Palabra</h3>
-        {% if frecuencias_por_palabra %}
-        <ul>
-            {% for palabra, data in frecuencias_por_palabra.items() %}
-            <li><strong>{{ palabra }}</strong>: {{ data["frecuencia_por_letra"] }} = {{ data["suma"] }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>No se pudo calcular la frecuencia por palabra.</p>
-        {% endif %}
-    </div>    
-    <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Lupa: Frecuencia Amplificada</h3>
-        <p>{{ lupa }}</p>
+
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
+            <h3 class="text-lg font-semibold text-gray-900">Potencial Lógico</h3>
+            <p class="mt-4 text-gray-700">
+                <strong>Frecuencia por letra:</strong> {{ detalle }}
+            </p>
+            <p class="text-gray-700">
+                <strong>Frecuencia total:</strong> {{ potencial }}
+            </p>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
+            <h3 class="text-lg font-semibold text-gray-900">Frecuencia por Palabra</h3>
+            {% if frecuencias_por_palabra %}
+            <ul class="mt-4 space-y-2">
+                {% for palabra, data in frecuencias_por_palabra.items() %}
+                <li>
+                    <strong>{{ palabra }}</strong>: {{ data["frecuencia_por_letra"] }} = {{ data["suma"] }}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="mt-4 text-gray-500">No se pudo calcular la frecuencia por palabra.</p>
+            {% endif %}
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
+            <h3 class="text-lg font-semibold text-gray-900">Lupa</h3>
+            <p class="mt-4 text-gray-700">{{ lupa }}</p>
+        </div>
     </div>
-    <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Resonancias de Palabras Relacionadas</h3>
-        {% if palabras %}
-        <p><i>{{ palabras | join(', ') }}</i></p>
-        {% else %}
-        <p>No se encontraron palabras asociadas.</p>
-        {% endif %}
+
+    <div class="mt-12">
+        <a href="/" class="inline-block bg-blue-500 text-white font-medium py-3 px-6 rounded-lg shadow hover:bg-blue-600 transition">
+            Volver al Menú Principal
+        </a>
     </div>
-    <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary">Resonancia Geográfica</h3>
-        {% if territorios %}
-        <ul>
-            {% for territorio in territorios %}
-            <li>Código Territorial: +{{ territorio['codigo'] }} - País: {{ territorio['pais'] }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>No se encontraron coincidencias geográficas.</p>
-        {% endif %}
-    </div>
-    <div class="card shadow-sm p-4 my-4">
-        <h3 class="text-primary"><strong>Resonancia Elemental</strong></h3>
-        {% if elementos %}
-        <ul>
-            {% for elemento in elementos %}
-            <li>{{ elemento|safe }}</li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>No se encontraron elementos químicos asociados.</p>
-        {% endif %}
-    </div>
-    <a href="/" class="btn btn-secondary">Volver al Menú Principal</a>
 </div>
 {% endblock %}
