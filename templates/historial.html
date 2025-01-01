@@ -21,16 +21,17 @@
                     {{ item }}
                 </td>
                 <td class="px-4 py-3 text-right">
-                    {% if ranking and item in ranking %}
+                    {% set normalizada = item.lower() %}
+                    {% if ranking and normalizada in ranking %}
                     <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                        Puntuación: {{ ranking[item] }}
+                        Puntuación: {{ ranking[normalizada] }}
                     </span>
                     {% else %}
                     <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
                         Sin puntuación
                     </span>
                     {% endif %}
-                </td>
+                </td>                
             </tr>
             {% endfor %}
         </tbody>
