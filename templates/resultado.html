@@ -52,16 +52,18 @@
     </div>
 
     <!-- Secciones Adicionales -->
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        <!-- Resonancias de Palabras Relacionadas -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
-            <h3 class="text-lg font-semibold text-gray-900">Resonancias de Palabras Relacionadas</h3>
-            {% if palabras %}
-            <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
-            {% else %}
-            <p class="mt-4 text-gray-500">No se encontraron palabras asociadas.</p>
-            {% endif %}
+            <h3 class="text-lg font-semibold text-gray-900">Potencial Lógico</h3>
+            <p class="mt-4 text-gray-700">
+                <strong>Frecuencia por letra:</strong> {{ detalle }}
+            </p>
+            <p class="text-gray-700">
+                <strong>Frecuencia total:</strong> {{ potencial }}
+            </p>
         </div>
+        ...
+    </div>    
 
         <!-- Resonancia Geográfica -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
