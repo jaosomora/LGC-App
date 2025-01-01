@@ -7,10 +7,11 @@
             Resultados para "{{ palabra }}"
         </h2>
         <p class="mt-4 text-gray-600">
-            Despliegue completo de las métricas y resonancias asociadas
+            Explora las métricas obtenidas para "{{ palabra }}"
         </p>
     </div>
 
+    <!-- Sección: Potencial Lógico -->
     <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
             <h3 class="text-lg font-semibold text-gray-900">Potencial Lógico</h3>
@@ -21,6 +22,8 @@
                 <strong>Frecuencia total:</strong> {{ potencial }}
             </p>
         </div>
+
+        <!-- Sección: Frecuencia por Palabra -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
             <h3 class="text-lg font-semibold text-gray-900">Frecuencia por Palabra</h3>
             {% if frecuencias_por_palabra %}
@@ -35,13 +38,57 @@
             <p class="mt-4 text-gray-500">No se pudo calcular la frecuencia por palabra.</p>
             {% endif %}
         </div>
+
+        <!-- Sección: Lupa -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
             <h3 class="text-lg font-semibold text-gray-900">Lupa</h3>
             <p class="mt-4 text-gray-700">{{ lupa }}</p>
         </div>
     </div>
 
-    <div class="mt-12">
+    <!-- Secciones Adicionales -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <!-- Resonancias de Palabras Relacionadas -->
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
+            <h3 class="text-lg font-semibold text-gray-900">Resonancias de Palabras Relacionadas</h3>
+            {% if palabras %}
+            <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
+            {% else %}
+            <p class="mt-4 text-gray-500">No se encontraron palabras asociadas.</p>
+            {% endif %}
+        </div>
+
+        <!-- Resonancia Geográfica -->
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg">
+            <h3 class="text-lg font-semibold text-gray-900">Resonancia Geográfica</h3>
+            {% if territorios %}
+            <ul class="mt-4 space-y-2">
+                {% for territorio in territorios %}
+                <li>Código Territorial: +{{ territorio['codigo'] }} - País: {{ territorio['pais'] }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="mt-4 text-gray-500">No se encontraron coincidencias geográficas.</p>
+            {% endif %}
+        </div>
+
+        <!-- Resonancia Elemental -->
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg col-span-2">
+            <h3 class="text-lg font-semibold text-gray-900">Resonancia Elemental</h3>
+            {% if elementos %}
+            <ul class="mt-4 space-y-2">
+                {% for elemento in elementos %}
+                <li>{{ elemento|safe }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="mt-4 text-gray-500">No se encontraron elementos químicos asociados.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botón de Regreso -->
+    <div class="mt-12 text-center">
         <a href="/" class="inline-block bg-blue-500 text-white font-medium py-3 px-6 rounded-lg shadow hover:bg-blue-600 transition">
             Volver al Menú Principal
         </a>
