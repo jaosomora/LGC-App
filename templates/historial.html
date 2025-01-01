@@ -6,14 +6,41 @@
     <title>Historial de Búsquedas</title>
 </head>
 <body>
-    <h1>Historial de Búsquedas</h1>
-    <ul>
-        {% for item in historial %}
-        <li>
-            <a href="{{ url_for('buscar_historial', query=item) }}">{{ item }}</a>
-        </li>
-        {% endfor %}
-    </ul>
-    <a href="{{ url_for('menu_principal') }}">Volver al Menú</a>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Historial de Búsquedas</h1>
+        <div class="overflow-hidden border border-gray-200 rounded-lg shadow-md">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Búsqueda
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Acción
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in historial %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-gray-900">
+                            {{ item }}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{{ url_for('buscar_historial', query=item) }}" class="text-blue-500 hover:underline">
+                                Ver Detalles
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-6">
+            <a href="{{ url_for('menu_principal') }}" class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600">
+                Volver al Menú
+            </a>
+        </div>
+    </div>
 </body>
 </html>

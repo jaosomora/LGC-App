@@ -1,22 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Cálculo de Frecuencia{% endblock %}
 {% block content %}
-<div class="text-center mb-4">
-    <h2 class="text-success">Cálculo de Frecuencia</h2>
-    
-    <!-- Mostrar mensaje de error si existe -->
-    {% if error %}
-    <div class="alert alert-danger" role="alert">
-        {{ error }}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-gray-900">
+            Cálculo de Frecuencia
+        </h2>
+        <p class="mt-4 text-gray-600">
+            Ingresa una palabra o frase para calcular su frecuencia
+        </p>
     </div>
-    {% endif %}
-    
-    <form action="/resultado_opcion2" method="post" class="shadow p-4 rounded bg-light">
-        <div class="mb-3">
-            <label for="palabra" class="form-label">Ingresa la palabra o frase:</label>
-            <input type="text" name="palabra" id="palabra" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-success w-100">Calcular</button>
-    </form>
+
+    <div class="mt-10 bg-white shadow rounded-lg p-6">
+        <form action="/resultado_opcion2" method="post" class="space-y-6">
+            <div>
+                <label for="palabra" class="block text-sm font-medium text-gray-700">
+                    Palabra o frase
+                </label>
+                <div class="mt-1">
+                    <input type="text" name="palabra" id="palabra" class="block w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm" required>
+                </div>
+            </div>
+            <div>
+                <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600">
+                    Calcular
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
