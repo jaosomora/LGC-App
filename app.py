@@ -329,7 +329,7 @@ def cargar_ranking_desde_bd():
 def actualizar_ranking(palabra):
     try:
         # Normalizar palabra o frase
-        palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
+        palabra_normalizada = normalizar_palabra_con_espacios(palabra).strip().lower()
         print(f"Intentando actualizar ranking para: {palabra_normalizada}")
 
         connection = sqlite3.connect(db_path)
@@ -343,11 +343,16 @@ def actualizar_ranking(palabra):
             # Incrementar puntuación
             nueva_puntuacion = resultado[0] + 1
             cursor.execute("UPDATE ranking SET puntuacion = ? WHERE palabra = ?", (nueva_puntuacion, palabra_normalizada))
-            print(f"Ranking actualizado para '{palabra_normalizada}' -> Nueva puntuación: {nueva_puntuacion}")
+            print(f"Ranking actualizado: {palabra_normalizada} -> Puntuación: {nueva_puntuacion}")
         else:
             # Agregar nueva palabra o frase
             cursor.execute("INSERT INTO ranking (palabra, puntuacion) VALUES (?, ?)", (palabra_normalizada, 1))
             print(f"'{palabra_normalizada}' añadida al ranking con puntuación inicial de 1.")
+        
+        # Depuración adicional para verificar el estado final de la tabla
+        cursor.execute("SELECT * FROM ranking WHERE palabra = ?", (palabra_normalizada,))
+        final_resultado = cursor.fetchone()
+        print(f"Estado final en la base de datos para '{palabra_normalizada}': {final_resultado}")
 
         connection.commit()
         connection.close()
@@ -385,23 +390,51 @@ def menu_principal():
 
     # Cargar el ranking desde la base de datos
     ranking = cargar_ranking_desde_bd()
-    ranking_dict = {normalizar_palabra_con_espacios(palabra): puntuacion for palabra, puntuacion in ranking} if ranking else {}
+    ranking_dict = {}
+    for palabra, puntuacion in ranking:
+        palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
+        ranking_dict[palabra_normalizada] = puntuacion
+    print(f"Ranking dict procesado correctamente: {ranking_dict}")
+
+    # Logs de depuración
+    print(f"Ranking desde BD: {ranking}")
+    print(f"Ranking dict procesado: {ranking_dict}")
 
     # Normalizar las palabras en el historial para evitar duplicados
-    historial_normalizado = {}
+    historial_normalizado = []
     for entry in historial:
-        palabra_original = entry.split(":")[1].strip().split("->")[0].strip()
-        palabra_normalizada = normalizar_palabra_con_espacios(palabra_original)
-        palabra_key = normalizar_palabra_con_espacios(entry.split(":")[1].strip().split("->")[0].strip().lower())
-        historial_normalizado[palabra_key] = entry
+        try:
+            # Extraer palabra o frecuencia del historial
+            if "Palabra:" in entry:
+                palabra_extraida = entry.split("Palabra:")[1].split("->")[0].strip().lower()
+            elif "Frecuencia:" in entry:
+                palabra_extraida = entry.split("Frecuencia:")[1].split("->")[0].strip().lower()
+            else:
+                palabra_extraida = None
 
+            # Agregar al historial normalizado con su puntuación correspondiente
+            historial_normalizado.append({
+                "item": entry,
+                "palabra": palabra_extraida,
+                "puntuacion": ranking_dict.get(palabra_extraida, None)
+            })
+        except IndexError:
+            historial_normalizado.append({
+                "item": entry,
+                "palabra": None,
+                "puntuacion": None
+            })
 
     # Convertir a lista ordenada y única
-    historial_unico = list(historial_normalizado.values())
+    historial_unico = historial_normalizado
     historial_unico.sort(key=lambda x: ranking_dict.get(
-        normalizar_palabra_con_espacios(x.split(":")[1].strip().split("->")[0]).lower(), 0
+        normalizar_palabra_con_espacios(x["palabra"]).lower(), 0
     ), reverse=True)
 
+    # Log del historial ordenado
+    print(f"Historial único ordenado: {historial_unico}")
+
+    # Retornar el render correctamente
     return render_template('menu.html', historial=historial_unico, ranking=ranking_dict)
 
 
@@ -477,9 +510,15 @@ def resultado_opcion2():
             actualizar_ranking(palabra_normalizada)
 
     # Normalizar la palabra antes de guardar o actualizar
+    print(f"Palabra ingresada: {palabra}")
     palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
+    print(f"Palabra normalizada: {palabra_normalizada}")
+    print(f"Ranking antes de actualizar: {cargar_ranking_desde_bd()}")
+
     guardar_palabra(palabra_normalizada)
     actualizar_ranking(palabra_normalizada)
+
+    print(f"Ranking después de actualizar: {cargar_ranking_desde_bd()}")
 
     if 'historial' not in session:
         session['historial'] = []
@@ -542,9 +581,15 @@ def resultado_opcion1():
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     # Normalizar la frecuencia y tratarla como palabra para el ranking
+    print(f"Frecuencia ingresada: {frecuencia}")
     frecuencia_normalizada = normalizar_palabra_con_espacios(str(frecuencia))
+    print(f"Frecuencia normalizada: {frecuencia_normalizada}")
+    print(f"Ranking antes de actualizar: {cargar_ranking_desde_bd()}")
+
     guardar_palabra(frecuencia_normalizada)
     actualizar_ranking(frecuencia_normalizada)
+
+    print(f"Ranking después de actualizar: {cargar_ranking_desde_bd()}")
 
 
     if 'historial' not in session:

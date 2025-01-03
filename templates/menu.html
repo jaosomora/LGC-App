@@ -1,33 +1,79 @@
-{% extends "base.html" %}
-{% block title %}Interfaz LGC{% endblock %}
-{% block content %}
-<div class="text-center mb-4">
-    <h1 class="text-primary">Menú Principal</h1>
-    <p class="lead">Selecciona una opción para continuar</p>
-</div>
-<div class="card shadow-sm p-4">
-    <ul class="list-group">
-        <li class="list-group-item"><a href="/opcion1" class="btn btn-primary w-100">1. Calcular Palabras por Frecuencia</a></li>
-        <li class="list-group-item"><a href="/opcion2" class="btn btn-success w-100">2. Calcular Frecuencia de una Palabra</a></li>
-    </ul>
-</div>
-{% if historial %}
-<div class="mt-5">
-    <h3 class="text-secondary">Historial de Búsquedas</h3>
-    <div class="history-container">
-        <ul class="list-group">
-            {% for item in historial %}
-                <li class="list-group-item">
-                    {{ item }}
-                    {% if ranking and item.split(":")[1].strip().split(" ")[0].lower() in ranking %}
-                    <span class="badge bg-primary ms-2">Puntuación: {{ ranking[item.split(":")[1].strip().split(" ")[0].lower()] }}</span>
-                    {% else %}
-                    <span class="badge bg-secondary ms-2">Sin puntuación</span>
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+{% extends "base.html" %} {% block title %}Interfaz LGC{% endblock %} {% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Encabezado -->
+    <div class="text-center">
+        <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl">
+            Menú Principal
+        </h1>
+        <p class="mt-4 text-lg text-gray-500">
+            Selecciona una opción para continuar
+        </p>
     </div>
+
+    <!-- Tarjetas del Menú Principal -->
+    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <a href="/opcion1" class="group block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-500 hover:border-transparent hover:shadow-lg transition">
+            <h3 class="text-lg font-medium text-gray-900 group-hover:text-white">
+                1. Calcular Palabras por Frecuencia
+            </h3>
+            <p class="mt-2 text-gray-500 group-hover:text-gray-200">
+                Calcula las palabras que se repiten con mayor frecuencia en el texto.
+            </p>
+        </a>
+        <a href="/opcion2" class="group block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-green-500 hover:border-transparent hover:shadow-lg transition">
+            <h3 class="text-lg font-medium text-gray-900 group-hover:text-white">
+                2. Calcular Frecuencia de una Palabra
+            </h3>
+            <p class="mt-2 text-gray-500 group-hover:text-gray-200">
+                Calcula cuántas veces aparece una palabra específica en el texto.
+            </p>
+        </a>
+    </div>
+
+    <!-- Historial de Búsquedas -->
+    {% if historial %}
+    <!-- Renderizar Historial si existe -->
+    <div class="mt-16">
+        <h3 class="text-xl font-semibold text-gray-900">Historial de Búsquedas
+        </h3>
+        <div class="mt-4 overflow-hidden border border-gray-200 rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Palabra o Frecuencia
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Puntuación
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for entry in historial %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-gray-900">
+                            {{ entry.item }}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            {% if entry.puntuacion %}
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                Puntuación: {{ entry.puntuacion }}
+                            </span> {% else %}
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                Sin puntuación
+                            </span> {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <!-- Mostrar un mensaje alternativo -->
+    <div class="mt-16 text-center">
+        <p class="text-gray-500 text-lg">No hay búsquedas recientes.</p>
+    </div>
+    {% endif %}
 </div>
-{% endif %}
 {% endblock %}
