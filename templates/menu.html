@@ -1,6 +1,4 @@
-{% extends "base.html" %}
-{% block title %}Interfaz LGC{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block title %}Interfaz LGC{% endblock %} {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Encabezado -->
     <div class="text-center">
@@ -35,7 +33,8 @@
     <!-- Historial de Búsquedas -->
     {% if historial %}
     <div class="mt-16">
-        <h3 class="text-xl font-semibold text-gray-900">Historial de Búsquedas</h3>
+        <h3 class="text-xl font-semibold text-gray-900">Historial de Búsquedas
+        </h3>
         <div class="mt-4 overflow-hidden border border-gray-200 rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
@@ -49,18 +48,23 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    {% for item in historial %}
+                    {% for entry in historial %}
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 text-gray-900">
-                            {{ item }}
+                            {{ entry.item }}
                         </td>
                         <td class="px-6 py-4 text-right">
+                            {% if entry.puntuacion %}
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                Puntuación: {{ entry.puntuacion }}
+                            </span> {% else %}
                             <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
                                 Sin puntuación
-                            </span>
+                            </span> {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
+
                 </tbody>
             </table>
         </div>
