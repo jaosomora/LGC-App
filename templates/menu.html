@@ -32,6 +32,7 @@
 
     <!-- Historial de Búsquedas -->
     {% if historial %}
+    <!-- Renderizar Historial si existe -->
     <div class="mt-16">
         <h3 class="text-xl font-semibold text-gray-900">Historial de Búsquedas
         </h3>
@@ -64,10 +65,14 @@
                         </td>
                     </tr>
                     {% endfor %}
-
                 </tbody>
             </table>
         </div>
+    </div>
+    {% else %}
+    <!-- Mostrar un mensaje alternativo -->
+    <div class="mt-16 text-center">
+        <p class="text-gray-500 text-lg">No hay búsquedas recientes.</p>
     </div>
     {% endif %}
 </div>
