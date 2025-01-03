@@ -158,7 +158,6 @@ proyecto/
 ├── tabla_periodica.json   # Datos JSON de la tabla periódica
 ├── territorios.json       # Datos JSON de territorios
 ├── static/                # Archivos estáticos
-│   └── styles.css         # Hojas de estilo
 ├── templates/             # Plantillas HTML
 │   ├── base.html          # Plantilla base
 │   ├── menu.html          # Menú principal
