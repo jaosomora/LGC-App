@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## [1.2.1] - 2025-01-03
+### Fixed
+- Resolución del problema con el cálculo incorrecto de la frecuencia de la letra `ñ` en la función `calcular_frecuencia_por_palabra`.
+- Ajuste en la normalización de palabras para preservar correctamente la `ñ` y evitar errores al calcular sus frecuencias.
+- Corrección de valores cero en las frecuencias por palabra relacionadas con normalización de letras y mapeo en el diccionario `valores_letras`.
+
+### Added
+- Nuevos comentarios en el código para mejorar la comprensión de la lógica en `calcular_frecuencia_por_palabra`.
+
 ## [1.2.0] - 2025-01-02
 ### Added
 - Migración completa a Tailwind CSS para un diseño más moderno y consistente.
