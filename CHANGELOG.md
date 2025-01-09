@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [1.2.2] - 2025-01-08
+### Added
+- Inclusión de todos los países reconocidos por la ONU y territorios adicionales en el archivo `territorios_final.json`, asegurando que cada país tenga su respectivo código telefónico internacional.
+- Reformateo del archivo `territorios_final.json` para cumplir con el estándar compacto solicitado.
+
+### Fixed
+- Corrección de códigos ausentes en los países faltantes para una representación precisa de los datos.
+
 ## [1.2.1] - 2025-01-03
 ### Fixed
 - Resolución del problema con el cálculo incorrecto de la frecuencia de la letra `ñ` en la función `calcular_frecuencia_por_palabra`.
