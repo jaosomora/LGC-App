@@ -679,6 +679,20 @@ def resultado_opcion2():
     # Calcular frecuencia por palabra en caso de que sea una frase
     frecuencias_por_palabra, suma_total = calcular_frecuencia_por_palabra(palabra)
 
+    # Verificar si hay más de una palabra
+    palabras_lista = palabra.split()  # Dividir la entrada en palabras
+    mostrar_numeros_por_letra = len(palabras_lista) > 1  # True si hay más de una palabra
+
+    # Crear la lista completa de números por letra solo si es necesario
+    numeros_por_letra = []
+    if mostrar_numeros_por_letra:
+        numeros_por_letra = [
+            valor
+            for palabra, data in frecuencias_por_palabra.items()
+            for valor in data["frecuencia_por_letra"]
+        ]
+    print(f"[DEBUG] Números por letra: {numeros_por_letra}")
+
     # Depuración de los resultados
     print(f"[DEBUG] Frecuencias por palabra: {frecuencias_por_palabra}")
     print(f"[DEBUG] Suma total de frecuencias: {suma_total}")
@@ -744,11 +758,13 @@ def resultado_opcion2():
         lupa=lupa,
         detalle=detalle,
         frecuencias_por_palabra=frecuencias_por_palabra,
-        total=suma_total,  # Cambiado para incluir el total de frecuencias
+        total=suma_total,
+        numeros_por_letra=numeros_por_letra,
+        mostrar_numeros_por_letra=mostrar_numeros_por_letra,  # Nueva bandera para el template
         territorios=territorios_encontrados,
         palabras=palabras_encontradas,
         elementos=elementos,
-        opcion=2,  # Identificar opción 2 en el template
+        opcion=2,
     )
 
 

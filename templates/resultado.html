@@ -18,6 +18,10 @@
     <!-- Opción 2: Reorganizar Potencial Lógico, Lupa y Frecuencia -->
     <div class="grid grid-cols-1 gap-4">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+            {% if mostrar_numeros_por_letra %}
+            <!-- Usar la palabra o frase buscada como título -->
+            <p class="mt-4 text-gray-700"><strong>{{ palabra }}:</strong> {{ numeros_por_letra }}</p>
+            {% endif %}
             <ul class="mt-4 space-y-2">
                 {% for palabra, data in frecuencias_por_palabra.items() %}
                 <li>
