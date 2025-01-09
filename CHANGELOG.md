@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## [1.2.3] - 2025-01-08
+### Added
+- Implementación de la funcionalidad para mostrar "Número por letra" solo cuando se ingresan frases con más de una palabra en la opción `resultado_opcion2`.
+- El encabezado dinámico en la opción 2 ahora utiliza la frase buscada como título para los "Números por letra".
+- Nueva lógica en el controlador para manejar entradas con múltiples palabras, pasando una bandera (`mostrar_numeros_por_letra`) al template para controlar la visualización.
+
+### Fixed
+- Ajustes en la plantilla `resultado.html` para mantener consistencia visual y no mostrar "Número por letra" en entradas con una sola palabra.
+- Verificación adicional para evitar duplicados en las entradas del historial.
+
 ## [1.2.2] - 2025-01-08
 ### Added
 - Inclusión de todos los países reconocidos por la ONU y territorios adicionales en el archivo `territorios_final.json`, asegurando que cada país tenga su respectivo código telefónico internacional.
