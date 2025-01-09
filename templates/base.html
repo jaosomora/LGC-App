@@ -70,6 +70,86 @@
         </div>
         {% endblock %}
     </main>
+
+    <!-- Modal -->
+    <div
+        id="modal"
+        class="fixed inset-0 bg-black/50 backdrop-blur hidden flex items-center justify-center z-50"
+    >
+        <div class="bg-white w-11/12 max-w-md rounded-lg shadow-lg p-6 text-center">
+            <h3 id="modal-title" class="text-lg font-bold mb-4">¿Qué deseas buscar?</h3>
+            <input
+                id="user-input"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
+                placeholder="Ingresa aquí"
+            />
+            <div class="mt-6 flex justify-end gap-4">
+                <button
+                    onclick="submitInput()"
+                    class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+                >
+                    Confirmar
+                </button>
+                <button
+                    onclick="closeModal()"
+                    class="bg-gray-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-600 transition"
+                >
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let selectedOption = null;
+
+        // Mostrar el modal
+        function showModal(option) {
+            selectedOption = option;
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const userInput = document.getElementById('user-input');
+
+            // Configurar el título según la opción
+            if (option === 1) {
+                title.innerText = 'Ingresa la frecuencia';
+                userInput.placeholder = 'Escribe un número';
+            } else if (option === 2) {
+                title.innerText = 'Ingresa la palabra o frase';
+                userInput.placeholder = 'Escribe aquí';
+            }
+
+            modal.classList.remove('hidden');
+            document.getElementById('menu-content').classList.add('blur-sm');
+        }
+
+        // Cerrar el modal
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            modal.classList.add('hidden');
+            document.getElementById('menu-content').classList.remove('blur-sm');
+        }
+
+        // Manejar el envío de datos
+        function submitInput() {
+            const userInput = document.getElementById('user-input').value.trim();
+            if (!userInput) {
+                alert('Por favor, ingresa un valor válido.');
+                return;
+            }
+
+            // Redirigir según la opción seleccionada
+            if (selectedOption === 1) {
+                window.location.href = `/resultado_opcion1?frecuencia=${encodeURIComponent(userInput)}`;
+            } else if (selectedOption === 2) {
+                window.location.href = `/resultado_opcion2?palabra=${encodeURIComponent(userInput)}`;
+            }
+
+            closeModal();
+        }
+    </script>
 </body>
 
 </html>
