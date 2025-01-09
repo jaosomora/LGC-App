@@ -135,94 +135,102 @@
 <script>
     let selectedOption = null;
 
+    // Listener global para la tecla Esc
+    document.addEventListener('keydown', (event) => {
+        const modal = document.getElementById('modal');
+        if (!modal.classList.contains('hidden') && event.key === 'Escape') {
+            closeModal();
+        }
+    });
+
     function showModal(option) {
-    selectedOption = option;
-    const modal = document.getElementById('modal');
-    const title = document.getElementById('modal-title');
-    const userInput = document.getElementById('user-input');
-    const inputError = document.getElementById('input-error');
+        selectedOption = option;
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modal-title');
+        const userInput = document.getElementById('user-input');
+        const inputError = document.getElementById('input-error');
 
-    userInput.value = ''; // Resetear valor al abrir el modal
-    inputError.classList.add('hidden'); // Ocultar mensaje de error
-    userInput.classList.remove('bg-red-100'); // Quitar fondo rojo
+        userInput.value = ''; // Resetear valor al abrir el modal
+        inputError.classList.add('hidden'); // Ocultar mensaje de error
+        userInput.classList.remove('bg-red-100'); // Quitar fondo rojo
 
-    // Configurar validación según la opción seleccionada
-    if (option === 1) {
-        title.innerText = 'Ingresa número';
-        userInput.placeholder = 'Escribe un número';
-        userInput.type = 'text'; // Usar text para validación
-        userInput.inputMode = 'numeric'; // Activar teclado numérico en móviles
-        userInput.oninput = () => {
-            // Validar solo números
-            userInput.value = userInput.value.replace(/[^0-9]/g, '');
-        };
-    } else if (option === 2) {
-        title.innerText = 'Ingresa la palabra o frase';
-        userInput.placeholder = 'Escribe aquí';
-        userInput.type = 'text';
-        userInput.inputMode = ''; // Quitar inputMode para texto
-        userInput.oninput = () => {
-            // Validar solo letras, espacios y caracteres válidos del español
-            const invalidCharacters = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(userInput.value);
-            if (invalidCharacters) {
-                userInput.classList.add('bg-red-100'); // Cambiar fondo a rojo claro
-                inputError.classList.remove('hidden'); // Mostrar mensaje de error
-            } else {
-                userInput.classList.remove('bg-red-100'); // Quitar fondo rojo
-                inputError.classList.add('hidden'); // Ocultar mensaje de error
-            }
-        };
+        // Configurar validación según la opción seleccionada
+        if (option === 1) {
+            title.innerText = 'Ingresa número';
+            userInput.placeholder = 'Escribe un número';
+            userInput.type = 'text'; // Usar text para validación
+            userInput.inputMode = 'numeric'; // Activar teclado numérico en móviles
+            userInput.oninput = () => {
+                // Validar solo números
+                userInput.value = userInput.value.replace(/[^0-9]/g, '');
+            };
+        } else if (option === 2) {
+            title.innerText = 'Ingresa la palabra o frase';
+            userInput.placeholder = 'Escribe aquí';
+            userInput.type = 'text';
+            userInput.inputMode = ''; // Quitar inputMode para texto
+            userInput.oninput = () => {
+                // Validar solo letras, espacios y caracteres válidos del español
+                const invalidCharacters = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(userInput.value);
+                if (invalidCharacters) {
+                    userInput.classList.add('bg-red-100'); // Cambiar fondo a rojo claro
+                    inputError.classList.remove('hidden'); // Mostrar mensaje de error
+                } else {
+                    userInput.classList.remove('bg-red-100'); // Quitar fondo rojo
+                    inputError.classList.add('hidden'); // Ocultar mensaje de error
+                }
+            };
+        }
+
+        modal.classList.remove('hidden');
+        document.getElementById('menu-content').classList.add('blur-sm');
     }
 
-    modal.classList.remove('hidden');
-    document.getElementById('menu-content').classList.add('blur-sm');
-}
-
-function closeModal() {
-    const modal = document.getElementById('modal');
-    modal.classList.add('hidden');
-    document.getElementById('menu-content').classList.remove('blur-sm');
-}
-
-function submitInput() {
-    const userInput = document.getElementById('user-input').value.trim();
-    const inputError = document.getElementById('input-error');
-
-    // Validar entrada antes de enviar
-    if (selectedOption === 2 && /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(userInput)) {
-        inputError.classList.remove('hidden');
-        return;
+    function closeModal() {
+        const modal = document.getElementById('modal');
+        modal.classList.add('hidden');
+        document.getElementById('menu-content').classList.remove('blur-sm');
     }
 
-    if (!userInput) {
-        alert('Por favor, ingresa un valor válido.');
-        return;
+    function submitInput() {
+        const userInput = document.getElementById('user-input').value.trim();
+        const inputError = document.getElementById('input-error');
+
+        // Validar entrada antes de enviar
+        if (selectedOption === 2 && /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(userInput)) {
+            inputError.classList.remove('hidden');
+            return;
+        }
+
+        if (!userInput) {
+            alert('Por favor, ingresa un valor válido.');
+            return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+
+        if (selectedOption === 1) {
+            form.action = '/resultado_opcion1';
+            const inputField = document.createElement('input');
+            inputField.type = 'hidden';
+            inputField.name = 'frecuencia';
+            inputField.value = userInput;
+            form.appendChild(inputField);
+        } else if (selectedOption === 2) {
+            form.action = '/resultado_opcion2';
+            const inputField = document.createElement('input');
+            inputField.type = 'hidden';
+            inputField.name = 'palabra';
+            inputField.value = userInput;
+            form.appendChild(inputField);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        closeModal();
     }
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-
-    if (selectedOption === 1) {
-        form.action = '/resultado_opcion1';
-        const inputField = document.createElement('input');
-        inputField.type = 'hidden';
-        inputField.name = 'frecuencia';
-        inputField.value = userInput;
-        form.appendChild(inputField);
-    } else if (selectedOption === 2) {
-        form.action = '/resultado_opcion2';
-        const inputField = document.createElement('input');
-        inputField.type = 'hidden';
-        inputField.name = 'palabra';
-        inputField.value = userInput;
-        form.appendChild(inputField);
-    }
-
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
-
-    closeModal();
-}
 </script>
 {% endblock %}
