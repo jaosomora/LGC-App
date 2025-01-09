@@ -1,38 +1,52 @@
-{% extends "base.html" %} {% block title %}Interfaz LGC{% endblock %} {% block content %}
+{% extends "base.html" %} 
+{% block title %}Interfaz LGC{% endblock %} 
+{% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Encabezado -->
     <div class="text-center">
-        <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl">
-            Menú Principal
+        <!-- Encabezado principal -->
+        <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 sm:text-5xl lg:text-6xl">
+            Explora el <mark class="px-2 text-white bg-blue-600 rounded">potencial lógico</mark> que conecta las palabras con los números
         </h1>
-        <p class="mt-4 text-lg text-gray-500">
-            Selecciona una opción para continuar
+        <!-- Descripción -->
+        <p class="text-lg font-normal text-gray-500 lg:text-xl mb-6">
+            Las palabras encuentran su expresión lógica más abstracta y universal en los números.
         </p>
-    </div>
-
+        <!-- Subtítulo pequeño -->
+        <p class="text-sm font-medium text-gray-400">
+            Elige una herramienta para comenzar
+        </p>
+    </div>    
     <!-- Tarjetas del Menú Principal -->
-    <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <a href="/opcion1" class="group block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-500 hover:border-transparent hover:shadow-lg transition">
+    <div id="menu-content" class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <!-- Opción 1 -->
+        <button
+            onclick="showModal(1)"
+            class="group block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-blue-500 hover:border-transparent hover:shadow-lg transition"
+        >
             <h3 class="text-lg font-medium text-gray-900 group-hover:text-white">
                 1. Buscador de Palabras por Número
             </h3>
             <p class="mt-2 text-gray-500 group-hover:text-gray-200">
                 Herramienta que permite ingresar un número y descubrir las palabras que tienen el mismo valor numérico.
             </p>
-        </a>
-        <a href="/opcion2" class="group block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-green-500 hover:border-transparent hover:shadow-lg transition">
+        </button>
+
+        <!-- Opción 2 -->
+        <button
+            onclick="showModal(2)"
+            class="group block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-green-500 hover:border-transparent hover:shadow-lg transition"
+        >
             <h3 class="text-lg font-medium text-gray-900 group-hover:text-white">
                 2. Conversor de Palabras a Números
             </h3>
             <p class="mt-2 text-gray-500 group-hover:text-gray-200">
                 Herramienta que convierte una palabra en su valor numérico sumando los valores asignados a cada letra.
             </p>
-        </a>
+        </button>
     </div>
 
     <!-- Historial de Búsquedas -->
     {% if historial %}
-    <!-- Renderizar Historial si existe -->
     <div class="mt-16">
         <h3 class="text-xl font-semibold text-gray-900">Historial de Búsquedas
         </h3>
@@ -58,10 +72,12 @@
                             {% if entry.puntuacion %}
                             <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
                                 Puntuación: {{ entry.puntuacion }}
-                            </span> {% else %}
+                            </span>
+                            {% else %}
                             <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
                                 Sin puntuación
-                            </span> {% endif %}
+                            </span>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -70,10 +86,143 @@
         </div>
     </div>
     {% else %}
-    <!-- Mostrar un mensaje alternativo -->
     <div class="mt-16 text-center">
         <p class="text-gray-500 text-lg">No hay búsquedas recientes.</p>
     </div>
     {% endif %}
 </div>
+<!-- Modal -->
+<div
+    id="modal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-md hidden flex items-center justify-center z-50"
+>
+    <div class="bg-white w-11/12 max-w-lg rounded-2xl shadow-lg p-6">
+        <h3 id="modal-title" class="text-xl font-semibold text-gray-900 mb-6 text-center">
+            ¿Qué deseas buscar?
+        </h3>
+        <div class="mb-6 relative">
+            <input
+                id="user-input"
+                type="text"
+                class="w-full px-5 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 placeholder-gray-400"
+                placeholder="Ingresa aquí"
+            />
+            <!-- Mensaje de error -->
+            <p
+                id="input-error"
+                class="text-red-500 text-sm mt-2 hidden"
+            >
+                Solo use letras y espacios.
+            </p>
+        </div>
+        <div class="flex justify-between mt-6">
+            <button
+                onclick="submitInput()"
+                class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition-all w-[48%]"
+            >
+                Confirmar
+            </button>
+            <button
+                onclick="closeModal()"
+                class="bg-gray-300 text-gray-700 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-400 hover:shadow-lg transition-all w-[48%]"
+            >
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+<!-- Scripts -->
+<script>
+    let selectedOption = null;
+
+    function showModal(option) {
+        selectedOption = option;
+        const modal = document.getElementById('modal');
+        const title = document.getElementById('modal-title');
+        const userInput = document.getElementById('user-input');
+        const inputError = document.getElementById('input-error');
+
+        userInput.value = ''; // Resetear valor al abrir el modal
+        inputError.classList.add('hidden'); // Ocultar mensaje de error
+        userInput.classList.remove('bg-red-100'); // Quitar fondo rojo
+
+        // Configurar validación según la opción seleccionada
+        if (option === 1) {
+            title.innerText = 'Ingresa número';
+            userInput.placeholder = 'Escribe un número';
+            userInput.type = 'text'; // Usar text para validación
+            userInput.inputMode = 'numeric'; // Activar teclado numérico en móviles
+            userInput.oninput = () => {
+                // Validar solo números
+                userInput.value = userInput.value.replace(/[^0-9]/g, '');
+            };
+        } else if (option === 2) {
+            title.innerText = 'Ingresa la palabra o frase';
+            userInput.placeholder = 'Escribe aquí';
+            userInput.type = 'text';
+            userInput.inputMode = ''; // Quitar inputMode para texto
+            userInput.oninput = () => {
+                // Validar solo letras y espacios
+                const invalidCharacters = /[^a-zA-Z\s]/.test(userInput.value);
+                if (invalidCharacters) {
+                    userInput.classList.add('bg-red-100'); // Cambiar fondo a rojo claro
+                    inputError.classList.remove('hidden'); // Mostrar mensaje de error
+                } else {
+                    userInput.classList.remove('bg-red-100'); // Quitar fondo rojo
+                    inputError.classList.add('hidden'); // Ocultar mensaje de error
+                }
+            };
+        }
+
+        modal.classList.remove('hidden');
+        document.getElementById('menu-content').classList.add('blur-sm');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('modal');
+        modal.classList.add('hidden');
+        document.getElementById('menu-content').classList.remove('blur-sm');
+    }
+
+    function submitInput() {
+        const userInput = document.getElementById('user-input').value.trim();
+        const inputError = document.getElementById('input-error');
+
+        // Validar entrada antes de enviar
+        if (selectedOption === 2 && /[^a-zA-Z\s]/.test(userInput)) {
+            inputError.classList.remove('hidden');
+            return;
+        }
+
+        if (!userInput) {
+            alert('Por favor, ingresa un valor válido.');
+            return;
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+
+        if (selectedOption === 1) {
+            form.action = '/resultado_opcion1';
+            const inputField = document.createElement('input');
+            inputField.type = 'hidden';
+            inputField.name = 'frecuencia';
+            inputField.value = userInput;
+            form.appendChild(inputField);
+        } else if (selectedOption === 2) {
+            form.action = '/resultado_opcion2';
+            const inputField = document.createElement('input');
+            inputField.type = 'hidden';
+            inputField.name = 'palabra';
+            inputField.value = userInput;
+            form.appendChild(inputField);
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+
+        closeModal();
+    }
+</script>
 {% endblock %}

@@ -773,7 +773,18 @@ def resultado_opcion1():
     """
     Procesa la frecuencia ingresada en la opción 1 y genera los resultados.
     """
-    frecuencia = int(request.form.get("frecuencia"))
+    print(f"Método de solicitud recibido: {request.method}")  # Log del método recibido
+
+    frecuencia = request.form.get("frecuencia")
+
+    # Validación para asegurar que sea un número
+    if not frecuencia or not frecuencia.isdigit():
+        return render_template(
+            "opcion1.html",
+            error="Por favor, ingrese un número válido.",
+        )
+
+    frecuencia = int(frecuencia)
     lupa = calcular_lupa(frecuencia)
 
     # Detalles para la frecuencia ingresada
