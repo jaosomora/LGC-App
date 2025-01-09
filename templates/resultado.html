@@ -6,30 +6,18 @@
     </div>
 
     <!-- Métricas principales -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Potencial Lógico -->
+    {% if opcion == 1 %}
+    <!-- Opción 1: Mostrar Número y Lupa en una sola caja -->
+    <div class="grid grid-cols-1 gap-4">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Potencial Lógico
-            </h3>
-            <p class="mt-4 text-gray-700">
-                <strong>Frecuencia por letra:</strong> {{ detalle }}
-            </p>
-            <p class="text-gray-700">
-                <strong>Frecuencia total:</strong> {{ potencial }}
-            </p>
+            <p class="mt-4 text-gray-700"><strong>Número:</strong> {{ frecuencia }}</p>
+            <p class="mt-4 text-gray-700"><strong>Lupa:</strong> {{ lupa }}</p>
         </div>
-
-        <!-- Lupa -->
+    </div>
+    {% elif opcion == 2 %}
+    <!-- Opción 2: Reorganizar Potencial Lógico, Lupa y Frecuencia -->
+    <div class="grid grid-cols-1 gap-4">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Lupa</h3>
-            <p class="mt-4 text-gray-700">{{ lupa }}</p>
-        </div>
-
-        <!-- Frecuencia por Palabra -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Frecuencia por Palabra
-            </h3>
-            {% if frecuencias_por_palabra %}
             <ul class="mt-4 space-y-2">
                 {% for palabra, data in frecuencias_por_palabra.items() %}
                 <li>
@@ -37,12 +25,11 @@
                 </li>
                 {% endfor %}
             </ul>
-            {% else %}
-            <p class="mt-4 text-gray-500">No se pudo calcular la frecuencia por palabra.
-            </p>
-            {% endif %}
+            <p class="mt-4 text-gray-700">Total: {{ total }}</p>
+            <p class="mt-4 text-gray-700">Lupa: {{ lupa }}</p>
         </div>
     </div>
+    {% endif %}
 
     <!-- Resonancias -->
     <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 gap-y-6">

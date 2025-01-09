@@ -676,33 +676,26 @@ def resultado_opcion2():
     lupa = calcular_lupa(potencial)
     detalle = detalle_potencial(palabra)
 
-    # Calcular potencial, lupa y detalle
-    potencial = calcular_potencial(palabra)
-    lupa = calcular_lupa(potencial)
-    detalle = detalle_potencial(palabra)
-
     # Calcular frecuencia por palabra en caso de que sea una frase
     frecuencias_por_palabra, suma_total = calcular_frecuencia_por_palabra(palabra)
-    
+
     # Depuración de los resultados
     print(f"[DEBUG] Frecuencias por palabra: {frecuencias_por_palabra}")
     print(f"[DEBUG] Suma total de frecuencias: {suma_total}")
-    
+
     # Normalizar la palabra antes de guardar o actualizar
     palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
     print(f"[DEBUG] Palabra normalizada: {palabra_normalizada}")
-    
+
     # Guardar la palabra en la base de datos
     guardar_palabra(palabra_normalizada)
 
     # Actualizar el ranking
     actualizar_ranking(palabra_normalizada)
-    
+
     # Verificar el ranking actualizado
     ranking_actualizado = cargar_ranking_desde_bd()
     print(f"[DEBUG] Ranking después de actualizar: {ranking_actualizado}")
-    
-    
 
     # Cargar y buscar territorios
     territorios = cargar_codigos_territorios(archivo_territorios)
@@ -733,27 +726,17 @@ def resultado_opcion2():
             ).lower()
             actualizar_ranking(palabra_normalizada)
 
-    # Normalizar la palabra antes de guardar o actualizar
-    print(f"Palabra ingresada: {palabra}")
-    palabra_normalizada = normalizar_palabra_con_espacios(palabra).lower()
-    print(f"Palabra normalizada: {palabra_normalizada}")
-    print(f"Ranking antes de actualizar: {cargar_ranking_desde_bd()}")
-
-    guardar_palabra(palabra_normalizada)
-    actualizar_ranking(palabra_normalizada)
-
-    print(f"Ranking después de actualizar: {cargar_ranking_desde_bd()}")
-
+    # Historial de búsqueda
     if "historial" not in session:
         session["historial"] = []
 
-    # Crear la nueva entrada con normalización
     nueva_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
     if nueva_entrada.lower() not in [entry.lower() for entry in session["historial"]]:
         session["historial"].append(nueva_entrada)
 
     session.modified = True
 
+    # Renderizado de resultados
     return render_template(
         "resultado.html",
         palabra=palabra,
@@ -761,10 +744,11 @@ def resultado_opcion2():
         lupa=lupa,
         detalle=detalle,
         frecuencias_por_palabra=frecuencias_por_palabra,
-        suma_total=suma_total,
+        total=suma_total,  # Cambiado para incluir el total de frecuencias
         territorios=territorios_encontrados,
         palabras=palabras_encontradas,
         elementos=elementos,
+        opcion=2,  # Identificar opción 2 en el template
     )
 
 
@@ -847,10 +831,11 @@ def resultado_opcion1():
         palabra=str(frecuencia),
         frecuencia=frecuencia,
         lupa=lupa,
-        detalle=detalle,
-        territorios=territorios_encontrados,
-        palabras=palabras_encontradas,
-        elementos=elementos,
+        detalle=detalle,  # Mantener detalle
+        territorios=territorios_encontrados,  # Mantener Resonancia Geográfica
+        palabras=palabras_encontradas,  # Mantener Resonancias de Palabras Relacionadas
+        elementos=elementos,  # Mantener Resonancia Elemental
+        opcion=1,  # Identificar opción 1 en el template
     )
 
 
