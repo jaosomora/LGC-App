@@ -135,6 +135,14 @@
 <script>
     let selectedOption = null;
 
+    // Listener global para la tecla Esc
+    document.addEventListener('keydown', (event) => {
+        const modal = document.getElementById('modal');
+        if (!modal.classList.contains('hidden') && event.key === 'Escape') {
+            closeModal();
+        }
+    });
+
     function showModal(option) {
         selectedOption = option;
         const modal = document.getElementById('modal');
@@ -162,8 +170,8 @@
             userInput.type = 'text';
             userInput.inputMode = ''; // Quitar inputMode para texto
             userInput.oninput = () => {
-                // Validar solo letras y espacios
-                const invalidCharacters = /[^a-zA-Z\s]/.test(userInput.value);
+                // Validar solo letras, espacios y caracteres válidos del español
+                const invalidCharacters = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(userInput.value);
                 if (invalidCharacters) {
                     userInput.classList.add('bg-red-100'); // Cambiar fondo a rojo claro
                     inputError.classList.remove('hidden'); // Mostrar mensaje de error
@@ -189,7 +197,7 @@
         const inputError = document.getElementById('input-error');
 
         // Validar entrada antes de enviar
-        if (selectedOption === 2 && /[^a-zA-Z\s]/.test(userInput)) {
+        if (selectedOption === 2 && /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(userInput)) {
             inputError.classList.remove('hidden');
             return;
         }
