@@ -20,7 +20,8 @@ env/
 .DS_Store
 potencial.py
 
-
 *.db
 *.txt
 
+# Archivos y carpetas de Node.js
+node_modules/
