@@ -117,6 +117,7 @@
         </div>
         <div class="flex justify-between mt-6">
             <button
+                id="confirm-button"
                 onclick="submitInput()"
                 class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 hover:shadow-lg transition-all w-[48%]"
             >
@@ -131,6 +132,7 @@
         </div>
     </div>
 </div>
+
 <!-- Scripts -->
 <script>
     let selectedOption = null;
@@ -140,6 +142,18 @@
         const modal = document.getElementById('modal');
         if (!modal.classList.contains('hidden') && event.key === 'Escape') {
             closeModal();
+        }
+    });
+
+    // Listener global para la tecla Enter
+    document.addEventListener('keydown', (event) => {
+        const modal = document.getElementById('modal');
+        const userInput = document.getElementById('user-input');
+        const confirmButton = document.getElementById('confirm-button');
+
+        // Verificar si Enter se presiona con el modal activo
+        if (!modal.classList.contains('hidden') && event.key === 'Enter' && userInput === document.activeElement) {
+            confirmButton.click(); // Activar el botón "Confirmar"
         }
     });
 
