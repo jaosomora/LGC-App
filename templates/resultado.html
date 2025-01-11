@@ -35,6 +35,58 @@
     </div>
     {% endif %}
 
+    <!-- Calculadora Visual -->
+    <div class="mt-12">
+        <h3 class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
+        <div class="flex justify-center">
+            <div class="calculator-grid grid grid-cols-3 gap-2 bg-gray-200 p-4 rounded-lg shadow-lg">
+                {% for number in [7, 8, 9, 4, 5, 6, 1, 2, 3, 0] %}
+                <div
+                    class="calculator-cell {% if number in numero_resaltado %}resaltado{% else %}bg-white border border-gray-300{% endif %}"
+                    data-number="{{ number }}"
+                >
+                    {{ number }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Ajustar el tamaño de las celdas de la calculadora */
+        .calculator-cell {
+            height: 70px;
+            width: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+
+        /* Animación de latido para los números resaltados */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 8px rgba(255, 223, 0, 0.7);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 0 16px rgba(255, 223, 0, 1);
+            }
+        }
+
+        /* Aplicar la animación de latido a los números resaltados */
+        .calculator-cell.resaltado {
+            background-color: #facc15; /* Amarillo vibrante */
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 10px rgba(255, 223, 0, 0.9);
+            color: #000; /* Texto negro para contraste */
+            border: none; /* Eliminar bordes */
+        }
+    </style>
+
     <!-- Resonancias -->
     <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 gap-y-6">
         <!-- Resonancias de Palabras Relacionadas -->
@@ -43,15 +95,13 @@
             {% if palabras %}
             <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
             {% else %}
-            <p class="mt-4 text-gray-500">No se encontraron palabras asociadas.
-            </p>
+            <p class="mt-4 text-gray-500">No se encontraron palabras asociadas.</p>
             {% endif %}
         </div>
 
         <!-- Resonancia Geográfica -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Resonancia Geográfica
-            </h3>
+            <h3 class="text-lg font-semibold text-gray-900">Resonancia Geográfica</h3>
             {% if territorios %}
             <ul class="mt-4 space-y-2">
                 {% for territorio in territorios %}
@@ -59,16 +109,14 @@
                 {% endfor %}
             </ul>
             {% else %}
-            <p class="mt-4 text-gray-500">No se encontraron coincidencias geográficas.
-            </p>
+            <p class="mt-4 text-gray-500">No se encontraron coincidencias geográficas.</p>
             {% endif %}
         </div>
     </div>
 
     <!-- Resonancia Elemental -->
     <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Resonancia Elemental
-        </h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Resonancia Elemental</h3>
         {% if elementos %}
         <ul class="space-y-4">
             {% for elemento in elementos %}
@@ -79,8 +127,7 @@
             {% endfor %}
         </ul>
         {% else %}
-        <p class="text-gray-500">No se encontraron coincidencias en elementos.
-        </p>
+        <p class="text-gray-500">No se encontraron coincidencias en elementos.</p>
         {% endif %}
     </div>
 

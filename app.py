@@ -750,6 +750,9 @@ def resultado_opcion2():
 
     session.modified = True
 
+    # Convertir el total en una lista de dígitos
+    numero_resaltado = [int(digito) for digito in str(suma_total)]
+
     # Renderizado de resultados
     return render_template(
         "resultado.html",
@@ -765,6 +768,7 @@ def resultado_opcion2():
         palabras=palabras_encontradas,
         elementos=elementos,
         opcion=2,
+        numero_resaltado=numero_resaltado  # Enviar lista de dígitos
     )
 
 
@@ -841,18 +845,10 @@ def resultado_opcion1():
         session["historial"].append(nueva_entrada)
     session.modified = True
 
-    # Actualizar ranking basado en palabras encontradas
-    if palabras_encontradas:
-        print(f"Palabras encontradas para actualizar ranking: {palabras_encontradas}")
-        for palabra in palabras_encontradas:
-            if all(letra.isalpha() for letra in palabra):
-                actualizar_ranking(palabra)
-                print(f"Actualizando ranking para: {palabra.lower()}")
-            else:
-                print(f"Palabra ignorada por contener caracteres no válidos: {palabra}")
-    else:
-        print("No se encontraron palabras para actualizar ranking.")
+    # Convertir la frecuencia en una lista de dígitos
+    numero_resaltado = [int(digito) for digito in str(frecuencia)]
 
+    # Renderizado de resultados
     return render_template(
         "resultado.html",
         palabra=str(frecuencia),
@@ -863,6 +859,7 @@ def resultado_opcion1():
         palabras=palabras_encontradas,  # Mantener Resonancias de Palabras Relacionadas
         elementos=elementos,  # Mantener Resonancia Elemental
         opcion=1,  # Identificar opción 1 en el template
+        numero_resaltado=numero_resaltado  # Enviar lista de dígitos
     )
 
 
