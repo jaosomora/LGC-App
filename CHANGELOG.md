@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.2.5] - 2025-01-11
+### Added
+- Implementación de una calculadora visual interactiva en la página de resultados.
+- Animación CSS de "latido" (`pulse`) para los números resaltados en la calculadora, mejorando la experiencia visual.
+- Ajustes dinámicos en la lógica de resaltar números para admitir listas de dígitos (`numero_resaltado`).
+
+### Fixed
+- Lógica para calcular y resaltar números en la calculadora, evitando errores al interpretar `numero_resaltado`.
+
+---
+
 ## [1.2.4] - 2025-01-09
 ### Added
 - Implementación de un modal interactivo con efecto de desenfoque (`blur`) en el fondo, utilizando Tailwind CSS, para una experiencia más inmersiva en la selección de opciones del menú principal.
