@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## [1.2.6] - 2025-01-12
+### Added
+- Integración del botón flotante de Ko-fi para donaciones en todas las páginas.
+  - Botón configurado para desplegarse como un "floating chat" con un diseño minimalista y llamativo.
+  - Colores personalizados adaptados a la paleta del proyecto.
+- Mejora de la experiencia de usuario con un acceso claro para apoyar al desarrollador.
+
+### Changed
+- Ajustes menores en el diseño para garantizar la correcta visualización del botón Ko-fi en dispositivos móviles y de escritorio.
+
+---
+
 ## [1.2.5] - 2025-01-11
 ### Added
 - Implementación de una calculadora visual interactiva en la página de resultados.
