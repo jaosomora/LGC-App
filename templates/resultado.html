@@ -7,7 +7,6 @@
 
     <!-- Métricas principales -->
     {% if opcion == 1 %}
-    <!-- Opción 1: Mostrar Número y Lupa en una sola caja -->
     <div class="grid grid-cols-1 gap-4">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
             <p class="mt-4 text-gray-700"><strong>Número:</strong> {{ frecuencia }}</p>
@@ -15,11 +14,9 @@
         </div>
     </div>
     {% elif opcion == 2 %}
-    <!-- Opción 2: Reorganizar Potencial Lógico, Lupa y Frecuencia -->
     <div class="grid grid-cols-1 gap-4">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
             {% if mostrar_numeros_por_letra %}
-            <!-- Usar la palabra o frase buscada como título -->
             <p class="mt-4 text-gray-700"><strong>{{ palabra }}:</strong> {{ numeros_por_letra }}</p>
             {% endif %}
             <ul class="mt-4 space-y-2">
@@ -53,7 +50,6 @@
     </div>
 
     <style>
-        /* Ajustar el tamaño de las celdas de la calculadora */
         .calculator-cell {
             height: 70px;
             width: 70px;
@@ -65,7 +61,18 @@
             transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
         }
 
-        /* Animación de latido para los números resaltados */
+        .calculator-cell.resaltado {
+            background-color: #facc15;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 10px rgba(255, 223, 0, 0.9);
+            color: #000;
+            border: none;
+        }
+
+        .calculator-grid {
+            position: relative;
+        }
+
         @keyframes pulse {
             0%, 100% {
                 transform: scale(1);
@@ -76,20 +83,10 @@
                 box-shadow: 0 0 16px rgba(255, 223, 0, 1);
             }
         }
-
-        /* Aplicar la animación de latido a los números resaltados */
-        .calculator-cell.resaltado {
-            background-color: #facc15; /* Amarillo vibrante */
-            animation: pulse 1.5s infinite;
-            box-shadow: 0 0 10px rgba(255, 223, 0, 0.9);
-            color: #000; /* Texto negro para contraste */
-            border: none; /* Eliminar bordes */
-        }
     </style>
 
     <!-- Resonancias -->
     <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 gap-y-6">
-        <!-- Resonancias de Palabras Relacionadas -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
             <h3 class="text-lg font-semibold text-gray-900">Resonancias de Palabras Relacionadas</h3>
             {% if palabras %}
@@ -99,7 +96,6 @@
             {% endif %}
         </div>
 
-        <!-- Resonancia Geográfica -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
             <h3 class="text-lg font-semibold text-gray-900">Resonancia Geográfica</h3>
             {% if territorios %}
@@ -114,14 +110,12 @@
         </div>
     </div>
 
-    <!-- Resonancia Elemental -->
     <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">Resonancia Elemental</h3>
         {% if elementos %}
         <ul class="space-y-4">
             {% for elemento in elementos %}
             <li class="flex flex-col">
-                <!-- Renderizar el HTML directamente sin escapar -->
                 {{ elemento|safe }}
             </li>
             {% endfor %}
@@ -131,11 +125,21 @@
         {% endif %}
     </div>
 
-    <!-- Botón de Regreso -->
     <div class="mt-12 text-center">
         <a href="/" class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600 text-sm md:text-base">
             Volver al Menú Principal
         </a>
     </div>
 </div>
+
+<!-- Ko-fi Floating Button -->
+<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+<script>
+  kofiWidgetOverlay.draw('julianosoriom', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': '¿Un café?',
+    'floating-chat.donateButton.background-color': '#3B82F6',
+    'floating-chat.donateButton.text-color': '#FFFFFF'
+  });
+</script>
 {% endblock %}
