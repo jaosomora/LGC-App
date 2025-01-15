@@ -1,38 +1,46 @@
-{% extends "base.html" %} {% block title %}Resultados{% endblock %} {% block content %}
+{% extends "base.html" %} 
+{% block title %}Resultados{% endblock %} 
+{% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Título principal de la página -->
+    <!-- Muestra la frase analizada en formato capitalizado usando el filtro 'title' -->
     <div class="text-center mb-8">
-        <h2 class="text-3xl font-extrabold text-gray-900">Resultados para "{{ palabra }}"</h2>
-        <p class="mt-2 text-gray-600">Explora las métricas obtenidas para "{{ palabra }}"</p>
+        <h2 class="text-3xl font-extrabold text-gray-900">Métricas para '{{ palabra|title }}'</h2>
     </div>
 
     <!-- Métricas principales -->
+    <!-- Diferencia entre opción 1 (resultado de un número único) y opción 2 (análisis de una frase) -->
     {% if opcion == 1 %}
     <div class="grid grid-cols-1 gap-4">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+            <!-- Muestra el número calculado para la opción 1 -->
             <p class="mt-4 text-gray-700"><strong>Número:</strong> {{ frecuencia }}</p>
+            <!-- Muestra la lupa asociada al número calculado -->
             <p class="mt-4 text-gray-700"><strong>Lupa:</strong> {{ lupa }}</p>
         </div>
     </div>
     {% elif opcion == 2 %}
     <div class="grid grid-cols-1 gap-4">
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            {% if mostrar_numeros_por_letra %}
-            <p class="mt-4 text-gray-700"><strong>{{ palabra }}:</strong> {{ numeros_por_letra }}</p>
-            {% endif %}
+            <!-- Resultados formateados para la opción 2 -->
+            <!-- Cada línea muestra una palabra analizada con su detalle -->
             <ul class="mt-4 space-y-2">
-                {% for palabra, data in frecuencias_por_palabra.items() %}
-                <li>
-                    <strong>{{ palabra }}</strong>: {{ data["frecuencia_por_letra"] }} = {{ data["suma"] }}
+                {% for linea in salida_detallada %}
+                <li class="text-gray-700">
+                    <!-- 'safe' se usa para renderizar contenido HTML seguro (negritas en palabras) -->
+                    {{ linea|safe }}
                 </li>
                 {% endfor %}
             </ul>
-            <p class="mt-4 text-gray-700">Total: {{ total }}</p>
-            <p class="mt-4 text-gray-700">Lupa: {{ lupa }}</p>
+            <!-- Total y lupa de la frase analizada -->
+            <p class="mt-4 text-gray-700"><strong>Total:</strong> {{ total }}</p>
+            <p class="mt-4 text-gray-700"><strong>Lupa:</strong> {{ lupa }}</p>
         </div>
     </div>
     {% endif %}
 
     <!-- Calculadora Visual -->
+    <!-- Representa números de 0 a 9 con resaltado en los que coincidan con la frecuencia -->
     <div class="mt-12">
         <h3 class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
         <div class="flex justify-center">
@@ -42,6 +50,7 @@
                     class="calculator-cell {% if number in numero_resaltado %}resaltado{% else %}bg-white border border-gray-300{% endif %}"
                     data-number="{{ number }}"
                 >
+                    <!-- Cada celda muestra un número con resaltado si pertenece a los números destacados -->
                     {{ number }}
                 </div>
                 {% endfor %}
@@ -49,6 +58,7 @@
         </div>
     </div>
 
+    <!-- Estilos personalizados para la calculadora -->
     <style>
         .calculator-cell {
             height: 70px;
@@ -62,15 +72,11 @@
         }
 
         .calculator-cell.resaltado {
-            background-color: #facc15;
-            animation: pulse 1.5s infinite;
+            background-color: #facc15; /* Color de resaltado */
+            animation: pulse 1.5s infinite; /* Efecto animado para celdas resaltadas */
             box-shadow: 0 0 10px rgba(255, 223, 0, 0.9);
             color: #000;
             border: none;
-        }
-
-        .calculator-grid {
-            position: relative;
         }
 
         @keyframes pulse {
@@ -85,20 +91,25 @@
         }
     </style>
 
-    <!-- Resonancias -->
+    <!-- Secciones de Resonancias -->
     <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 gap-y-6">
+        <!-- Palabras con la misma frecuencia numérica -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Resonancias de Palabras Relacionadas</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Relación Numérica con Palabras</h3>
             {% if palabras %}
+            <!-- Lista de palabras relacionadas -->
             <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
             {% else %}
+            <!-- Mensaje cuando no hay coincidencias -->
             <p class="mt-4 text-gray-500">No se encontraron palabras asociadas.</p>
             {% endif %}
         </div>
 
+        <!-- Territorios relacionados -->
         <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Resonancia Geográfica</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Relación Numérica con Países</h3>
             {% if territorios %}
+            <!-- Lista de coincidencias territoriales -->
             <ul class="mt-4 space-y-2">
                 {% for territorio in territorios %}
                 <li>Código Territorial: +{{ territorio['codigo'] }} - País: {{ territorio['pais'] }}</li>
@@ -110,12 +121,15 @@
         </div>
     </div>
 
+    <!-- Elementos relacionados -->
     <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Resonancia Elemental</h3>
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Relación Numérica con Elementos</h3>
         {% if elementos %}
+        <!-- Lista de elementos químicos relacionados -->
         <ul class="space-y-4">
             {% for elemento in elementos %}
             <li class="flex flex-col">
+                <!-- 'safe' asegura que se rendericen etiquetas HTML dentro de los datos -->
                 {{ elemento|safe }}
             </li>
             {% endfor %}
@@ -125,6 +139,7 @@
         {% endif %}
     </div>
 
+    <!-- Botón para regresar al menú principal -->
     <div class="mt-12 text-center">
         <a href="/" class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600 text-sm md:text-base">
             Volver al Menú Principal
@@ -132,7 +147,7 @@
     </div>
 </div>
 
-<!-- Ko-fi Floating Button -->
+<!-- Botón flotante de Ko-fi para donaciones -->
 <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
 <script>
   kofiWidgetOverlay.draw('julianosoriom', {
