@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## [1.2.8] - 2025-01-15
+### Added
+- Inclusión de un **botón para compartir resultados**, con opciones para:
+  - Enviar los resultados por WhatsApp con formato claro y amigable.
+  - Copiar los resultados al portapapeles.
+- Efectos visuales en el modal:
+  - **Desenfoque de fondo** (`blur`) al abrir el modal.
+  - Fondo semitransparente para resaltar el contenido activo.
+
+### Changed
+- Optimización del modal para mayor consistencia visual:
+  - Se ajustaron las clases de Tailwind para asegurar un diseño responsivo y visualmente atractivo.
+
+---
+
 ## [1.2.7] - 2025-01-14
 ### Added
 - Inclusión de la funcionalidad para mostrar las palabras o frases en **negrita** en el análisis de resultados.
