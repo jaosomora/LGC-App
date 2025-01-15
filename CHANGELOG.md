@@ -1,5 +1,24 @@
 # CHANGELOG
 
+## [1.2.7] - 2025-01-14
+### Added
+- Inclusión de la funcionalidad para mostrar las palabras o frases en **negrita** en el análisis de resultados.
+- Nueva lógica en el backend para diferenciar correctamente entre palabras únicas y frases al formatear los resultados:
+  - Se elimina el "= suma" redundante en palabras únicas.
+  - Para frases, se mantiene el detalle completo, incluyendo la suma total.
+- Ajuste en el título dinámico del análisis:
+  - Actualizado a "Métricas de 'Palabra o Frase'" con formato capitalizado, simplificando la presentación.
+- Personalización del encabezado "Relación Numérica con Palabras":
+  - Cambiado a "Palabras con la misma Frecuencia Numérica" para mayor claridad.
+- Inclusión de comentarios explicativos en el código fuente (`resultado.html`) para facilitar la comprensión por parte de otros desarrolladores.
+
+### Changed
+- Refinamiento en la visualización de resultados:
+  - Para palabras únicas, se eliminó el `= suma` redundante en la línea de detalle.
+  - Mejoras en la consistencia visual y legibilidad de los resultados en todas las secciones.
+
+---
+
 ## [1.2.6] - 2025-01-12
 ### Added
 - Integración del botón flotante de Ko-fi para donaciones en todas las páginas.
