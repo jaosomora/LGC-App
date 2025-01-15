@@ -679,6 +679,22 @@ def resultado_opcion2():
     # Calcular frecuencia por palabra en caso de que sea una frase
     frecuencias_por_palabra, suma_total = calcular_frecuencia_por_palabra(palabra)
 
+    # Crear la nueva representación de frecuencias para cada palabra
+    salida_detallada = []
+    for palabra_actual, datos in frecuencias_por_palabra.items():
+        letras_con_valores = [
+            f"{letra.upper()}={valor}" for letra, valor in zip(palabra_actual, datos["frecuencia_por_letra"])
+        ]
+        # Formatear la palabra o frase en negrita
+        palabra_formateada = f"<strong>{palabra_actual}</strong>: [ {', '.join(letras_con_valores)} ]"
+    
+        # Agregar "= suma" solo para frases con múltiples palabras
+        if len(frecuencias_por_palabra) > 1:
+            palabra_formateada += f" = {datos['suma']}"
+    
+        salida_detallada.append(palabra_formateada)
+
+
     # Verificar si hay más de una palabra
     palabras_lista = palabra.split()  # Dividir la entrada en palabras
     mostrar_numeros_por_letra = len(palabras_lista) > 1  # True si hay más de una palabra
@@ -760,7 +776,8 @@ def resultado_opcion2():
         potencial=potencial,
         lupa=lupa,
         detalle=detalle,
-        frecuencias_por_palabra=frecuencias_por_palabra,
+        frecuencias_por_palabra=frecuencias_por_palabra,  # Mantener datos originales
+        salida_detallada=salida_detallada,  # Nueva representación
         total=suma_total,
         numeros_por_letra=numeros_por_letra,
         mostrar_numeros_por_letra=mostrar_numeros_por_letra,  # Nueva bandera para el template
