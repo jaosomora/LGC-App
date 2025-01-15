@@ -1,27 +1,31 @@
-{% extends "base.html" %} 
-{% block title %}Resultados{% endblock %} 
+{% extends "base.html" %}
+{% block title %}Resultados{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- Título principal de la página -->
     <!-- Muestra la frase analizada en formato capitalizado usando el filtro 'title' -->
     <div class="text-center mb-8">
-        <h2 class="text-3xl font-extrabold text-gray-900">Métricas para '{{ palabra|title }}'</h2>
+        <h2 class="text-3xl font-extrabold text-gray-900">Métricas para
+            '{{ palabra|title }}'</h2>
     </div>
 
     <!-- Métricas principales -->
     <!-- Diferencia entre opción 1 (resultado de un número único) y opción 2 (análisis de una frase) -->
     {% if opcion == 1 %}
     <div class="grid grid-cols-1 gap-4">
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+        <div
+            class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
             <!-- Muestra el número calculado para la opción 1 -->
-            <p class="mt-4 text-gray-700"><strong>Número:</strong> {{ frecuencia }}</p>
+            <p class="mt-4 text-gray-700"><strong>Número:</strong> {{ frecuencia
+                }}</p>
             <!-- Muestra la lupa asociada al número calculado -->
             <p class="mt-4 text-gray-700"><strong>Lupa:</strong> {{ lupa }}</p>
         </div>
     </div>
     {% elif opcion == 2 %}
     <div class="grid grid-cols-1 gap-4">
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+        <div
+            class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
             <!-- Resultados formateados para la opción 2 -->
             <!-- Cada línea muestra una palabra analizada con su detalle -->
             <ul class="mt-4 space-y-2">
@@ -33,23 +37,143 @@
                 {% endfor %}
             </ul>
             <!-- Total y lupa de la frase analizada -->
-            <p class="mt-4 text-gray-700"><strong>Total:</strong> {{ total }}</p>
+            <p class="mt-4 text-gray-700"><strong>Total:</strong> {{ total
+                }}</p>
             <p class="mt-4 text-gray-700"><strong>Lupa:</strong> {{ lupa }}</p>
         </div>
     </div>
     {% endif %}
 
+    <!-- Botón para compartir -->
+    <button id="share-button"
+        class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-600">
+        Compartir Resultado
+    </button>
+
+    <!-- Modal de respaldo para compartir -->
+    <div id="share-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur-md">
+        <div class="bg-white rounded-lg shadow-lg p-6 max-w-md">
+            <h3
+                class="text-lg font-bold text-gray-900 mb-4 text-center">Compartir
+                Resultado</h3>
+            <p class="text-gray-700 mb-4 text-center">Elige una opción para
+                compartir:</p>
+            <div class="space-y-4">
+                <!-- Botón para WhatsApp -->
+                <a id="whatsapp-button"
+                    href="#"
+                    class="block text-white py-2 px-4 rounded-lg shadow text-center hover:bg-green-600"
+                    style="background-color: #25D366;"
+                    target="_blank">
+                    WhatsApp
+                </a>
+                <!-- Botón para Copiar -->
+                <button id="copy-button"
+                    class="block bg-blue-500 text-white py-2 px-4 rounded-lg shadow text-center hover:bg-blue-600 w-full">
+                    Copiar
+                </button>
+            </div>
+            <button id="close-modal"
+                class="mt-6 w-full bg-gray-500 text-white py-2 px-4 rounded-lg text-center hover:bg-gray-600">
+                Cancelar
+            </button>
+        </div>
+    </div>
+
+    <script>
+    // Abrir el modal con efecto de blur
+    document.getElementById('share-button').addEventListener('click', () => {
+        document.getElementById('share-modal').classList.remove('hidden');
+        document.body.classList.add('modal-open'); // Aplicar blur al fondo
+    });
+    
+    
+    // Funcionalidad para copiar al portapapeles
+    document.getElementById('copy-button').addEventListener('click', () => {
+        // Estas variables deben ser procesadas por el servidor antes de enviar el HTML al cliente
+        const salidaDetallada = `
+            {% for linea in salida_detallada %}
+            {{ linea | striptags }}
+            {% endfor %}
+        `.trim(); // Ajuste para quitar espacios innecesarios
+    
+        const textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}`;
+    
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    document.getElementById('share-modal').classList.add('hidden'); // Cerrar modal
+                    document.body.classList.remove('modal-open'); // Quitar blur
+                })
+                .catch(err => console.error('Error al copiar:', err));
+        } else {
+            // Fallback para navegadores antiguos
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                document.getElementById('share-modal').classList.add('hidden'); // Cerrar modal
+                document.body.classList.remove('modal-open'); // Quitar blur
+            } catch (err) {
+                console.error('Error al copiar:', err);
+            }
+            document.body.removeChild(textArea);
+        }
+    });
+    
+    // Funcionalidad para el botón de WhatsApp
+    document.getElementById('whatsapp-button').addEventListener('click', () => {
+        // Estas variables también deben ser renderizadas por el servidor
+        const salidaDetallada = `
+            {% for linea in salida_detallada %}
+            *{{ linea | striptags }}*
+            {% endfor %}
+        `.trim(); // Ajuste para formato
+    
+        const textForWhatsApp = `Métricas para *{{ palabra }}*\n\n${salidaDetallada}\nTotal: *{{ total }}*\nLupa: *{{ lupa }}*`;
+        
+        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(textForWhatsApp)}`;
+        document.getElementById('whatsapp-button').setAttribute('href', whatsappUrl);
+    
+        // Cerrar modal después de redirigir
+        document.getElementById('share-modal').classList.add('hidden');
+        document.body.classList.remove('modal-open'); // Quitar blur
+    });
+    
+    // Cerrar el modal de respaldo
+    document.getElementById('close-modal').addEventListener('click', () => {
+        document.getElementById('share-modal').classList.add('hidden');
+        document.body.classList.remove('modal-open'); // Quitar blur
+    });
+    
+// Cerrar el modal con la tecla Esc
+document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') { // Detecta si la tecla presionada es "Esc"
+            const modal = document.getElementById('share-modal');
+            if (!modal.classList.contains('hidden')) { // Verifica si el modal está visible
+                modal.classList.add('hidden'); // Oculta el modal
+                document.body.classList.remove('modal-open'); // Quita el efecto de blur
+            }
+        }
+    });    
+    
+    </script>
+
     <!-- Calculadora Visual -->
     <!-- Representa números de 0 a 9 con resaltado en los que coincidan con la frecuencia -->
     <div class="mt-12">
-        <h3 class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
+        <h3
+            class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
         <div class="flex justify-center">
-            <div class="calculator-grid grid grid-cols-3 gap-2 bg-gray-200 p-4 rounded-lg shadow-lg">
+            <div
+                class="calculator-grid grid grid-cols-3 gap-2 bg-gray-200 p-4 rounded-lg shadow-lg">
                 {% for number in [7, 8, 9, 4, 5, 6, 1, 2, 3, 0] %}
                 <div
                     class="calculator-cell {% if number in numero_resaltado %}resaltado{% else %}bg-white border border-gray-300{% endif %}"
-                    data-number="{{ number }}"
-                >
+                    data-number="{{ number }}">
                     <!-- Cada celda muestra un número con resaltado si pertenece a los números destacados -->
                     {{ number }}
                 </div>
@@ -58,74 +182,46 @@
         </div>
     </div>
 
-    <!-- Estilos personalizados para la calculadora -->
-    <style>
-        .calculator-cell {
-            height: 70px;
-            width: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            border-radius: 8px;
-            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
-        }
-
-        .calculator-cell.resaltado {
-            background-color: #facc15; /* Color de resaltado */
-            animation: pulse 1.5s infinite; /* Efecto animado para celdas resaltadas */
-            box-shadow: 0 0 10px rgba(255, 223, 0, 0.9);
-            color: #000;
-            border: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 8px rgba(255, 223, 0, 0.7);
-            }
-            50% {
-                transform: scale(1.2);
-                box-shadow: 0 0 16px rgba(255, 223, 0, 1);
-            }
-        }
-    </style>
-
     <!-- Secciones de Resonancias -->
     <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 gap-y-6">
         <!-- Palabras con la misma frecuencia numérica -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Relación Numérica con Palabras</h3>
+        <div
+            class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Relación Numérica
+                con Palabras</h3>
             {% if palabras %}
-            <!-- Lista de palabras relacionadas -->
             <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
             {% else %}
-            <!-- Mensaje cuando no hay coincidencias -->
-            <p class="mt-4 text-gray-500">No se encontraron palabras asociadas.</p>
+            <p class="mt-4 text-gray-500">No se encontraron palabras
+                asociadas.</p>
             {% endif %}
         </div>
 
         <!-- Territorios relacionados -->
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Relación Numérica con Países</h3>
+        <div
+            class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+            <h3 class="text-lg font-semibold text-gray-900">Relación Numérica
+                con Países</h3>
             {% if territorios %}
-            <!-- Lista de coincidencias territoriales -->
             <ul class="mt-4 space-y-2">
                 {% for territorio in territorios %}
-                <li>Código Territorial: +{{ territorio['codigo'] }} - País: {{ territorio['pais'] }}</li>
+                <li>Código Territorial: +{{ territorio['codigo'] }} - País: {{
+                    territorio['pais'] }}</li>
                 {% endfor %}
             </ul>
             {% else %}
-            <p class="mt-4 text-gray-500">No se encontraron coincidencias geográficas.</p>
+            <p class="mt-4 text-gray-500">No se encontraron coincidencias
+                geográficas.</p>
             {% endif %}
         </div>
     </div>
 
     <!-- Elementos relacionados -->
-    <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Relación Numérica con Elementos</h3>
+    <div
+        class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Relación Numérica
+            con Elementos</h3>
         {% if elementos %}
-        <!-- Lista de elementos químicos relacionados -->
         <ul class="space-y-4">
             {% for elemento in elementos %}
             <li class="flex flex-col">
@@ -135,19 +231,166 @@
             {% endfor %}
         </ul>
         {% else %}
-        <p class="text-gray-500">No se encontraron coincidencias en elementos.</p>
+        <p class="text-gray-500">No se encontraron coincidencias en
+            elementos.</p>
         {% endif %}
     </div>
 
     <!-- Botón para regresar al menú principal -->
     <div class="mt-12 text-center">
-        <a href="/" class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600 text-sm md:text-base">
+        <a href="/"
+            class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600 text-sm md:text-base">
             Volver al Menú Principal
         </a>
     </div>
 </div>
 
-<!-- Botón flotante de Ko-fi para donaciones -->
+<style>
+    /* Twilight CSS personalizado */
+    .hidden {
+        display: none !important; /* Forzar ocultamiento */
+    }
+    
+    .backdrop-blur-md {
+        backdrop-filter: blur(5px); /* Efecto de desenfoque */
+        -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
+        position: fixed; /* Cubre toda la ventana */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9998; /* Justo debajo del modal */
+        background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    }
+    
+    body.modal-open {
+        overflow: hidden; /* Evita el scroll cuando el modal está abierto */
+    }
+    
+    .bg-green-600 {
+        background-color: #22c55e;
+    }
+    
+    .bg-blue-500 {
+        background-color: #3b82f6;
+    }
+    
+    .bg-blue-600 {
+        background-color: #2563eb;
+    }
+    
+    .hover\:bg-green-600:hover {
+        background-color: #15803d;
+    }
+    
+    .hover\:bg-blue-600:hover {
+        background-color: #1e40af;
+    }
+    
+    button,
+    a {
+        text-align: center; /* Centra los textos de todos los botones */
+    }
+    
+    /* Estilos del modal */
+    #share-modal {
+        position: fixed; /* El modal cubre toda la ventana */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 9999; /* Elevado para que esté encima de todo */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    /* Estilos personalizados para la calculadora */
+    .calculator-grid {
+        position: relative; /* Mantén la calculadora en su flujo normal */
+        z-index: 0; /* Asegúrate de que esté detrás del modal */
+    }
+    
+    .calculator-cell {
+        height: 70px;
+        width: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border-radius: 8px;
+        transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        position: relative; /* Asegura que no sobresalga de su contexto */
+        z-index: 1; /* Por defecto, detrás del modal */
+    }
+    
+    .calculator-cell.resaltado {
+        background-color: #facc15; /* Color de resaltado */
+        animation: pulse 1.5s infinite; /* Efecto animado para celdas resaltadas */
+        box-shadow: 0 0 10px rgba(255, 223, 0, 0.9);
+        color: #000; /* Color del texto */
+        border: none; /* Sin bordes */
+        position: relative; /* Mantén la posición relativa */
+        z-index: 1; /* Asegúrate de que no sobresalga del modal */
+    }
+    
+    /* Animación para las celdas resaltadas */
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 8px rgba(255, 223, 0, 0.7);
+        }
+        50% {
+            transform: scale(1.2);
+            box-shadow: 0 0 16px rgba(255, 223, 0, 1);
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const shareButton = document.getElementById('share-button');
+        const shareModal = document.getElementById('share-modal');
+        const closeModalButton = document.getElementById('close-modal');
+
+        // Asegúrate de que el modal esté oculto al cargar la página
+        if (shareModal) {
+            shareModal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        }
+
+        // Evento para abrir el modal solo cuando se haga clic en el botón de compartir
+        if (shareButton && shareModal) {
+            shareButton.addEventListener('click', () => {
+                if (shareModal.classList.contains('hidden')) {
+                    shareModal.classList.remove('hidden');
+                    document.body.classList.add('modal-open'); // Aplicar efecto de fondo
+                }
+            });
+        }
+
+        // Evento para cerrar el modal al hacer clic en "Cancelar"
+        if (closeModalButton) {
+            closeModalButton.addEventListener('click', () => {
+                if (!shareModal.classList.contains('hidden')) {
+                    shareModal.classList.add('hidden');
+                    document.body.classList.remove('modal-open'); // Quitar efecto de fondo
+                }
+            });
+        }
+    });
+
+    // Asegúrate de cerrar el modal si la tecla "Escape" es presionada
+    document.addEventListener('keydown', (event) => {
+        const shareModal = document.getElementById('share-modal');
+        if (event.key === 'Escape' && shareModal && !shareModal.classList.contains('hidden')) {
+            shareModal.classList.add('hidden');
+            document.body.classList.remove('modal-open'); // Quitar efecto de fondo
+        }
+    });
+</script>
+
+<!-- Botón flotante de Ko-fi -->
 <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
 <script>
   kofiWidgetOverlay.draw('julianosoriom', {
