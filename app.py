@@ -756,6 +756,32 @@ def resultado_opcion2():
             ).lower()
             actualizar_ranking(palabra_normalizada)
 
+    # Calcular el total invertido
+    total_invertido = int(str(suma_total)[::-1])  # Invierte el total
+    print(f"[DEBUG] Total invertido: {total_invertido}")
+
+    # Buscar palabras que coincidan con el total invertido
+    palabras_invertidas = buscar_palabras_por_potencial(palabras, total_invertido)
+    palabras_invertidas = list(
+        set(normalizar_palabra_con_espacios(p) for p in palabras_invertidas)
+    )
+    palabras_invertidas = [
+        p for p in palabras_invertidas if p.lower() != palabra.lower()
+    ]  # Excluir la palabra buscada
+    palabras_invertidas = [
+        p for p in palabras_invertidas if p != palabra
+    ]  # Eliminar duplicados normalizando
+    palabras_invertidas.sort(key=lambda p: calcular_potencial(p), reverse=True)
+
+    if palabras_invertidas:
+        for palabra_invertida in palabras_invertidas:
+            palabra_normalizada = normalizar_palabra_con_espacios(
+                palabra_invertida
+            ).lower()
+            actualizar_ranking(palabra_normalizada)
+
+    print(f"[DEBUG] Palabras con total invertido: {palabras_invertidas}")
+
     # Historial de búsqueda
     if "historial" not in session:
         session["historial"] = []
@@ -776,16 +802,18 @@ def resultado_opcion2():
         potencial=potencial,
         lupa=lupa,
         detalle=detalle,
-        frecuencias_por_palabra=frecuencias_por_palabra,  # Mantener datos originales
-        salida_detallada=salida_detallada,  # Nueva representación
+        frecuencias_por_palabra=frecuencias_por_palabra,
+        salida_detallada=salida_detallada,
         total=suma_total,
+        total_invertido=total_invertido,  # Nuevo valor enviado al template
         numeros_por_letra=numeros_por_letra,
-        mostrar_numeros_por_letra=mostrar_numeros_por_letra,  # Nueva bandera para el template
+        mostrar_numeros_por_letra=mostrar_numeros_por_letra,
         territorios=territorios_encontrados,
         palabras=palabras_encontradas,
+        palabras_invertidas=palabras_invertidas,  # Nuevas palabras invertidas enviadas al template
         elementos=elementos,
         opcion=2,
-        numero_resaltado=numero_resaltado  # Enviar lista de dígitos
+        numero_resaltado=numero_resaltado
     )
 
 
