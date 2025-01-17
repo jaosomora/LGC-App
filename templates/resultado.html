@@ -226,21 +226,36 @@ document.addEventListener('keydown', (event) => {
         </div>
     </div>
 
-    <!-- Secciones de Resonancias -->
-    <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 gap-y-6">
-        <!-- Palabras con la misma frecuencia numérica -->
-        <div
-            class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Relación Numérica
-                con Palabras</h3>
-            {% if palabras %}
-            <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
-            {% else %}
-            <p class="mt-4 text-gray-500">No se encontraron palabras
-                asociadas.</p>
-            {% endif %}
-        </div>
+<!-- Secciones de Resonancias -->
+<div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 gap-y-6">
+    <!-- Palabras con la misma frecuencia numérica -->
+    <div
+        class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">
+            Relación Numérica con Palabras desde el Pasado
+            <span class="text-green-500">({{ total }})</span>
+        </h3>
+        {% if palabras %}
+        <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
+        {% else %}
+        <p class="mt-4 text-gray-500">Sin resonancias desde el máximo pasado.</p>
+        {% endif %}
+    </div>
 
+    <!-- Palabras con el potencial numérico invertido -->
+    <div
+        class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">
+            Relación Numérica con Palabras desde el Futuro
+            <span class="text-blue-500">({{ total_invertido }})</span>
+        </h3>
+        {% if palabras_invertidas %}
+        <p class="mt-4 text-gray-700"><i>{{ palabras_invertidas | join(', ') }}</i></p>
+        {% else %}
+        <p class="mt-4 text-gray-500">Sin resonancias desde el máximo futuro.</p>
+        {% endif %}
+    </div>
+</div>
         <!-- Territorios relacionados -->
         <div
             class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">

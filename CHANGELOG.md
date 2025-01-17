@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## [1.3.0] - 2025-01-17
+### Added
+- Nueva funcionalidad para mostrar **palabras con el potencial invertido**:
+  - Si la palabra buscada tiene un total de 57, se muestra una nueva sección con palabras cuyo total sea 75 (el inverso).
+  - Implementada en la plantilla `resultado.html` con un bloque adicional similar al de "Palabras con la misma Frecuencia Numérica".
+- Lógica en el backend (`app.py`):
+  - Se calcula el total invertido y se buscan palabras con dicho total.
+  - Los resultados se envían al template bajo el parámetro `palabras_invertidas`.
+- Comentarios detallados para explicar el manejo de la lógica del potencial invertido en `app.py`.
+
+### Changed
+- Refactorización de partes del controlador `resultado_opcion2` para mejorar la legibilidad y evitar redundancia en la manipulación de listas y búsquedas.
+- Ajuste del diseño de `resultado.html` para mantener consistencia visual al agregar la nueva funcionalidad.
+
+### Fixed
+- Se corrigió un error menor en la generación del historial de búsquedas que permitía duplicados en ciertas condiciones.
+- Mejoras menores en los comentarios de código para claridad futura.
+
+---
+
 ## [1.2.9] - 2025-01-16
 ### Added
 - Inclusión del enlace **Convierte palabras en números: https://lgc.julianosoriom.com** al texto compartido:
