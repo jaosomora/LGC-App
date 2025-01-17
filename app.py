@@ -893,6 +893,9 @@ def resultado_opcion1():
     # Convertir la frecuencia en una lista de dígitos
     numero_resaltado = [int(digito) for digito in str(frecuencia)]
 
+    total = frecuencia  # Total es igual a la frecuencia ingresada
+    total_invertido = int(str(frecuencia)[::-1])  # Invertir el total
+    
     # Renderizado de resultados
     return render_template(
         "resultado.html",
@@ -904,8 +907,11 @@ def resultado_opcion1():
         palabras=palabras_encontradas,  # Mantener Resonancias de Palabras Relacionadas
         elementos=elementos,  # Mantener Resonancia Elemental
         opcion=1,  # Identificar opción 1 en el template
-        numero_resaltado=numero_resaltado  # Enviar lista de dígitos
+        numero_resaltado=numero_resaltado,  # Enviar lista de dígitos
+        total=frecuencia,  # Enviar el total como la frecuencia ingresada
+        total_invertido=int(str(frecuencia)[::-1])  # Calcular y enviar el total invertido
     )
+
 
 
 @app.route("/embed_page")
