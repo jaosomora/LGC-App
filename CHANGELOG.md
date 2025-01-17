@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## [1.2.9] - 2025-01-16
+### Added
+- Inclusión del enlace **Convierte palabras en números: https://lgc.julianosoriom.com** al texto compartido:
+  - En el texto copiado al portapapeles.
+  - En el mensaje compartido vía WhatsApp.
+- Mensaje temporal al copiar texto:
+  - Añadido un mensaje visual "Texto copiado al portapapeles" que aparece automáticamente y desaparece con un efecto de desvanecimiento suave.
+  - Implementado con transparencia ajustada para mayor sutileza visual.
+
+### Changed
+- Ajustes en el formato de las líneas de resultados para asegurar que no contengan espacios innecesarios ni indentaciones en:
+  - Texto copiado al portapapeles.
+  - Mensaje compartido por WhatsApp.
+- Refinamiento del diseño del mensaje temporal:
+  - Mayor transparencia en el fondo (`rgba(76, 175, 80, 0.6)`).
+  - Aparición y desvanecimiento más suaves con transiciones optimizadas.
+
+### Fixed
+- Eliminación de tabs o espacios adicionales en los resultados generados.
+- Garantía de que el diseño visual del mensaje temporal no interfiera con otros elementos de la interfaz.
+
+---
+
 ## [1.2.8] - 2025-01-15
 ### Added
 - Inclusión de un **botón para compartir resultados**, con opciones para:
@@ -13,7 +36,7 @@
 - Optimización del modal para mayor consistencia visual:
   - Se ajustaron las clases de Tailwind para asegurar un diseño responsivo y visualmente atractivo.
 
----
+
 
 ## [1.2.7] - 2025-01-14
 ### Added

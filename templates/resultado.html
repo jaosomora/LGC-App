@@ -89,65 +89,109 @@
     });
     
     
-    // Funcionalidad para copiar al portapapeles
-    document.getElementById('copy-button').addEventListener('click', () => {
-        // Estas variables deben ser procesadas por el servidor antes de enviar el HTML al cliente
-        const salidaDetallada = `
-            {% for linea in salida_detallada %}
-            {{ linea | striptags }}
-            {% endfor %}
-        `.trim(); // Ajuste para quitar espacios innecesarios
-    
-        const textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}`;
-    
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(textToCopy)
-                .then(() => {
-                    document.getElementById('share-modal').classList.add('hidden'); // Cerrar modal
-                    document.body.classList.remove('modal-open'); // Quitar blur
-                })
-                .catch(err => console.error('Error al copiar:', err));
-        } else {
-            // Fallback para navegadores antiguos
-            const textArea = document.createElement('textarea');
-            textArea.value = textToCopy;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                document.getElementById('share-modal').classList.add('hidden'); // Cerrar modal
-                document.body.classList.remove('modal-open'); // Quitar blur
-            } catch (err) {
-                console.error('Error al copiar:', err);
-            }
-            document.body.removeChild(textArea);
+// Crear función para mostrar mensajes dinámicos
+function showTemporaryMessage(message, duration = 3000) {
+    // Verificar si ya existe un contenedor de mensaje
+    let messageContainer = document.getElementById('temporary-message');
+    if (!messageContainer) {
+        // Crear un contenedor si no existe
+        messageContainer = document.createElement('div');
+        messageContainer.id = 'temporary-message';
+        messageContainer.style.position = 'fixed';
+        messageContainer.style.bottom = '20px';
+        messageContainer.style.right = '20px';
+        messageContainer.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Fondo más transparente
+        messageContainer.style.color = 'white';
+        messageContainer.style.padding = '10px 20px';
+        messageContainer.style.borderRadius = '5px';
+        messageContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+        messageContainer.style.fontSize = '14px';
+        messageContainer.style.zIndex = '9999';
+        messageContainer.style.transition = 'opacity 0.3s ease-in-out'; // Suavizar la aparición y desaparición
+        document.body.appendChild(messageContainer);
+    }
+
+    // Configurar el mensaje
+    messageContainer.textContent = message;
+    messageContainer.style.display = 'block';
+    messageContainer.style.opacity = '1';
+
+    // Ocultar el mensaje después de un tiempo
+    setTimeout(() => {
+        messageContainer.style.opacity = '0'; // Añadir efecto de desvanecimiento
+        setTimeout(() => {
+            messageContainer.style.display = 'none';
+        }, 300); // Esperar a que termine la transición
+    }, duration);
+}
+
+// Funcionalidad para copiar al portapapeles
+document.getElementById('copy-button').addEventListener('click', () => {
+    const salidaDetallada = `
+        {% for linea in salida_detallada %}
+        {{ linea | striptags }}
+        {% endfor %}
+    `.trim().split('\n').map(line => line.trim()).join('\n');
+
+    const textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}\n\nConvierte palabras en números: https://lgc.julianosoriom.com`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy)
+            .then(() => {
+                document.getElementById('share-modal').classList.add('hidden');
+                document.body.classList.remove('modal-open');
+                showTemporaryMessage('¡Listo! Texto copiado');
+            })
+            .catch(err => console.error('Error al copiar:', err));
+    } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = textToCopy;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            showTemporaryMessage('¡Listo! Texto copiado');
+            document.getElementById('share-modal').classList.add('hidden');
+            document.body.classList.remove('modal-open');
+        } catch (err) {
+            console.error('Error al copiar:', err);
         }
-    });
-    
-    // Funcionalidad para el botón de WhatsApp
-    document.getElementById('whatsapp-button').addEventListener('click', () => {
-        // Estas variables también deben ser renderizadas por el servidor
-        const salidaDetallada = `
-            {% for linea in salida_detallada %}
-            *{{ linea | striptags }}*
-            {% endfor %}
-        `.trim(); // Ajuste para formato
-    
-        const textForWhatsApp = `Métricas para *{{ palabra }}*\n\n${salidaDetallada}\nTotal: *{{ total }}*\nLupa: *{{ lupa }}*`;
-        
-        const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(textForWhatsApp)}`;
-        document.getElementById('whatsapp-button').setAttribute('href', whatsappUrl);
-    
-        // Cerrar modal después de redirigir
-        document.getElementById('share-modal').classList.add('hidden');
-        document.body.classList.remove('modal-open'); // Quitar blur
-    });
-    
-    // Cerrar el modal de respaldo
-    document.getElementById('close-modal').addEventListener('click', () => {
-        document.getElementById('share-modal').classList.add('hidden');
-        document.body.classList.remove('modal-open'); // Quitar blur
-    });
+        document.body.removeChild(textArea);
+    }
+});
+
+
+// Funcionalidad para el botón de WhatsApp
+document.getElementById('whatsapp-button').addEventListener('click', () => {
+    // Procesar salida detallada sin espacios adicionales
+    const salidaDetallada = `
+        {% for linea in salida_detallada %}
+        *{{ linea | striptags }}*
+        {% endfor %}
+    `.trim().split('\n').map(line => line.trim()).join('\n'); // Quitar espacios al inicio y al final de cada línea
+
+    // Formatear texto para WhatsApp
+    const textForWhatsApp = [
+        `Métricas para *{{ palabra }}*`,
+        salidaDetallada,
+        `Total: *{{ total }}*`,
+        `Lupa: *{{ lupa }}*`,
+        `Convierte palabras en números: https://lgc.julianosoriom.com`
+    ].join('\n\n'); // Combinar en un solo string con saltos de línea
+
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(textForWhatsApp)}`;
+    document.getElementById('whatsapp-button').setAttribute('href', whatsappUrl);
+
+    // Cerrar modal después de redirigir
+    document.getElementById('share-modal').classList.add('hidden');
+    document.body.classList.remove('modal-open'); // Quitar blur
+});
+
+// Cerrar el modal de respaldo
+document.getElementById('close-modal').addEventListener('click', () => {
+    document.getElementById('share-modal').classList.add('hidden');
+    document.body.classList.remove('modal-open'); // Quitar blur
+});
     
 // Cerrar el modal con la tecla Esc
 document.addEventListener('keydown', (event) => {
