@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## [1.3.1] - 2025-01-18
+### Added
+- **Implementación de activación automática del teclado** al abrir el modal en dispositivos móviles:
+  - Se asegura que el campo de entrada (`input`) reciba el foco de manera automática al abrir el modal.
+  - Se incluye una simulación de clic virtual para navegadores que requieren interacción explícita, como Safari en iOS.
+  - Ajustado con un retardo breve para garantizar que el modal esté completamente visible antes de activar el teclado.
+
+### Changed
+- Refactorización en la función `showModal` para manejar de manera más robusta la compatibilidad con navegadores móviles:
+  - Uso de `setTimeout` con retardo optimizado.
+  - Inclusión de eventos `focus()` y `click()` aplicados secuencialmente para maximizar la compatibilidad.
+  - Mejora de los comentarios en el código para documentar las razones detrás de estos ajustes.
+
+---
+
 ## [1.3.0] - 2025-01-17
 ### Added
 - Nueva funcionalidad para mostrar **palabras con el potencial invertido**:
