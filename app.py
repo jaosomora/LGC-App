@@ -655,12 +655,17 @@ def mostrar_ranking():
     return render_template("ranking.html", ranking=ranking)
 
 
-@app.route("/resultado_opcion2", methods=["POST"])
+@app.route("/resultado_opcion2", methods=["GET", "POST"])
 def resultado_opcion2():
     """
     Procesa la palabra o frase ingresada en la opción 2 y genera los resultados.
     """
-    palabra = request.form.get("palabra")
+    # Obtener la palabra desde POST o GET
+    if request.method == "POST":
+        palabra = request.form.get("palabra")  # Método POST (Formulario)
+    elif request.method == "GET":
+        palabra = request.args.get("frase")  # Método GET (Query Parameters)
+    
     print(f"[DEBUG] Palabra ingresada por el usuario: {palabra}")  # LOG NUEVO
 
     # Verificar si la palabra contiene caracteres válidos (alfabéticos y espacios)

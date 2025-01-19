@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.3.2] - 2025-01-18
+### Added
+- Soporte para solicitudes **GET** en la ruta `/resultado_opcion2`, lo que permite procesar frases enviadas como parámetros en la URL (`?frase=...`).
+  - Ejemplo: `https://lgc.julianosoriom.com/resultado_opcion2?frase=coraz%C3%B3n%20abierto`.
+- La ruta sigue siendo compatible con solicitudes **POST**, manteniendo el comportamiento original.
+
+### Changed
+- Ningún cambio en funcionalidades existentes. La implementación asegura la compatibilidad con el flujo actual.
+
+---
+
 ## [1.3.1] - 2025-01-18
 ### Added
 - **Implementación de activación automática del teclado** al abrir el modal en dispositivos móviles:
