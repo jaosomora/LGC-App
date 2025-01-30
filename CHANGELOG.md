@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## [1.3.5] - 2025-01-30
+### Mejoras y cambios principales
+- **Ahora puedes navegar más fácilmente** con el nuevo diseño del **header**:
+  - El **logo** con el texto **"Interfaz LGC"** ha sido destacado de manera más visual, mejorando la presencia de la marca.
+  - **Ahora puedes explorar las características de la app** a través de un enlace directo titulado **"Ahora puedes"**, que te lleva a un documento de **Notion** para conocer todas las funcionalidades disponibles.
+  - **Ahora puedes disfrutar de una experiencia más fluida** gracias a las transiciones suaves en los enlaces y elementos interactivos, mejorando la interacción del usuario.
+
+### Cambios adicionales
+- **Ahora puedes colaborar con el proyecto fácilmente**:
+  - Un nuevo enlace en el **footer**, titulado **"¿Quieres colaborar con el proyecto?"**, con un ícono de **♥️** que te llevará a un enlace donde podrás obtener más información sobre cómo contribuir.
+  - **Ahora puedes ver los créditos** con el nuevo mensaje **"Hecho 🚀 por"**, en lugar de "Hecho con ❤️ por", manteniendo un tono más dinámico y alineado con la visión del proyecto.
+  
+### Detalles adicionales
+- **Ahora puedes sentir que todo está alineado**: El **header** y el **footer** han sido rediseñados para tener un estilo coherente con la identidad visual de la app.
+- **Ahora puedes explorar mejor el contenido** del sitio con la actualización visual, brindando una experiencia de usuario más atractiva y fluida.
+
+---
+
 ## [1.3.4] - 2025-01-30
 ### Mejoras y cambios principales
 - **Implementación de Footer mejorado**:
