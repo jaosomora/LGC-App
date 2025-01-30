@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [1.3.4] - 2025-01-30
+### Mejoras y cambios principales
+- **Implementación de Footer mejorado**:
+  - Se implementó un nuevo diseño de Footer con tres secciones:
+    - **GitHub** (izquierda).
+    - **Newsletter** (centro).
+    - **Créditos** (derecha).
+  - Se mejoró la interactividad del ícono de **Newsletter** 📩, haciendo que cambie de color al pasar el mouse, para una experiencia más dinámica.
+
+---
+
 ## [1.3.3] - 2025-01-29
 ### Mejoras y cambios principales
 - **Migración completa a Tailwind CSS v3**:
