@@ -19,16 +19,20 @@
             Elige una herramienta para comenzar
         </p>
     </div>
-    <!-- Tarjetas del Menú Principal -->
+<!-- Tarjetas del Menú Principal -->
 <div id="menu-content" class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
     <!-- Opción 1 -->
     <button
         onclick="showModal(1)"
-        class="group block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow hover:bg-primary-500 dark:hover:bg-primary-600 hover:border-transparent hover:shadow-lg transition-all">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 group-hover:text-white">
+        class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-primary-500 cursor-pointer animate-fadeIn">
+        
+        <!-- Ícono de acción para móviles (Animación wiggle corregida) -->
+        <span id="wiggle-icon-1" class="absolute -top-4 right-4 text-primary-600 dark:text-primary-400 text-lg sm:inline animate-wiggle">👆🏻</span>
+
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             1. Buscador de Palabras por Número
         </h3>
-        <p class="mt-2 text-gray-500 dark:text-gray-400 group-hover:text-gray-300">
+        <p class="mt-2 text-gray-500 dark:text-gray-400">
             Herramienta que permite ingresar un número y descubrir las palabras que tienen el mismo valor numérico.
         </p>
     </button>
@@ -36,15 +40,20 @@
     <!-- Opción 2 -->
     <button
         onclick="showModal(2)"
-        class="group block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow hover:bg-green-500 dark:hover:bg-green-600 hover:border-transparent hover:shadow-lg transition-all">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 group-hover:text-white">
+        class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-green-500 cursor-pointer animate-fadeIn">
+        
+        <!-- Ícono de acción para móviles (Animación wiggle corregida) -->
+        <span id="wiggle-icon-2" class="absolute -top-4 right-4 text-green-600 dark:text-green-400 text-lg sm:inline animate-wiggle">👆🏻</span>
+
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             2. Conversor de Palabras a Números
         </h3>
-        <p class="mt-2 text-gray-500 dark:text-gray-400 group-hover:text-gray-300">
+        <p class="mt-2 text-gray-500 dark:text-gray-400">
             Herramienta que convierte una palabra en su valor numérico sumando los valores asignados a cada letra.
         </p>
     </button>
 </div>
+
 
     <!-- Historial de Búsquedas -->
 {% if historial %}
@@ -253,5 +262,26 @@
 
         closeModal();
     }
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const toolButtons = document.querySelectorAll("#menu-content button");
+        const wiggleIcons = document.querySelectorAll("#menu-content span");
+
+        toolButtons.forEach((button, index) => {
+            button.addEventListener("click", function () {
+                // Oculta el icono después de la primera interacción
+                wiggleIcons[index].classList.add("hidden");
+            });
+        });
+
+        // Asegurar que la animación wiggle se active correctamente
+        setTimeout(() => {
+            wiggleIcons.forEach(icon => {
+                icon.classList.remove("hidden");
+            });
+        }, 500);
+    });
+
 </script>
 {% endblock %}

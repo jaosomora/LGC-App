@@ -9,169 +9,187 @@
             '{{ palabra|title }}'</h2>
     </div>
 
-<!-- Métricas principales -->
-<!-- Diferencia entre opción 1 (resultado de un número único) y opción 2 (análisis de una frase) -->
-{% if opcion == 1 %}
-<div class="grid grid-cols-1 gap-4">
-    <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
-        <!-- Muestra el número calculado para la opción 1 -->
-        <p class="mt-4 text-gray-600"><strong>Número:</strong> {{ frecuencia }}</p>
-        <!-- Muestra la lupa asociada al número calculado -->
-        <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
+    <!-- Métricas principales -->
+    <!-- Diferencia entre opción 1 (resultado de un número único) y opción 2 (análisis de una frase) -->
+    {% if opcion == 1 %}
+    <div class="grid grid-cols-1 gap-4">
+        <div
+            class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
+            <!-- Muestra el número calculado para la opción 1 -->
+            <p class="mt-4 text-gray-600"><strong>Número:</strong> {{ frecuencia
+                }}</p>
+            <!-- Muestra la lupa asociada al número calculado -->
+            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
+        </div>
     </div>
-</div>
-{% elif opcion == 2 %}
-<div class="grid grid-cols-1 gap-4">
-    <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
-        <!-- Resultados formateados para la opción 2 -->
-        <!-- Cada línea muestra una palabra analizada con su detalle -->
-        <ul class="mt-4 space-y-2">
-            {% for linea in salida_detallada %}
-            <li class="text-gray-600">
-                <!-- 'safe' se usa para renderizar contenido HTML seguro (negritas en palabras) -->
-                {{ linea|safe }}
-            </li>
-            {% endfor %}
-        </ul>
-        <!-- Total y lupa de la frase analizada -->
-        <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total }}</p>
-        <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
+    {% elif opcion == 2 %}
+    <div class="grid grid-cols-1 gap-4">
+        <div
+            class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
+            <!-- Resultados formateados para la opción 2 -->
+            <!-- Cada línea muestra una palabra analizada con su detalle -->
+            <ul class="mt-4 space-y-2">
+                {% for linea in salida_detallada %}
+                <li class="text-gray-600">
+                    <!-- 'safe' se usa para renderizar contenido HTML seguro (negritas en palabras) -->
+                    {{ linea|safe }}
+                </li>
+                {% endfor %}
+            </ul>
+            <!-- Total y lupa de la frase analizada -->
+            <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total
+                }}</p>
+            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
+        </div>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 
-<!-- Botón para compartir con margen superior para separarlo -->
-<button id="share-button"
-    class="mt-6 bg-primary-500 text-white py-2 px-4 rounded-xl shadow-md hover:bg-primary-600 transition-all">
-    Compartir Resultado
-</button>
+    <!-- Botón para compartir con margen superior para separarlo -->
+    <button id="share-button"
+        class="mt-6 bg-primary-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-primary-600 transition-all">
+        Compartir Resultado
+    </button>
 
     <!-- Modal de respaldo para compartir -->
-<div id="share-modal"
-class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur-md z-50">
+    <div id="share-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur-md z-50">
 
-<div class="bg-white rounded-xl shadow-lg p-6 max-w-md">
-    <h3 class="text-lg font-bold text-gray-900 mb-4 text-center">
-        Compartir Resultado
-    </h3>
-    <p class="text-gray-700 mb-4 text-center">
-        Elige una opción para compartir:
-    </p>
-    <div class="space-y-4">
-        <!-- Botón para WhatsApp -->
-        <a id="whatsapp-button"
-            href="#"
-            class="block text-white py-2 px-4 rounded-xl shadow-md text-center bg-[#25D366] hover:bg-[#1DA851] transition-all"
-            target="_blank">
-            WhatsApp
-        </a>
-        <!-- Botón para Copiar -->
-        <button id="copy-button"
-            class="block bg-primary-500 text-white py-2 px-4 rounded-xl shadow-md text-center hover:bg-primary-600 transition-all w-full">
-            Copiar
-        </button>
+        <div class="bg-white rounded-xl shadow-lg p-6 max-w-md">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 text-center">
+                Compartir Resultado
+            </h3>
+            <p class="text-gray-700 mb-4 text-center">
+                Elige una opción para compartir:
+            </p>
+            <div class="space-y-4">
+                <!-- Botón para WhatsApp -->
+                <a id="whatsapp-button"
+                    href="#"
+                    class="block text-white py-2 px-4 rounded-xl shadow-md text-center bg-[#25D366] hover:bg-[#1DA851] transition-all"
+                    target="_blank">
+                    WhatsApp
+                </a>
+                <!-- Botón para Copiar -->
+                <button id="copy-button"
+                    class="block bg-primary-500 text-white py-2 px-4 rounded-xl shadow-md text-center hover:bg-primary-600 transition-all w-full">
+                    Copiar
+                </button>
+            </div>
+            <button id="close-modal"
+                class="mt-6 w-full bg-gray-500 text-white py-2 px-4 rounded-xl text-center hover:bg-gray-600 transition-all">
+                Cancelar
+            </button>
+        </div>
+
+        <div id="temporary-message"
+            class="fixed bottom-5 right-5 bg-green-500 bg-opacity-70 text-white px-5 py-2 rounded-lg shadow-lg text-sm hidden opacity-0 transition-opacity duration-300 ease-in-out">
+        </div>
+
     </div>
-    <button id="close-modal"
-        class="mt-6 w-full bg-gray-500 text-white py-2 px-4 rounded-xl text-center hover:bg-gray-600 transition-all">
-        Cancelar
-    </button>
-</div>
 
-<div id="temporary-message"
-    class="fixed bottom-5 right-5 bg-green-500 bg-opacity-70 text-white px-5 py-2 rounded-lg shadow-lg text-sm hidden opacity-0 transition-opacity duration-300 ease-in-out">
-</div>
-
-</div>
-
-<!-- Calculadora Visual -->
-<div class="mt-12">
-    <h3 class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
-    <div class="flex justify-center">
-        <div class="calculator-grid grid grid-cols-3 gap-3 bg-gray-200 p-6 rounded-xl shadow-md">
-            {% for number in [7, 8, 9, 4, 5, 6, 1, 2, 3, 0] %}
-            <div class="calculator-cell flex items-center justify-center text-lg font-semibold w-16 h-16 rounded-lg transition-all duration-200 
+    <!-- Calculadora Visual -->
+    <div class="mt-12">
+        <h3
+            class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
+        <div class="flex justify-center">
+            <div
+                class="calculator-grid grid grid-cols-3 gap-3 bg-gray-200 p-6 rounded-xl shadow-md">
+                {% for number in [7, 8, 9, 4, 5, 6, 1, 2, 3, 0] %}
+                <div
+                    class="calculator-cell flex items-center justify-center text-lg font-semibold w-16 h-16 rounded-lg transition-all duration-200 
                         {% if number in numero_resaltado %}
                         bg-yellow-400 text-black animate-pulse shadow-xl
                         {% else %}
                         bg-white border border-gray-300 text-gray-800 hover:bg-gray-100
-                        {% endif %}" 
-                data-number="{{ number }}">
-                {{ number }}
+                        {% endif %}"
+                    data-number="{{ number }}">
+                    {{ number }}
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
     </div>
-</div>
 
-<!-- Secciones de Resonancias -->
-<div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
-    <!-- Sección: Relación con palabras del pasado -->
-    <div class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full">
-        <h3 class="text-lg font-semibold text-primary">
-            Relación Numérica con Palabras desde el Pasado
-            <span class="text-secondary">({{ total }})</span>
-        </h3>
-        {% if palabras %}
-        <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
+    <!-- Secciones de Resonancias -->
+    <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <!-- Sección: Relación con palabras del pasado -->
+        <div
+            class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full">
+            <h3 class="text-lg font-semibold text-primary">
+                Relación Numérica con Palabras desde el Pasado
+                <span class="text-secondary">({{ total }})</span>
+            </h3>
+            {% if palabras %}
+            <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
+            {% else %}
+            <p class="mt-4 text-gray-500">Sin resonancias desde el máximo
+                pasado.</p>
+            {% endif %}
+        </div>
+
+        <!-- Sección: Relación con palabras del futuro -->
+        <div
+            class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full">
+            <h3 class="text-lg font-semibold text-primary">
+                Relación Numérica con Palabras desde el Futuro
+                <span class="text-secondary">({{ total_invertido }})</span>
+            </h3>
+            {% if palabras_invertidas %}
+            <p class="mt-4 text-gray-700"><i>{{ palabras_invertidas | join(', ')
+                    }}</i></p>
+            {% else %}
+            <p class="mt-4 text-gray-500">Sin resonancias desde el máximo
+                futuro.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sección de Territorios Relacionados -->
+    <div
+        class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full mt-6">
+        <h3 class="text-lg font-semibold text-primary">Relación Numérica con
+            Países</h3>
+        {% if territorios %}
+        <ul class="mt-4 space-y-2 text-gray-700">
+            {% for territorio in territorios %}
+            <li><strong>Código Territorial:</strong> +{{ territorio['codigo'] }}
+                - <strong>País:</strong> {{ territorio['pais'] }}</li>
+            {% endfor %}
+        </ul>
         {% else %}
-        <p class="mt-4 text-gray-500">Sin resonancias desde el máximo pasado.</p>
+        <p class="mt-4 text-gray-500">No se encontraron coincidencias
+            geográficas.</p>
         {% endif %}
     </div>
 
-    <!-- Sección: Relación con palabras del futuro -->
-    <div class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full">
-        <h3 class="text-lg font-semibold text-primary">
-            Relación Numérica con Palabras desde el Futuro
-            <span class="text-secondary">({{ total_invertido }})</span>
-        </h3>
-        {% if palabras_invertidas %}
-        <p class="mt-4 text-gray-700"><i>{{ palabras_invertidas | join(', ') }}</i></p>
+    <!-- Sección de Elementos Relacionados -->
+    <div
+        class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full mt-6">
+        <h3 class="text-lg font-semibold text-primary mb-4">Relación Numérica
+            con Elementos</h3>
+        {% if elementos %}
+        <ul class="space-y-4 text-gray-700">
+            {% for elemento in elementos %}
+            <li class="flex flex-col">
+                <!-- 'safe' asegura que se rendericen etiquetas HTML dentro de los datos -->
+                {{ elemento|safe }}
+            </li>
+            {% endfor %}
+        </ul>
         {% else %}
-        <p class="mt-4 text-gray-500">Sin resonancias desde el máximo futuro.</p>
+        <p class="text-gray-500">No se encontraron coincidencias en
+            elementos.</p>
         {% endif %}
     </div>
-</div>
 
-<!-- Sección de Territorios Relacionados -->
-<div class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full mt-6">
-    <h3 class="text-lg font-semibold text-primary">Relación Numérica con Países</h3>
-    {% if territorios %}
-    <ul class="mt-4 space-y-2 text-gray-700">
-        {% for territorio in territorios %}
-        <li><strong>Código Territorial:</strong> +{{ territorio['codigo'] }} - <strong>País:</strong> {{ territorio['pais'] }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p class="mt-4 text-gray-500">No se encontraron coincidencias geográficas.</p>
-    {% endif %}
+    <!-- Botón para regresar al menú principal -->
+    <div class="mt-12 text-center">
+        <a href="/"
+            class="inline-block bg-primary-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-primary-600 transition-all">
+            Volver al Menú Principal
+        </a>
+    </div>
 </div>
-
-<!-- Sección de Elementos Relacionados -->
-<div class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full mt-6">
-    <h3 class="text-lg font-semibold text-primary mb-4">Relación Numérica con Elementos</h3>
-    {% if elementos %}
-    <ul class="space-y-4 text-gray-700">
-        {% for elemento in elementos %}
-        <li class="flex flex-col">
-            <!-- 'safe' asegura que se rendericen etiquetas HTML dentro de los datos -->
-            {{ elemento|safe }}
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p class="text-gray-500">No se encontraron coincidencias en elementos.</p>
-    {% endif %}
-</div>
-
-<!-- Botón para regresar al menú principal -->
-<div class="mt-12 text-center">
-    <a href="/" 
-        class="inline-block bg-primary text-white py-3 px-6 rounded-lg shadow-md hover:bg-primary-600 text-sm md:text-base transition-all border border-transparent hover:border-white">
-        Volver al Menú Principal
-    </a>
-</div>
-</div>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -296,7 +314,7 @@ class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-cen
             });
         }
     });
-    </script>    
+    </script>
 
 <!-- Código del botón flotante de Ko-fi -->
 <!-- 

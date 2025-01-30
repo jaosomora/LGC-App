@@ -66,6 +66,11 @@ module.exports = {
       animation: {
         pulse: 'pulse 1.5s infinite',
         fadeIn: 'fadeIn 0.5s ease-in-out',
+        bell: 'bell 1.5s ease-in-out infinite', // Animación por defecto
+        'bell-hover': 'bell 0.7s ease-in-out infinite', // Versión más rápida en hover
+        'bell-fast': 'bell 0.5s ease-in-out infinite', // Versión más rápida en touch
+        bounceIn: 'bounceIn 0.7s ease-out', // Efecto de entrada en herramientas
+        wiggle: 'wiggle 0.8s ease-in-out infinite', // Movimiento leve en las herramientas
       },
       keyframes: {
         pulse: {
@@ -75,6 +80,23 @@ module.exports = {
         fadeIn: {
           '0%': { opacity: 0 },
           '100%': { opacity: 1 },
+        },
+        bell: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-10deg)' },
+          '50%': { transform: 'rotate(10deg)' },
+          '75%': { transform: 'rotate(-5deg)' },
+        },
+        bounceIn: {
+          '0%': { transform: 'scale(0.8)', opacity: 0 },
+          '50%': { transform: 'scale(1.05)', opacity: 1 },
+          '100%': { transform: 'scale(1)', opacity: 1 },
+        },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-2deg)' },
+          '50%': { transform: 'rotate(2deg)' },
+          '75%': { transform: 'rotate(-1deg)' },
         },
       },
     },
