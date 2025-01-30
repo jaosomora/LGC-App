@@ -21,12 +21,14 @@ module.exports = {
         },
         secondary: {
           DEFAULT: '#50B5E9',
+          50: '#EAF8FF',
           100: '#D4EEFC',
           500: '#50B5E9',
           700: '#1D8ACD',
         },
         accent: {
           DEFAULT: '#25567B',
+          50: '#E1ECF5',
           100: '#DCE6F1',
           500: '#25567B',
           700: '#173A57',
@@ -35,10 +37,6 @@ module.exports = {
         green: {
           500: '#22c55e',
           600: '#15803d',
-        },
-        blue: {
-          500: '#3b82f6',
-          600: '#2563eb',
         },
         gray: {
           50: '#f9fafb',
@@ -60,6 +58,10 @@ module.exports = {
         lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
         xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
         '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+      },
+      borderRadius: {
+        xl: '1rem',
+        '2xl': '1.5rem',
       },
       animation: {
         pulse: 'pulse 1.5s infinite',

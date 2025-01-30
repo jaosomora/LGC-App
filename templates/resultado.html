@@ -5,7 +5,7 @@
     <!-- Título principal de la página -->
     <!-- Muestra la frase analizada en formato capitalizado usando el filtro 'title' -->
     <div class="text-center mb-8">
-        <h2 class="text-3xl font-extrabold text-gray-900">Métricas para
+        <h2 class="text-3xl font-extrabold text-primary-900">Métricas para
             '{{ palabra|title }}'</h2>
     </div>
 
@@ -14,72 +14,76 @@
     {% if opcion == 1 %}
     <div class="grid grid-cols-1 gap-4">
         <div
-            class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+            class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
             <!-- Muestra el número calculado para la opción 1 -->
-            <p class="mt-4 text-gray-700"><strong>Número:</strong> {{ frecuencia
-                }}</p>
+            <p class="mt-4 text-gray-600"><strong>Número:</strong> {{ frecuencia }}</p>
             <!-- Muestra la lupa asociada al número calculado -->
-            <p class="mt-4 text-gray-700"><strong>Lupa:</strong> {{ lupa }}</p>
+            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
         </div>
     </div>
     {% elif opcion == 2 %}
     <div class="grid grid-cols-1 gap-4">
         <div
-            class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
+            class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
             <!-- Resultados formateados para la opción 2 -->
             <!-- Cada línea muestra una palabra analizada con su detalle -->
             <ul class="mt-4 space-y-2">
                 {% for linea in salida_detallada %}
-                <li class="text-gray-700">
+                <li class="text-gray-600">
                     <!-- 'safe' se usa para renderizar contenido HTML seguro (negritas en palabras) -->
                     {{ linea|safe }}
                 </li>
                 {% endfor %}
             </ul>
             <!-- Total y lupa de la frase analizada -->
-            <p class="mt-4 text-gray-700"><strong>Total:</strong> {{ total
-                }}</p>
-            <p class="mt-4 text-gray-700"><strong>Lupa:</strong> {{ lupa }}</p>
+            <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total }}</p>
+            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
         </div>
     </div>
-    {% endif %}
+{% endif %}
 
     <!-- Botón para compartir -->
-    <button id="share-button"
-        class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-600">
-        Compartir Resultado
-    </button>
+<button id="share-button"
+class="bg-primary-500 text-white py-2 px-4 rounded-xl shadow-md hover:bg-primary-600 transition-all">
+Compartir Resultado
+</button>
 
     <!-- Modal de respaldo para compartir -->
-    <div id="share-modal"
-        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur-md">
-        <div class="bg-white rounded-lg shadow-lg p-6 max-w-md">
-            <h3
-                class="text-lg font-bold text-gray-900 mb-4 text-center">Compartir
-                Resultado</h3>
-            <p class="text-gray-700 mb-4 text-center">Elige una opción para
-                compartir:</p>
-            <div class="space-y-4">
-                <!-- Botón para WhatsApp -->
-                <a id="whatsapp-button"
-                    href="#"
-                    class="block text-white py-2 px-4 rounded-lg shadow text-center hover:bg-green-600"
-                    style="background-color: #25D366;"
-                    target="_blank">
-                    WhatsApp
-                </a>
-                <!-- Botón para Copiar -->
-                <button id="copy-button"
-                    class="block bg-blue-500 text-white py-2 px-4 rounded-lg shadow text-center hover:bg-blue-600 w-full">
-                    Copiar
-                </button>
-            </div>
-            <button id="close-modal"
-                class="mt-6 w-full bg-gray-500 text-white py-2 px-4 rounded-lg text-center hover:bg-gray-600">
-                Cancelar
-            </button>
-        </div>
+<div id="share-modal"
+class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur-md">
+
+<div class="bg-white rounded-xl shadow-lg p-6 max-w-md">
+    <h3 class="text-lg font-bold text-gray-900 mb-4 text-center">
+        Compartir Resultado
+    </h3>
+    <p class="text-gray-700 mb-4 text-center">
+        Elige una opción para compartir:
+    </p>
+    <div class="space-y-4">
+        <!-- Botón para WhatsApp -->
+        <a id="whatsapp-button"
+            href="#"
+            class="block text-white py-2 px-4 rounded-xl shadow-md text-center bg-[#25D366] hover:bg-[#1DA851] transition-all"
+            target="_blank">
+            WhatsApp
+        </a>
+        <!-- Botón para Copiar -->
+        <button id="copy-button"
+            class="block bg-primary-500 text-white py-2 px-4 rounded-xl shadow-md text-center hover:bg-primary-600 transition-all w-full">
+            Copiar
+        </button>
     </div>
+    <button id="close-modal"
+        class="mt-6 w-full bg-gray-500 text-white py-2 px-4 rounded-xl text-center hover:bg-gray-600 transition-all">
+        Cancelar
+    </button>
+</div>
+
+<div id="temporary-message"
+    class="fixed bottom-5 right-5 bg-green-500 bg-opacity-70 text-white px-5 py-2 rounded-lg shadow-lg text-sm hidden opacity-0 transition-opacity duration-300 ease-in-out">
+</div>
+
+</div>
 
     <script>
     // Abrir el modal con efecto de blur
@@ -89,86 +93,63 @@
     });
     
     
-// Crear función para mostrar mensajes dinámicos
-function showTemporaryMessage(message, duration = 3000) {
-    // Verificar si ya existe un contenedor de mensaje
-    let messageContainer = document.getElementById('temporary-message');
-    if (!messageContainer) {
-        // Crear un contenedor si no existe
-        messageContainer = document.createElement('div');
-        messageContainer.id = 'temporary-message';
-        messageContainer.style.position = 'fixed';
-        messageContainer.style.bottom = '20px';
-        messageContainer.style.right = '20px';
-        messageContainer.style.backgroundColor = 'rgba(76, 175, 80, 0.7)'; // Fondo más transparente
-        messageContainer.style.color = 'white';
-        messageContainer.style.padding = '10px 20px';
-        messageContainer.style.borderRadius = '5px';
-        messageContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-        messageContainer.style.fontSize = '14px';
-        messageContainer.style.zIndex = '9999';
-        messageContainer.style.transition = 'opacity 0.3s ease-in-out'; // Suavizar la aparición y desaparición
-        document.body.appendChild(messageContainer);
-    }
+    function showTemporaryMessage(message, duration = 3000) {
+    const messageContainer = document.getElementById('temporary-message');
+
+    if (!messageContainer) return; // Si no existe, no hace nada
 
     // Configurar el mensaje
     messageContainer.textContent = message;
-    messageContainer.style.display = 'block';
-    messageContainer.style.opacity = '1';
+    messageContainer.classList.remove('hidden', 'opacity-0'); // Mostrar mensaje con fade-in
 
-    // Ocultar el mensaje después de un tiempo
+    // Ocultar el mensaje después del tiempo especificado
     setTimeout(() => {
-        messageContainer.style.opacity = '0'; // Añadir efecto de desvanecimiento
+        messageContainer.classList.add('opacity-0'); // Aplicar fade-out
         setTimeout(() => {
-            messageContainer.style.display = 'none';
-        }, 300); // Esperar a que termine la transición
+            messageContainer.classList.add('hidden'); // Ocultar completamente
+        }, 300); // Esperar a que termine la animación
     }, duration);
 }
 
+
 // Funcionalidad para copiar al portapapeles
-document.getElementById('copy-button').addEventListener('click', () => {
-    const salidaDetallada = `
-        {% for linea in salida_detallada %}
-        {{ linea | striptags }}
-        {% endfor %}
-    `.trim().split('\n').map(line => line.trim()).join('\n');
+document.getElementById('copy-button').addEventListener('click', async () => {
+    const salidaDetallada = `{% for linea in salida_detallada %}{{ linea | striptags }}{% endfor %}`
+        .trim().split('\n').map(line => line.trim()).join('\n');
 
     const textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}\n\nConvierte palabras en números: https://lgc.julianosoriom.com`;
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(textToCopy)
-            .then(() => {
-                document.getElementById('share-modal').classList.add('hidden');
-                document.body.classList.remove('modal-open');
-                showTemporaryMessage('¡Listo! Texto copiado');
-            })
-            .catch(err => console.error('Error al copiar:', err));
-    } else {
-        const textArea = document.createElement('textarea');
-        textArea.value = textToCopy;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            showTemporaryMessage('¡Listo! Texto copiado');
-            document.getElementById('share-modal').classList.add('hidden');
-            document.body.classList.remove('modal-open');
-        } catch (err) {
-            console.error('Error al copiar:', err);
-        }
-        document.body.removeChild(textArea);
+    try {
+        await navigator.clipboard.writeText(textToCopy);
+        closeShareModal(); // Cierra el modal después de copiar
+        showTemporaryMessage('¡Listo! Texto copiado'); // Mensaje de éxito
+    } catch (err) {
+        console.error('Error al copiar:', err);
     }
 });
 
+// Función para cerrar el modal de compartir
+function closeShareModal() {
+    document.getElementById('share-modal').classList.add('hidden');
+    document.body.classList.remove('modal-open');
+}
 
-// Funcionalidad para el botón de WhatsApp
+
+
+
+
+
+
+
+
+
+
+
+
 document.getElementById('whatsapp-button').addEventListener('click', () => {
     // Procesar salida detallada sin espacios adicionales
-    const salidaDetallada = `
-        {% for linea in salida_detallada %}
-        *{{ linea | striptags }}*
-        {% endfor %}
-    `.trim().split('\n').map(line => line.trim()).join('\n'); // Quitar espacios al inicio y al final de cada línea
+    const salidaDetallada = `{% for linea in salida_detallada %}*{{ linea | striptags }}*{% endfor %}`
+        .trim().split('\n').map(line => line.trim()).join('\n');
 
     // Formatear texto para WhatsApp
     const textForWhatsApp = [
@@ -177,34 +158,50 @@ document.getElementById('whatsapp-button').addEventListener('click', () => {
         `Total: *{{ total }}*`,
         `Lupa: *{{ lupa }}*`,
         `Convierte palabras en números: https://lgc.julianosoriom.com`
-    ].join('\n\n'); // Combinar en un solo string con saltos de línea
+    ].join('\n\n');
 
-    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(textForWhatsApp)}`;
-    document.getElementById('whatsapp-button').setAttribute('href', whatsappUrl);
+    // Redirigir a WhatsApp
+    document.getElementById('whatsapp-button').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textForWhatsApp)}`;
 
-    // Cerrar modal después de redirigir
-    document.getElementById('share-modal').classList.add('hidden');
-    document.body.classList.remove('modal-open'); // Quitar blur
+    closeShareModal(); // Cierra el modal después de redirigir
 });
 
-// Cerrar el modal de respaldo
-document.getElementById('close-modal').addEventListener('click', () => {
+// Función para cerrar el modal de compartir
+function closeShareModal() {
     document.getElementById('share-modal').classList.add('hidden');
+    document.body.classList.remove('modal-open');
+}
+
+
+if (closeModalButton && shareModal) {
+    closeModalButton.addEventListener('click', closeShareModal);
+}
+
+// Función reutilizable para cerrar el modal
+function closeShareModal() {
+    shareModal.classList.add('hidden');
     document.body.classList.remove('modal-open'); // Quitar blur
-});
-    
+}
+
+
 // Cerrar el modal con la tecla Esc
 document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') { // Detecta si la tecla presionada es "Esc"
-            const modal = document.getElementById('share-modal');
-            if (!modal.classList.contains('hidden')) { // Verifica si el modal está visible
-                modal.classList.add('hidden'); // Oculta el modal
-                document.body.classList.remove('modal-open'); // Quita el efecto de blur
-            }
-        }
-    });    
+    if (event.key === 'Escape') { 
+        closeShareModal();
+    }
+});
+
+// Función reutilizable para cerrar el modal
+function closeShareModal() {
+    const shareModal = document.getElementById('share-modal');
+    if (shareModal && !shareModal.classList.contains('hidden')) {
+        shareModal.classList.add('hidden'); // Ocultar modal
+        document.body.classList.remove('modal-open'); // Quitar blur
+    }
+}
     
-    </script>
+    
+</script>
 
     <!-- Calculadora Visual -->
     <!-- Representa números de 0 a 9 con resaltado en los que coincidan con la frecuencia -->
@@ -227,13 +224,12 @@ document.addEventListener('keydown', (event) => {
     </div>
 
 <!-- Secciones de Resonancias -->
-<div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6 gap-y-6">
-    <!-- Palabras con la misma frecuencia numérica -->
-    <div
-        class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-        <h3 class="text-lg font-semibold text-gray-900">
+<div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <!-- Sección: Relación con palabras del pasado -->
+    <div class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full">
+        <h3 class="text-lg font-semibold text-primary">
             Relación Numérica con Palabras desde el Pasado
-            <span class="text-green-500">({{ total }})</span>
+            <span class="text-secondary">({{ total }})</span>
         </h3>
         {% if palabras %}
         <p class="mt-4 text-gray-700"><i>{{ palabras | join(', ') }}</i></p>
@@ -242,12 +238,11 @@ document.addEventListener('keydown', (event) => {
         {% endif %}
     </div>
 
-    <!-- Palabras con el potencial numérico invertido -->
-    <div
-        class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-        <h3 class="text-lg font-semibold text-gray-900">
+    <!-- Sección: Relación con palabras del futuro -->
+    <div class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full">
+        <h3 class="text-lg font-semibold text-primary">
             Relación Numérica con Palabras desde el Futuro
-            <span class="text-blue-500">({{ total_invertido }})</span>
+            <span class="text-secondary">({{ total_invertido }})</span>
         </h3>
         {% if palabras_invertidas %}
         <p class="mt-4 text-gray-700"><i>{{ palabras_invertidas | join(', ') }}</i></p>
@@ -256,52 +251,45 @@ document.addEventListener('keydown', (event) => {
         {% endif %}
     </div>
 </div>
-        <!-- Territorios relacionados -->
-        <div
-            class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-            <h3 class="text-lg font-semibold text-gray-900">Relación Numérica
-                con Países</h3>
-            {% if territorios %}
-            <ul class="mt-4 space-y-2">
-                {% for territorio in territorios %}
-                <li>Código Territorial: +{{ territorio['codigo'] }} - País: {{
-                    territorio['pais'] }}</li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p class="mt-4 text-gray-500">No se encontraron coincidencias
-                geográficas.</p>
-            {% endif %}
-        </div>
-    </div>
 
-    <!-- Elementos relacionados -->
-    <div
-        class="bg-white shadow-md rounded-lg p-6 border border-gray-200 hover:shadow-lg mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Relación Numérica
-            con Elementos</h3>
-        {% if elementos %}
-        <ul class="space-y-4">
-            {% for elemento in elementos %}
-            <li class="flex flex-col">
-                <!-- 'safe' asegura que se rendericen etiquetas HTML dentro de los datos -->
-                {{ elemento|safe }}
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-gray-500">No se encontraron coincidencias en
-            elementos.</p>
-        {% endif %}
-    </div>
+<!-- Sección de Territorios Relacionados -->
+<div class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full mt-6">
+    <h3 class="text-lg font-semibold text-primary">Relación Numérica con Países</h3>
+    {% if territorios %}
+    <ul class="mt-4 space-y-2 text-gray-700">
+        {% for territorio in territorios %}
+        <li><strong>Código Territorial:</strong> +{{ territorio['codigo'] }} - <strong>País:</strong> {{ territorio['pais'] }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="mt-4 text-gray-500">No se encontraron coincidencias geográficas.</p>
+    {% endif %}
+</div>
 
-    <!-- Botón para regresar al menú principal -->
-    <div class="mt-12 text-center">
-        <a href="/"
-            class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600 text-sm md:text-base">
-            Volver al Menú Principal
-        </a>
-    </div>
+<!-- Sección de Elementos Relacionados -->
+<div class="bg-white shadow-md rounded-xl p-6 border border-gray-200 hover:shadow-lg flex flex-col h-full mt-6">
+    <h3 class="text-lg font-semibold text-primary mb-4">Relación Numérica con Elementos</h3>
+    {% if elementos %}
+    <ul class="space-y-4 text-gray-700">
+        {% for elemento in elementos %}
+        <li class="flex flex-col">
+            <!-- 'safe' asegura que se rendericen etiquetas HTML dentro de los datos -->
+            {{ elemento|safe }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-gray-500">No se encontraron coincidencias en elementos.</p>
+    {% endif %}
+</div>
+
+<!-- Botón para regresar al menú principal -->
+<div class="mt-12 text-center">
+    <a href="/" 
+        class="inline-block bg-primary text-white py-3 px-6 rounded-lg shadow-md hover:bg-primary-600 text-sm md:text-base transition-all border border-transparent hover:border-white">
+        Volver al Menú Principal
+    </a>
+</div>
 </div>
 
 <style>
