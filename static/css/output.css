@@ -846,10 +846,6 @@ select {
   display: none;
 }
 
-.max-h-\[75vh\] {
-  max-height: 75vh;
-}
-
 .w-11\/12 {
   width: 91.666667%;
 }
@@ -880,10 +876,6 @@ select {
 
 .max-w-md {
   max-width: 28rem;
-}
-
-.table-auto {
-  table-layout: auto;
 }
 
 .transform {
