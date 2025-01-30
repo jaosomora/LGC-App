@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## [1.3.6] - 2025-01-30
+### Mejoras y cambios principales
+- **Ahora puedes interactuar más fácilmente con las herramientas**:
+  - Se mejoró la presentación de las **tarjetas del menú principal**, asegurando que los usuarios comprendan su propósito de manera más intuitiva.
+  - **Ahora puedes notar más claramente que las tarjetas son interactivas** gracias a un efecto de **hover mejorado**, evitando que los textos cambien de color de forma inesperada.
+  - Se implementó una animación **"wiggle"** en el icono de la mano **👆**, que desaparece tras la primera interacción, para guiar mejor a los usuarios en móviles.
+
+### Mejoras en la experiencia visual
+- **Ahora puedes notar que los botones son consistentes**:
+  - Se unificaron los estilos de los botones **"Compartir Resultado"** y **"Volver al Menú Principal"**, asegurando que ambos tengan el mismo tamaño, bordes, colores y efectos de hover.
+  - **Ahora puedes ver los botones con un diseño uniforme**, mejorando la coherencia visual en la app.
+
+### Detalles técnicos
+- Se realizaron ajustes en **tailwind.config.js** para mejorar las animaciones y transiciones, asegurando una mejor fluidez en la interfaz.
+- Se corrigió el contraste de los botones y tarjetas en **hover**, evitando que los textos pierdan visibilidad al interactuar con ellos.
+
+---
+
 ## [1.3.5] - 2025-01-30
 ### Mejoras y cambios principales
 - **Ahora puedes navegar más fácilmente** con el nuevo diseño del **header**:
