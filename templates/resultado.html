@@ -10,42 +10,40 @@
     </div>
 
     <!-- Métricas principales -->
-    <!-- Diferencia entre opción 1 (resultado de un número único) y opción 2 (análisis de una frase) -->
-    {% if opcion == 1 %}
-    <div class="grid grid-cols-1 gap-4">
-        <div
-            class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
-            <!-- Muestra el número calculado para la opción 1 -->
-            <p class="mt-4 text-gray-600"><strong>Número:</strong> {{ frecuencia }}</p>
-            <!-- Muestra la lupa asociada al número calculado -->
-            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
-        </div>
+<!-- Diferencia entre opción 1 (resultado de un número único) y opción 2 (análisis de una frase) -->
+{% if opcion == 1 %}
+<div class="grid grid-cols-1 gap-4">
+    <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
+        <!-- Muestra el número calculado para la opción 1 -->
+        <p class="mt-4 text-gray-600"><strong>Número:</strong> {{ frecuencia }}</p>
+        <!-- Muestra la lupa asociada al número calculado -->
+        <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
     </div>
-    {% elif opcion == 2 %}
-    <div class="grid grid-cols-1 gap-4">
-        <div
-            class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
-            <!-- Resultados formateados para la opción 2 -->
-            <!-- Cada línea muestra una palabra analizada con su detalle -->
-            <ul class="mt-4 space-y-2">
-                {% for linea in salida_detallada %}
-                <li class="text-gray-600">
-                    <!-- 'safe' se usa para renderizar contenido HTML seguro (negritas en palabras) -->
-                    {{ linea|safe }}
-                </li>
-                {% endfor %}
-            </ul>
-            <!-- Total y lupa de la frase analizada -->
-            <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total }}</p>
-            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
-        </div>
+</div>
+{% elif opcion == 2 %}
+<div class="grid grid-cols-1 gap-4">
+    <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
+        <!-- Resultados formateados para la opción 2 -->
+        <!-- Cada línea muestra una palabra analizada con su detalle -->
+        <ul class="mt-4 space-y-2">
+            {% for linea in salida_detallada %}
+            <li class="text-gray-600">
+                <!-- 'safe' se usa para renderizar contenido HTML seguro (negritas en palabras) -->
+                {{ linea|safe }}
+            </li>
+            {% endfor %}
+        </ul>
+        <!-- Total y lupa de la frase analizada -->
+        <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total }}</p>
+        <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
     </div>
+</div>
 {% endif %}
 
-    <!-- Botón para compartir -->
+<!-- Botón para compartir con margen superior para separarlo -->
 <button id="share-button"
-class="bg-primary-500 text-white py-2 px-4 rounded-xl shadow-md hover:bg-primary-600 transition-all">
-Compartir Resultado
+    class="mt-6 bg-primary-500 text-white py-2 px-4 rounded-xl shadow-md hover:bg-primary-600 transition-all">
+    Compartir Resultado
 </button>
 
     <!-- Modal de respaldo para compartir -->
