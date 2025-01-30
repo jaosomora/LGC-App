@@ -70,7 +70,7 @@ module.exports = {
       keyframes: {
         pulse: {
           '0%, 100%': { transform: 'scale(1)', boxShadow: '0 0 8px rgba(255, 223, 0, 0.7)' },
-          '50%': { transform: 'scale(1.1)', boxShadow: '0 0 16px rgba(255, 223, 0, 1)' },
+          '50%': { transform: 'scale(1.2)', boxShadow: '0 0 16px rgba(255, 223, 0, 1)' },
         },
         fadeIn: {
           '0%': { opacity: 0 },

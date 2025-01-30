@@ -9,7 +9,7 @@
             '{{ palabra|title }}'</h2>
     </div>
 
-    <!-- Métricas principales -->
+<!-- Métricas principales -->
 <!-- Diferencia entre opción 1 (resultado de un número único) y opción 2 (análisis de una frase) -->
 {% if opcion == 1 %}
 <div class="grid grid-cols-1 gap-4">
@@ -48,7 +48,7 @@
 
     <!-- Modal de respaldo para compartir -->
 <div id="share-modal"
-class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur-md">
+class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur-md z-50">
 
 <div class="bg-white rounded-xl shadow-lg p-6 max-w-md">
     <h3 class="text-lg font-bold text-gray-900 mb-4 text-center">
@@ -83,143 +83,25 @@ class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-cen
 
 </div>
 
-    <script>
-    // Abrir el modal con efecto de blur
-    document.getElementById('share-button').addEventListener('click', () => {
-        document.getElementById('share-modal').classList.remove('hidden');
-        document.body.classList.add('modal-open'); // Aplicar blur al fondo
-    });
-    
-    
-    function showTemporaryMessage(message, duration = 3000) {
-    const messageContainer = document.getElementById('temporary-message');
-
-    if (!messageContainer) return; // Si no existe, no hace nada
-
-    // Configurar el mensaje
-    messageContainer.textContent = message;
-    messageContainer.classList.remove('hidden', 'opacity-0'); // Mostrar mensaje con fade-in
-
-    // Ocultar el mensaje después del tiempo especificado
-    setTimeout(() => {
-        messageContainer.classList.add('opacity-0'); // Aplicar fade-out
-        setTimeout(() => {
-            messageContainer.classList.add('hidden'); // Ocultar completamente
-        }, 300); // Esperar a que termine la animación
-    }, duration);
-}
-
-
-// Funcionalidad para copiar al portapapeles
-document.getElementById('copy-button').addEventListener('click', async () => {
-    const salidaDetallada = `{% for linea in salida_detallada %}{{ linea | striptags }}{% endfor %}`
-        .trim().split('\n').map(line => line.trim()).join('\n');
-
-    const textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}\n\nConvierte palabras en números: https://lgc.julianosoriom.com`;
-
-    try {
-        await navigator.clipboard.writeText(textToCopy);
-        closeShareModal(); // Cierra el modal después de copiar
-        showTemporaryMessage('¡Listo! Texto copiado'); // Mensaje de éxito
-    } catch (err) {
-        console.error('Error al copiar:', err);
-    }
-});
-
-// Función para cerrar el modal de compartir
-function closeShareModal() {
-    document.getElementById('share-modal').classList.add('hidden');
-    document.body.classList.remove('modal-open');
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-document.getElementById('whatsapp-button').addEventListener('click', () => {
-    // Procesar salida detallada sin espacios adicionales
-    const salidaDetallada = `{% for linea in salida_detallada %}*{{ linea | striptags }}*{% endfor %}`
-        .trim().split('\n').map(line => line.trim()).join('\n');
-
-    // Formatear texto para WhatsApp
-    const textForWhatsApp = [
-        `Métricas para *{{ palabra }}*`,
-        salidaDetallada,
-        `Total: *{{ total }}*`,
-        `Lupa: *{{ lupa }}*`,
-        `Convierte palabras en números: https://lgc.julianosoriom.com`
-    ].join('\n\n');
-
-    // Redirigir a WhatsApp
-    document.getElementById('whatsapp-button').href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textForWhatsApp)}`;
-
-    closeShareModal(); // Cierra el modal después de redirigir
-});
-
-// Función para cerrar el modal de compartir
-function closeShareModal() {
-    document.getElementById('share-modal').classList.add('hidden');
-    document.body.classList.remove('modal-open');
-}
-
-
-if (closeModalButton && shareModal) {
-    closeModalButton.addEventListener('click', closeShareModal);
-}
-
-// Función reutilizable para cerrar el modal
-function closeShareModal() {
-    shareModal.classList.add('hidden');
-    document.body.classList.remove('modal-open'); // Quitar blur
-}
-
-
-// Cerrar el modal con la tecla Esc
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') { 
-        closeShareModal();
-    }
-});
-
-// Función reutilizable para cerrar el modal
-function closeShareModal() {
-    const shareModal = document.getElementById('share-modal');
-    if (shareModal && !shareModal.classList.contains('hidden')) {
-        shareModal.classList.add('hidden'); // Ocultar modal
-        document.body.classList.remove('modal-open'); // Quitar blur
-    }
-}
-    
-    
-</script>
-
-    <!-- Calculadora Visual -->
-    <!-- Representa números de 0 a 9 con resaltado en los que coincidan con la frecuencia -->
-    <div class="mt-12">
-        <h3
-            class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
-        <div class="flex justify-center">
-            <div
-                class="calculator-grid grid grid-cols-3 gap-2 bg-gray-200 p-4 rounded-lg shadow-lg">
-                {% for number in [7, 8, 9, 4, 5, 6, 1, 2, 3, 0] %}
-                <div
-                    class="calculator-cell {% if number in numero_resaltado %}resaltado{% else %}bg-white border border-gray-300{% endif %}"
-                    data-number="{{ number }}">
-                    <!-- Cada celda muestra un número con resaltado si pertenece a los números destacados -->
-                    {{ number }}
-                </div>
-                {% endfor %}
+<!-- Calculadora Visual -->
+<div class="mt-12">
+    <h3 class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
+    <div class="flex justify-center">
+        <div class="calculator-grid grid grid-cols-3 gap-3 bg-gray-200 p-6 rounded-xl shadow-md">
+            {% for number in [7, 8, 9, 4, 5, 6, 1, 2, 3, 0] %}
+            <div class="calculator-cell flex items-center justify-center text-lg font-semibold w-16 h-16 rounded-lg transition-all duration-200 
+                        {% if number in numero_resaltado %}
+                        bg-yellow-400 text-black animate-pulse shadow-xl
+                        {% else %}
+                        bg-white border border-gray-300 text-gray-800 hover:bg-gray-100
+                        {% endif %}" 
+                data-number="{{ number }}">
+                {{ number }}
             </div>
+            {% endfor %}
         </div>
     </div>
+</div>
 
 <!-- Secciones de Resonancias -->
 <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -290,150 +172,131 @@ function closeShareModal() {
 </div>
 </div>
 
-<style>
-    /* Twilight CSS personalizado */
-    .hidden {
-        display: none !important; /* Forzar ocultamiento */
-    }
-    
-    .backdrop-blur-md {
-        backdrop-filter: blur(5px); /* Efecto de desenfoque */
-        -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
-        position: fixed; /* Cubre toda la ventana */
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 9998; /* Justo debajo del modal */
-        background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
-    }
-    
-    body.modal-open {
-        overflow: hidden; /* Evita el scroll cuando el modal está abierto */
-    }
-    
-    .bg-green-600 {
-        background-color: #22c55e;
-    }
-    
-    .bg-blue-500 {
-        background-color: #3b82f6;
-    }
-    
-    .bg-blue-600 {
-        background-color: #2563eb;
-    }
-    
-    .hover\:bg-green-600:hover {
-        background-color: #15803d;
-    }
-    
-    .hover\:bg-blue-600:hover {
-        background-color: #1e40af;
-    }
-    
-    button,
-    a {
-        text-align: center; /* Centra los textos de todos los botones */
-    }
-    
-    /* Estilos del modal */
-    #share-modal {
-        position: fixed; /* El modal cubre toda la ventana */
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 9999; /* Elevado para que esté encima de todo */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    /* Estilos personalizados para la calculadora */
-    .calculator-grid {
-        position: relative; /* Mantén la calculadora en su flujo normal */
-        z-index: 0; /* Asegúrate de que esté detrás del modal */
-    }
-    
-    .calculator-cell {
-        height: 70px;
-        width: 70px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        border-radius: 8px;
-        transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
-        position: relative; /* Asegura que no sobresalga de su contexto */
-        z-index: 1; /* Por defecto, detrás del modal */
-    }
-    
-    .calculator-cell.resaltado {
-        background-color: #facc15; /* Color de resaltado */
-        animation: pulse 1.5s infinite; /* Efecto animado para celdas resaltadas */
-        box-shadow: 0 0 10px rgba(255, 223, 0, 0.9);
-        color: #000; /* Color del texto */
-        border: none; /* Sin bordes */
-        position: relative; /* Mantén la posición relativa */
-        z-index: 1; /* Asegúrate de que no sobresalga del modal */
-    }
-    
-    /* Animación para las celdas resaltadas */
-    @keyframes pulse {
-        0%, 100% {
-            transform: scale(1);
-            box-shadow: 0 0 8px rgba(255, 223, 0, 0.7);
-        }
-        50% {
-            transform: scale(1.2);
-            box-shadow: 0 0 16px rgba(255, 223, 0, 1);
-        }
-    }
-</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const shareButton = document.getElementById('share-button');
         const shareModal = document.getElementById('share-modal');
         const closeModalButton = document.getElementById('close-modal');
-
-        // Asegúrate de que el modal esté oculto al cargar la página
+        const copyButton = document.getElementById('copy-button');
+        const whatsappButton = document.getElementById('whatsapp-button');
+        const messageContainer = document.getElementById('temporary-message');
+    
+        // Asegurarse de que el modal esté oculto al cargar
         if (shareModal) {
             shareModal.classList.add('hidden');
             document.body.classList.remove('modal-open');
         }
-
-        // Evento para abrir el modal solo cuando se haga clic en el botón de compartir
-        if (shareButton && shareModal) {
+    
+        // Abrir el modal con efecto de blur
+        if (shareButton) {
             shareButton.addEventListener('click', () => {
-                if (shareModal.classList.contains('hidden')) {
-                    shareModal.classList.remove('hidden');
-                    document.body.classList.add('modal-open'); // Aplicar efecto de fondo
-                }
+                shareModal.classList.remove('hidden');
+                document.body.classList.toggle('modal-open'); // Aplicar blur al fondo
             });
         }
-
-        // Evento para cerrar el modal al hacer clic en "Cancelar"
+    
+        // Cerrar el modal al hacer clic en "Cancelar"
         if (closeModalButton) {
-            closeModalButton.addEventListener('click', () => {
-                if (!shareModal.classList.contains('hidden')) {
-                    shareModal.classList.add('hidden');
-                    document.body.classList.remove('modal-open'); // Quitar efecto de fondo
-                }
+            closeModalButton.addEventListener('click', toggleShareModal);
+        }
+    
+        // Función para cerrar el modal
+        function toggleShareModal() {
+            if (shareModal && !shareModal.classList.contains('hidden')) {
+                shareModal.classList.add('hidden');
+                document.body.classList.remove('modal-open');
+            }
+        }
+    
+        // Cerrar el modal con la tecla Esc
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                toggleShareModal();
+            }
+        });
+    
+        // Mostrar mensaje temporal
+        function showTemporaryMessage(message, duration = 3000) {
+            if (!messageContainer) return;
+            messageContainer.textContent = message;
+            messageContainer.classList.remove('hidden', 'opacity-0');
+    
+            setTimeout(() => {
+                messageContainer.classList.add('opacity-0');
+                setTimeout(() => {
+                    messageContainer.classList.add('hidden');
+                }, 300);
+            }, duration);
+        }
+    
+        if (copyButton) {
+    copyButton.addEventListener('click', async () => {
+        const salidaDetallada = `{% for linea in salida_detallada %}{{ linea | striptags }}{% endfor %}`
+            .trim().split('\n').map(line => line.trim()).join('\n');
+
+        const textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}\n\nConvierte palabras en números: https://lgc.julianosoriom.com`;
+
+        let copySuccess = false;
+
+        try {
+            // Intentar copiar con la API moderna
+            await navigator.clipboard.writeText(textToCopy);
+            copySuccess = true;
+        } catch (err) {
+            console.warn('navigator.clipboard falló, usando fallback:', err);
+
+            // Método alternativo con un textarea oculto
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                copySuccess = true;
+            } catch (err) {
+                console.error('Error al copiar:', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // ✅ Primero, mostrar el mensaje de éxito
+        if (copySuccess) {
+            showTemporaryMessage('¡Listo! Texto copiado');
+        } else {
+            showTemporaryMessage('Error al copiar');
+        }
+
+        // ✅ Luego, cerrar el modal
+        setTimeout(() => {
+            toggleShareModal();
+        }, 500); // Se da un pequeño tiempo para mostrar el mensaje antes de cerrar el modal
+    });
+
+}
+
+
+    
+        // Compartir en WhatsApp
+        if (whatsappButton) {
+            whatsappButton.addEventListener('click', () => {
+                const salidaDetallada = `{% for linea in salida_detallada %}*{{ linea | striptags }}*{% endfor %}`
+                    .trim().split('\n').map(line => line.trim()).join('\n');
+    
+                const textForWhatsApp = [
+                    `Métricas para *{{ palabra }}*`,
+                    salidaDetallada,
+                    `Total: *{{ total }}*`,
+                    `Lupa: *{{ lupa }}*`,
+                    `Convierte palabras en números: https://lgc.julianosoriom.com`
+                ].join('\n\n');
+    
+                whatsappButton.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textForWhatsApp)}`;
+                toggleShareModal();
             });
         }
     });
-
-    // Asegúrate de cerrar el modal si la tecla "Escape" es presionada
-    document.addEventListener('keydown', (event) => {
-        const shareModal = document.getElementById('share-modal');
-        if (event.key === 'Escape' && shareModal && !shareModal.classList.contains('hidden')) {
-            shareModal.classList.add('hidden');
-            document.body.classList.remove('modal-open'); // Quitar efecto de fondo
-        }
-    });
-</script>
+    </script>    
 
 <!-- Código del botón flotante de Ko-fi -->
 <!-- 
