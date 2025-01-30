@@ -1,5 +1,42 @@
 # CHANGELOG
 
+## [1.3.3] - 2025-01-29
+### Mejoras y cambios principales
+- **Migración completa a Tailwind CSS v3**:
+  - Se actualizaron las configuraciones en `tailwind.config.js` para aprovechar las nuevas funcionalidades de Tailwind v3.
+  - Se ajustaron las clases de Tailwind en `resultado.html` y otras plantillas para compatibilidad total con la nueva versión.
+  - Se eliminó código CSS innecesario en `output.css`, reduciendo el peso del archivo final.
+
+- **Refactorización del código JavaScript**:
+  - Se consolidaron funciones redundantes en `resultado.html` para mejorar la eficiencia.
+  - `closeShareModal()` se unificó para evitar múltiples declaraciones en distintos lugares.
+  - Se optimizó el acceso a elementos del DOM mediante variables globales en lugar de llamadas repetitivas a `document.getElementById()`.
+  - Se mejoró la gestión de clases CSS con `classList.toggle()` en lugar de múltiples `add` y `remove`.
+
+- **Correcciones en el modal de compartir**:
+  - Ahora el desenfoque del fondo (`backdrop-blur-md`) oculta correctamente la calculadora visual cuando el modal está abierto.
+  - Se aseguraron transiciones más suaves al abrir y cerrar el modal.
+  - Se corrigió la lógica para que el modal desaparezca inmediatamente tras copiar el texto.
+
+### Correcciones de errores
+- **Restauración del mensaje "¡Listo! Texto copiado"**:
+  - Ahora el mensaje aparece inmediatamente después de copiar y se desvanece correctamente después de unos segundos.
+  - Se solucionó un problema donde el mensaje no aparecía debido a un conflicto con la ejecución del cierre del modal.
+
+- **Solución de problemas con compatibilidad en móviles**:
+  - Se mejoró el soporte para dispositivos móviles en la visualización del modal.
+  - Se ajustó la detección de `navigator.clipboard.writeText()` para evitar fallos en navegadores con restricciones.
+
+- **Ajustes en la calculadora visual**:
+  - Se corrigió un problema donde algunos números resaltados no se mostraban correctamente tras la actualización a Tailwind v3.
+  - Se optimizó la animación de los números resaltados para mejorar la experiencia del usuario.
+
+### Eliminaciones
+- Eliminación de estilos duplicados en `output.css`.
+- Eliminación de código obsoleto en `resultado.html` y `app.py` relacionado con clases de Tailwind desactualizadas.
+
+---
+
 ## [1.3.2] - 2025-01-18
 ### Added
 - Soporte para solicitudes **GET** en la ruta `/resultado_opcion2`, lo que permite procesar frases enviadas como parámetros en la URL (`?frase=...`).

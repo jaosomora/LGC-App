@@ -1,5 +1,20 @@
-import unicodedata
 import os
+import sys
+import subprocess
+
+# Verificar e instalar dependencias automáticamente
+def instalar_dependencias():
+    try:
+        import flask_sqlalchemy
+        import flask_cors
+    except ImportError:
+        print("Dependencias faltantes. Instalándolas...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+
+instalar_dependencias()
+
+# Importar después de verificar dependencias
+import unicodedata
 import json
 import time
 import sqlite3

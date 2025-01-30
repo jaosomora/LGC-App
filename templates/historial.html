@@ -1,7 +1,13 @@
-{% extends "base.html" %} {% block title %}Historial de Búsquedas{% endblock %} {% block content %}
-<h1 class="text-3xl font-bold text-gray-900 mb-6 text-center sm:text-left">Historial de Búsquedas</h1>
-<div class="overflow-y-auto max-h-[75vh] border border-gray-200 rounded-lg shadow-md">
-    <table class="min-w-full divide-y divide-gray-200 table-auto">
+{% extends "base.html" %} 
+{% block title %}Historial de Búsquedas{% endblock %} 
+
+{% block content %}
+<h1 class="text-3xl font-bold text-gray-900 mb-6 text-center sm:text-left">
+    Historial de Búsquedas
+</h1>
+
+<div class="overflow-y-auto max-h-screen-md border border-gray-200 rounded-lg shadow-md">
+    <table class="min-w-full divide-y divide-gray-200 border rounded-lg shadow-md">
         <thead class="bg-gray-50">
             <tr>
                 <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -12,7 +18,7 @@
                 </th>
             </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
+        <tbody class="bg-white divide-y divide-gray-200 space-y-2">
             {% for entry in historial %}
             <tr class="hover:bg-gray-50">
                 <td class="px-4 py-3 text-gray-900 text-sm">
@@ -22,16 +28,19 @@
                     {% if entry.puntuacion %}
                     <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
                         Puntuación: {{ entry.puntuacion }}
-                    </span> {% else %}
+                    </span> 
+                    {% else %}
                     <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
                         Sin puntuación
-                    </span> {% endif %}
+                    </span> 
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
 <div class="mt-6 flex justify-center sm:justify-start">
     <a href="/" class="inline-block bg-blue-500 text-white py-3 px-6 rounded-lg shadow hover:bg-blue-600 transition">
         Volver al Menú
