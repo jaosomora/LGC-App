@@ -69,9 +69,23 @@ db = SQLAlchemy(app)
 # Configurar CORS para permitir el acceso desde julianosoriom.com
 CORS(app, origins=["https://www.julianosoriom.com"])
 
-# Configurar cookies para trabajar en iframes
-app.config["SESSION_COOKIE_SAMESITE"] = "None"  # Permitir compartir cookies en iframes
-app.config["SESSION_COOKIE_SECURE"] = True  # HTTPS obligatorio en producción
+import os
+
+# Si no está definida la variable ENV, se usará "LOCAL" por defecto.
+env = os.getenv("ENV", "LOCAL")
+
+if env == "PRODUCTION":
+    # Configuración para producción
+    app.config["SESSION_COOKIE_SAMESITE"] = "None"
+    app.config["SESSION_COOKIE_SECURE"] = True
+elif env == "DEVELOPMENT":
+    # Configuración para desarrollo
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  # o "Strict" según prefieras
+    app.config["SESSION_COOKIE_SECURE"] = False
+else:
+    # Configuración para el entorno local o cualquier otro valor
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["SESSION_COOKIE_SECURE"] = False
 
 # Configuración de la clave secreta para sesiones
 app.secret_key = os.getenv("SECRET_KEY", "clave-secreta-por-defecto")

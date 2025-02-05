@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [1.3.7] - 2025-02-04
+### Mejoras y cambios técnicos
+- Se agregó configuración condicional de cookies de sesión en `app.py`:
+  - En **PRODUCTION** se requiere HTTPS y se utiliza `SESSION_COOKIE_SAMESITE = "None"` para permitir iframes.
+  - En **DEVELOPMENT** y entornos locales se usa `SESSION_COOKIE_SAMESITE = "Lax"` y `SESSION_COOKIE_SECURE = False`, permitiendo que el historial se almacene correctamente en HTTP.
+
+---
+
 ## [1.3.6] - 2025-01-30
 ### Mejoras y cambios principales
 - **Ahora puedes interactuar más fácilmente con las herramientas**:
