@@ -1,5 +1,14 @@
 # CHANGELOG
 
+
+## [1.3.10] - 2025-03-16
+### Mejorado
+- **Funcionalidad de compartir resultados**:
+  - Se implementó normalización de URLs para manejar caracteres especiales y acentos.
+  - Las URLs compartidas ahora funcionan correctamente para todas las opciones.
+  - Mejorada la visualización del texto compartido para mantener saltos de línea.
+
+
 ## [1.3.9] - 2025-03-16
 ### Añadido
 - **Nueva "Calculadora de Operaciones entre Palabras"**:

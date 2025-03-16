@@ -341,6 +341,26 @@
     
         if (copyButton) {
             copyButton.addEventListener('click', async () => {
+                // Crear URL con parámetros según la opción
+                let directURL = new URL('https://lgc.julianosoriom.com');
+                
+                // Función para normalizar texto para URL (eliminar acentos y caracteres especiales)
+                const normalizeForURL = (text) => {
+                    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                };
+                
+                if ({{ opcion }} === 1) {
+                    directURL.pathname = "/resultado_opcion1";
+                    directURL.searchParams.append('frecuencia', '{{ frecuencia }}');
+                } else if ({{ opcion }} === 2) {
+                    directURL.pathname = "/resultado_opcion2";
+                    directURL.searchParams.append('frase', normalizeForURL('{{ palabra }}'));
+                } else if ({{ opcion }} === 3) {
+                    directURL.pathname = "/resultado_opcion3";
+                    directURL.searchParams.append('palabra1', normalizeForURL('{{ palabra1 }}'));
+                    directURL.searchParams.append('palabra2', normalizeForURL('{{ palabra2 }}'));
+                }
+                
                 let textToCopy = '';
                 
                 // Determinar el texto según la opción
@@ -350,12 +370,19 @@
                         `{{ palabra2 }}: Total: {{ total2 }}, Lupa: {{ lupa2 }}\n\n` +
                         `Suma ({{ total1 }} + {{ total2 }}): {{ suma_total }}, Lupa: {{ lupa_suma }}\n` +
                         `Resta ({{ total1 }} - {{ total2 }}): {{ resta_total }}, Lupa: {{ lupa_resta }}\n\n` +
-                        `Convierte palabras en números: https://lgc.julianosoriom.com`;
+                        `Ver resultado completo: ${directURL.toString()}`;
                 } else {
-                    const salidaDetallada = `{% for linea in salida_detallada %}{{ linea | striptags }}{% endfor %}`
-                        .trim().split('\n').map(line => line.trim()).join('\n');
+                    // Crear un array con cada línea de salida_detallada
+                    const salidaArray = [
+                        {% for linea in salida_detallada %}
+                        "{{ linea | striptags }}",
+                        {% endfor %}
+                    ];
                     
-                    textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}\n\nConvierte palabras en números: https://lgc.julianosoriom.com`;
+                    // Unir con saltos de línea
+                    const salidaFormateada = salidaArray.join('\n');
+                    
+                    textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaFormateada}\n\nTotal: {{ total }}\nLupa: {{ lupa }}\n\nVer resultado completo: ${directURL.toString()}`;
                 }
 
                 let copySuccess = false;
@@ -381,23 +408,43 @@
                     document.body.removeChild(textArea);
                 }
 
-                // ✅ Primero, mostrar el mensaje de éxito
+                // Mostrar el mensaje de éxito
                 if (copySuccess) {
                     showTemporaryMessage('¡Listo! Texto copiado');
                 } else {
                     showTemporaryMessage('Error al copiar');
                 }
 
-                // ✅ Luego, cerrar el modal
+                // Cerrar el modal
                 setTimeout(() => {
                     toggleShareModal();
-                }, 500); // Se da un pequeño tiempo para mostrar el mensaje antes de cerrar el modal
+                }, 500);
             });
         }
     
         // Compartir en WhatsApp
         if (whatsappButton) {
             whatsappButton.addEventListener('click', () => {
+                // Crear URL con parámetros según la opción
+                let directURL = new URL('https://lgc.julianosoriom.com');
+                
+                // Función para normalizar texto para URL (eliminar acentos y caracteres especiales)
+                const normalizeForURL = (text) => {
+                    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                };
+                
+                if ({{ opcion }} === 1) {
+                    directURL.pathname = "/resultado_opcion1";
+                    directURL.searchParams.append('frecuencia', '{{ frecuencia }}');
+                } else if ({{ opcion }} === 2) {
+                    directURL.pathname = "/resultado_opcion2";
+                    directURL.searchParams.append('frase', normalizeForURL('{{ palabra }}'));
+                } else if ({{ opcion }} === 3) {
+                    directURL.pathname = "/resultado_opcion3";
+                    directURL.searchParams.append('palabra1', normalizeForURL('{{ palabra1 }}'));
+                    directURL.searchParams.append('palabra2', normalizeForURL('{{ palabra2 }}'));
+                }
+                
                 let textForWhatsApp = '';
                 
                 if ({{ opcion }} === 3) {
@@ -407,18 +454,25 @@
                         `{{ palabra2 }}: Total: *{{ total2 }}*, Lupa: *{{ lupa2 }}*`,
                         `Suma ({{ total1 }} + {{ total2 }}): *{{ suma_total }}*, Lupa: *{{ lupa_suma }}*`,
                         `Resta ({{ total1 }} - {{ total2 }}): *{{ resta_total }}*, Lupa: *{{ lupa_resta }}*`,
-                        `Convierte palabras en números: https://lgc.julianosoriom.com`
+                        `Ver resultado completo: ${directURL.toString()}`
                     ].join('\n\n');
                 } else {
-                    const salidaDetallada = `{% for linea in salida_detallada %}*{{ linea | striptags }}*{% endfor %}`
-                        .trim().split('\n').map(line => line.trim()).join('\n');
-        
+                    // Crear un array con cada línea de salida_detallada
+                    const salidaArray = [
+                        {% for linea in salida_detallada %}
+                        "*{{ linea | striptags }}*",
+                        {% endfor %}
+                    ];
+                    
+                    // Unir con saltos de línea para WhatsApp
+                    const salidaFormateada = salidaArray.join('\n');
+                    
                     textForWhatsApp = [
                         `Métricas para *{{ palabra }}*`,
-                        salidaDetallada,
+                        salidaFormateada,
                         `Total: *{{ total }}*`,
                         `Lupa: *{{ lupa }}*`,
-                        `Convierte palabras en números: https://lgc.julianosoriom.com`
+                        `Ver resultado completo: ${directURL.toString()}`
                     ].join('\n\n');
                 }
 
