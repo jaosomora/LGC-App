@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## [1.3.12] - 2025-03-16
+### Mejorado
+- **Diseño de Páginas de Resultados**:
+  - Rediseñado el estilo de los títulos en las páginas de resultados.
+  - Añadido resaltado con marca de color primario para palabras clave.
+  - Implementada tipografía más grande y bold para mayor impacto visual.
+  - Agregado soporte para modo claro y oscuro en los títulos.
+  - Mejora de la responsividad del título para diferentes tamaños de pantalla.
+
+### Características
+- Los títulos ahora utilizan clases de Tailwind para un diseño moderno y adaptativo.
+- Introducida marca de texto con fondo de color para destacar palabras principales.
+- Títulos centrados con transición suave entre tamaños de pantalla.
+
+
 ## [1.3.11] - 2025-03-16
 ### Mejorado
 - **Historial de búsquedas**:

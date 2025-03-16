@@ -887,7 +887,18 @@ def resultado_opcion2():
         session["historial"] = []
 
     nueva_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
-    if nueva_entrada.lower() not in [entry.lower() for entry in session["historial"]]:
+    nueva_entrada = {
+        "tipo": "opcion2",
+        "texto": f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}",
+        "parametros": {"frase": palabra}
+    }
+
+    # Verificar si la entrada ya existe
+    if not any(
+        (isinstance(entry, dict) and entry.get("texto") == nueva_entrada["texto"]) or 
+        (isinstance(entry, str) and entry.lower() == nueva_entrada["texto"].lower())
+        for entry in session["historial"]
+    ):
         session["historial"].append(nueva_entrada)
 
     session.modified = True
@@ -991,11 +1002,11 @@ def resultado_opcion1():
     if "historial" not in session:
         session["historial"] = []
 
-    texto_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
+    texto_entrada = f"Frecuencia: {frecuencia} -> Potencial: {frecuencia}, Lupa: {lupa}"
     nueva_entrada = {
-        "tipo": "opcion2",
+        "tipo": "opcion1",
         "texto": texto_entrada,
-        "parametros": {"frase": palabra}
+        "parametros": {"frecuencia": frecuencia}
     }
 
     # Verificar si ya existe una entrada similar

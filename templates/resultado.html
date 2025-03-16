@@ -5,15 +5,29 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- Título principal de la página -->
-    {% if opcion == 3 %}
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-extrabold text-primary-900">Comparación entre '{{ palabra1|title }}' y '{{ palabra2|title }}'</h2>
-        </div>
-    {% else %}
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-extrabold text-primary-900">Métricas para '{{ palabra|title }}'</h2>
-        </div>
-    {% endif %}
+{% if opcion == 3 %}
+<div class="text-center mb-8">
+    <h2 class="mb-4 text-4xl font-extrabold leading-none tracking-tight sm:leading-tight text-gray-900 dark:text-gray-100 sm:text-5xl lg:text-6xl">
+        Comparación entre 
+        <mark class="px-2 text-white bg-primary-600 dark:bg-primary-700 rounded-lg">
+            '{{ palabra1|title }}'
+        </mark> 
+        y 
+        <mark class="px-2 text-white bg-primary-600 dark:bg-primary-700 rounded-lg">
+            '{{ palabra2|title }}'
+        </mark>
+    </h2>
+</div>
+{% else %}
+<div class="text-center mb-8">
+    <h2 class="mb-4 text-4xl font-extrabold leading-none tracking-tight sm:leading-tight text-gray-900 dark:text-gray-100 sm:text-5xl lg:text-6xl">
+        Métricas para 
+        <mark class="px-2 text-white bg-primary-600 dark:bg-primary-700 rounded-lg">
+            '{{ palabra|title }}'
+        </mark>
+    </h2>
+</div>
+{% endif %}
 
     <!-- Métricas principales -->
     {% if opcion == 1 %}
