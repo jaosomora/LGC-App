@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## [1.3.8] - 2025-03-16
+### Mejoras y cambios principales
+- **Implementación de componentes modulares para mejorar el mantenimiento del código**:
+  - Se creó un componente reutilizable `search_modal.html` que centraliza la funcionalidad del modal de búsqueda.
+  - **Ahora puedes realizar nuevas búsquedas directamente desde la página de resultados** con un nuevo botón "Nueva Búsqueda" que mantiene coherencia con la opción usada inicialmente.
+  - Se eliminó código duplicado de los modales en `base.html` y otras plantillas, mejorando la mantenibilidad del proyecto.
+
+### Detalles técnicos
+- Uso de macros Jinja2 para implementar componentes reutilizables.
+- Exposición de funciones JavaScript globales (`showSearchModal`, `closeSearchModal`, `submitSearchInput`) para garantizar la interoperabilidad entre componentes.
+- Detección automática del tipo de búsqueda previa (opción 1 o 2) para mantener consistencia en la experiencia del usuario.
+
+---
+
 ## [1.3.7] - 2025-02-04
 ### Mejoras y cambios técnicos
 - Se agregó configuración condicional de cookies de sesión en `app.py`:
