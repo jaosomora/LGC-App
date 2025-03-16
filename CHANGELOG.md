@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [1.3.11] - 2025-03-16
+### Mejorado
+- **Historial de búsquedas**:
+  - El historial ahora muestra enlaces interactivos que permiten volver rápidamente a resultados anteriores.
+  - Cambiado el título de la columna "Veces buscado" a "Cuántas veces se ha buscado" para mayor claridad.
+  - Mejora en la visualización del contador de búsquedas para una experiencia más intuitiva.
+  - Añadido mensaje de bienvenida para nuevos usuarios que explica la funcionalidad del historial.
+
 
 ## [1.3.10] - 2025-03-16
 ### Mejorado

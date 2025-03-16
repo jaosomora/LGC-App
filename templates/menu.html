@@ -21,102 +21,161 @@
             Elige una herramienta para comenzar
         </p>
     </div>
-<!-- Tarjetas del Menú Principal -->
-<div id="menu-content" class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
-    <!-- Opción 1 -->
-    <button
-        onclick="showSearchModal(1)"
-        class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-primary-500 cursor-pointer animate-fadeIn">
-        
-        <!-- Ícono de acción para móviles (Animación wiggle corregida) -->
-        <span id="wiggle-icon-1" class="absolute -top-4 right-4 text-primary-600 dark:text-primary-400 text-lg sm:inline animate-wiggle">👆🏻</span>
+    
+    <!-- Tarjetas del Menú Principal -->
+    <div id="menu-content" class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <!-- Opción 1 -->
+        <button
+            onclick="showSearchModal(1)"
+            class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-primary-500 cursor-pointer animate-fadeIn">
+            
+            <!-- Ícono de acción para móviles (Animación wiggle corregida) -->
+            <span id="wiggle-icon-1" class="absolute -top-4 right-4 text-primary-600 dark:text-primary-400 text-lg sm:inline animate-wiggle">👆🏻</span>
 
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            1. Buscador de Palabras por Número
-        </h3>
-        <p class="mt-2 text-gray-500 dark:text-gray-400">
-            Herramienta que permite ingresar un número y descubrir las palabras que tienen el mismo valor numérico.
-        </p>
-    </button>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                1. Buscador de Palabras por Número
+            </h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+                Herramienta que permite ingresar un número y descubrir las palabras que tienen el mismo valor numérico.
+            </p>
+        </button>
 
-    <!-- Opción 2 -->
-    <button
-        onclick="showSearchModal(2)"
-        class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-green-500 cursor-pointer animate-fadeIn">
-        
-        <!-- Ícono de acción para móviles (Animación wiggle corregida) -->
-        <span id="wiggle-icon-2" class="absolute -top-4 right-4 text-green-600 dark:text-green-400 text-lg sm:inline animate-wiggle">👆🏻</span>
+        <!-- Opción 2 -->
+        <button
+            onclick="showSearchModal(2)"
+            class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-green-500 cursor-pointer animate-fadeIn">
+            
+            <!-- Ícono de acción para móviles (Animación wiggle corregida) -->
+            <span id="wiggle-icon-2" class="absolute -top-4 right-4 text-green-600 dark:text-green-400 text-lg sm:inline animate-wiggle">👆🏻</span>
 
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            2. Conversor de Palabras a Números
-        </h3>
-        <p class="mt-2 text-gray-500 dark:text-gray-400">
-            Herramienta que convierte una palabra en su valor numérico sumando los valores asignados a cada letra.
-        </p>
-    </button>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                2. Conversor de Palabras a Números
+            </h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+                Herramienta que convierte una palabra en su valor numérico sumando los valores asignados a cada letra.
+            </p>
+        </button>
 
-    <!-- Opción 3 (Nueva) -->
-    <button
-        onclick="showSearchModal(3)"
-        class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-accent-500 cursor-pointer animate-fadeIn">
-        
-        <!-- Ícono de acción para móviles -->
-        <span id="wiggle-icon-3" class="absolute -top-4 right-4 text-accent-500 dark:text-accent-400 text-lg sm:inline animate-wiggle">👆🏻</span>
+        <!-- Opción 3 (Nueva) -->
+        <button
+            onclick="showSearchModal(3)"
+            class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-accent-500 cursor-pointer animate-fadeIn">
+            
+            <!-- Ícono de acción para móviles -->
+            <span id="wiggle-icon-3" class="absolute -top-4 right-4 text-accent-500 dark:text-accent-400 text-lg sm:inline animate-wiggle">👆🏻</span>
 
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
-            3. Calculadora de Operaciones entre Palabras
-        </h3>
-        <p class="mt-2 text-gray-500 dark:text-gray-400">
-            Herramienta que permite sumar y restar los valores numéricos de dos palabras o frases diferentes.
-        </p>
-    </button>
-
-</div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                3. Calculadora de Operaciones entre Palabras
+            </h3>
+            <p class="mt-2 text-gray-500 dark:text-gray-400">
+                Herramienta que permite sumar y restar los valores numéricos de dos palabras o frases diferentes.
+            </p>
+        </button>
+    </div>
 
     <!-- Historial de Búsquedas -->
-{% if historial %}
-<div class="mt-16">
-    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Historial de Búsquedas</h3>
-    <div class="mt-4 overflow-hidden border border-gray-300 dark:border-gray-600 rounded-lg">
-        <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
-            <thead class="bg-gray-50 dark:bg-gray-700">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Palabra o Frecuencia
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Puntuación
-                    </th>
-                </tr>
-            </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-300 dark:divide-gray-600">
-                {% for entry in historial %}
-                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
-                        {{ entry.item }}
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        {% if entry.puntuacion %}
-                        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300">
-                            Puntuación: {{ entry.puntuacion }}
-                        </span>
-                        {% else %}
-                        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-                            Sin puntuación
-                        </span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    {% if historial %}
+    <div class="mt-16">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Historial de Búsquedas</h3>
+        <div class="mt-4 overflow-hidden border border-gray-300 dark:border-gray-600 rounded-lg">
+            <table class="min-w-full divide-y divide-gray-300 dark:divide-gray-600">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Palabra o Frecuencia
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Cuántas veces se ha buscado
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-300 dark:divide-gray-600">
+                    {% for entry in historial %}
+                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 transition duration-150">
+                        <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
+                            {% if entry.tipo and entry.parametros %}
+                                <!-- Para entradas con formato nuevo -->
+                                <a href="{{ url_for('resultado_' + entry.tipo, **entry.parametros) }}" 
+                                   class="block hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 hover:underline">
+                                    {{ entry.texto }}
+                                </a>
+                            {% elif 'item' in entry and 'Palabra:' in entry.item %}
+                                <!-- Para entradas de palabra (opción 2) con formato antiguo -->
+                                {% set palabra = entry.item.split('Palabra:')[1].split('->')[0].strip() %}
+                                <a href="{{ url_for('resultado_opcion2', frase=palabra) }}"
+                                   class="block hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 hover:underline">
+                                    {{ entry.item }}
+                                </a>
+                            {% elif 'item' in entry and 'Frecuencia:' in entry.item %}
+                                <!-- Para entradas de frecuencia (opción 1) con formato antiguo -->
+                                {% set frecuencia = entry.item.split('Frecuencia:')[1].split('->')[0].strip() %}
+                                <a href="{{ url_for('resultado_opcion1', frecuencia=frecuencia) }}"
+                                   class="block hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 hover:underline">
+                                    {{ entry.item }}
+                                </a>
+                            {% elif 'item' in entry and 'Comparación:' in entry.item %}
+                                <!-- Para entradas de comparación (opción 3) con formato antiguo -->
+                                {% set comparacion = entry.item.split('Comparación:')[1].split('=')[0].strip() %}
+                                {% set palabras = comparacion.split('+') %}
+                                {% if palabras|length >= 2 %}
+                                    {% set palabra1 = palabras[0].strip() %}
+                                    {% set palabra2 = palabras[1].strip() %}
+                                    <a href="{{ url_for('resultado_opcion3', palabra1=palabra1, palabra2=palabra2) }}"
+                                       class="block hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 hover:underline">
+                                        {{ entry.item }}
+                                    </a>
+                                {% else %}
+                                    {{ entry.item }}
+                                {% endif %}
+                            {% else %}
+                                <!-- Fallback para cualquier otro formato -->
+                                {{ entry.item }}
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            {% if entry.puntuacion %}
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300">
+                                Veces buscado: {{ entry.puntuacion }}
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                Sin búsquedas previas
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-{% else %}
-<div class="mt-16 text-center">
-    <p class="text-gray-500 dark:text-gray-400 text-lg">No hay búsquedas recientes.</p>
-</div>
-{% endif %}
+    {% else %}
+    <div class="mt-16">
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Historial de Búsquedas</h3>
+        
+        <div class="mt-8 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 shadow-sm">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-blue-800 dark:text-blue-300">
+                        ¡Bienvenido a la Interfaz LGC!
+                    </h3>
+                    <div class="mt-2 text-sm text-blue-700 dark:text-blue-400">
+                        <p>
+                            Esta herramienta te permite explorar la relación numérica entre palabras y números. A medida que realices búsquedas, verás tu historial aquí. El contador "Veces buscado" muestra la popularidad de cada término en la plataforma.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <p class="mt-4 text-center text-gray-500 dark:text-gray-400 text-lg">No hay búsquedas recientes.</p>
+    </div>
+    {% endif %}
 </div>
 
 <!-- Renderizar el modal compartido -->

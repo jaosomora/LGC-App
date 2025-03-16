@@ -618,36 +618,101 @@ def menu_principal():
     historial_normalizado = []
     for entry in historial:
         try:
-            # Extraer palabra o frecuencia del historial
-            if "Palabra:" in entry:
-                palabra_extraida = (
-                    entry.split("Palabra:")[1].split("->")[0].strip().lower()
-                )
-            elif "Frecuencia:" in entry:
-                palabra_extraida = (
-                    entry.split("Frecuencia:")[1].split("->")[0].strip().lower()
-                )
-            else:
+            # Detectar si es formato nuevo o antiguo
+            if isinstance(entry, dict) and "tipo" in entry and "texto" in entry:
+                # Es formato nuevo
                 palabra_extraida = None
-
-            # Agregar al historial normalizado con su puntuación correspondiente
-            historial_normalizado.append(
-                {
-                    "item": entry,
+                texto = entry["texto"]
+                
+                # Extraer palabra para buscar en ranking
+                if "Palabra:" in texto:
+                    palabra_extraida = texto.split("Palabra:")[1].split("->")[0].strip().lower()
+                elif "Frecuencia:" in texto:
+                    palabra_extraida = texto.split("Frecuencia:")[1].split("->")[0].strip().lower()
+                
+                # Mantener el formato nuevo
+                historial_normalizado.append({
+                    "tipo": entry["tipo"],
+                    "texto": texto,
+                    "parametros": entry["parametros"],
                     "palabra": palabra_extraida,
                     "puntuacion": ranking_dict.get(palabra_extraida, None),
-                }
-            )
-        except IndexError:
-            historial_normalizado.append(
-                {"item": entry, "palabra": None, "puntuacion": None}
-            )
+                })
+            else:
+                # Formato antiguo (string)
+                palabra_extraida = None
+                tipo = None
+                parametros = {}
+                
+                # Extraer palabra o frecuencia del historial
+                if isinstance(entry, str):
+                    if "Palabra:" in entry:
+                        palabra_extraida = entry.split("Palabra:")[1].split("->")[0].strip().lower()
+                        tipo = "opcion2"
+                        parametros = {"frase": palabra_extraida}
+                    elif "Frecuencia:" in entry:
+                        palabra_extraida = entry.split("Frecuencia:")[1].split("->")[0].strip().lower()
+                        tipo = "opcion1"
+                        parametros = {"frecuencia": palabra_extraida}
+                    elif "Comparación:" in entry:
+                        comp_text = entry.split("Comparación:")[1].split("=")[0].strip()
+                        partes = comp_text.split("+")
+                        if len(partes) >= 2:
+                            palabra1 = partes[0].strip()
+                            palabra2 = partes[1].strip()
+                            tipo = "opcion3"
+                            parametros = {"palabra1": palabra1, "palabra2": palabra2}
+                    
+                    # Agregar al historial normalizado con su puntuación correspondiente
+                    historial_normalizado.append({
+                        "tipo": tipo,
+                        "texto": entry,
+                        "parametros": parametros,
+                        "item": entry,  # Mantener compatibilidad con versión anterior
+                        "palabra": palabra_extraida,
+                        "puntuacion": ranking_dict.get(palabra_extraida, None),
+                    })
+                elif isinstance(entry, dict) and "item" in entry:
+                    # Formato intermedio (dict con item)
+                    item = entry["item"]
+                    if "Palabra:" in item:
+                        palabra_extraida = item.split("Palabra:")[1].split("->")[0].strip().lower()
+                        tipo = "opcion2"
+                        parametros = {"frase": palabra_extraida}
+                    elif "Frecuencia:" in item:
+                        palabra_extraida = item.split("Frecuencia:")[1].split("->")[0].strip().lower()
+                        tipo = "opcion1"
+                        parametros = {"frecuencia": palabra_extraida}
+                    elif "Comparación:" in item:
+                        comp_text = item.split("Comparación:")[1].split("=")[0].strip()
+                        partes = comp_text.split("+")
+                        if len(partes) >= 2:
+                            palabra1 = partes[0].strip()
+                            palabra2 = partes[1].strip()
+                            tipo = "opcion3"
+                            parametros = {"palabra1": palabra1, "palabra2": palabra2}
+                    
+                    # Copiar todas las propiedades existentes y añadir nuevas
+                    entry_copy = entry.copy()
+                    entry_copy["tipo"] = tipo
+                    entry_copy["texto"] = item
+                    entry_copy["parametros"] = parametros
+                    entry_copy["palabra"] = palabra_extraida
+                    entry_copy["puntuacion"] = ranking_dict.get(palabra_extraida, None)
+                    historial_normalizado.append(entry_copy)
+                else:
+                    # Formato no reconocido, añadir como está
+                    historial_normalizado.append(entry)
+        except (IndexError, TypeError, AttributeError) as e:
+            print(f"Error al procesar entrada del historial: {e}")
+            # En caso de error, añadir la entrada tal cual
+            historial_normalizado.append(entry)
 
     # Convertir a lista ordenada y única
     historial_unico = historial_normalizado
     historial_unico.sort(
         key=lambda x: ranking_dict.get(
-            normalizar_palabra_con_espacios(x["palabra"]).lower() if x["palabra"] is not None else "", 0
+            normalizar_palabra_con_espacios(x.get("palabra", "")).lower() if x.get("palabra") is not None else "", 0
         ),
         reverse=True,
     )
@@ -922,12 +987,25 @@ def resultado_opcion1():
 
     print(f"Ranking después de actualizar: {cargar_ranking_desde_bd()}")
 
+    # Historial de búsqueda con nuevo formato
     if "historial" not in session:
         session["historial"] = []
-    nueva_entrada = f"Frecuencia: {frecuencia} -> Lupa: {lupa}"
-    if nueva_entrada.lower() not in [entry.lower() for entry in session["historial"]]:
+
+    texto_entrada = f"Palabra: {palabra} -> Potencial: {potencial}, Lupa: {lupa}"
+    nueva_entrada = {
+        "tipo": "opcion2",
+        "texto": texto_entrada,
+        "parametros": {"frase": palabra}
+    }
+
+    # Verificar si ya existe una entrada similar
+    if not any(
+        (isinstance(entry, dict) and entry.get("texto") == texto_entrada) or 
+        (isinstance(entry, str) and entry.lower() == texto_entrada.lower())
+        for entry in session["historial"]
+    ):
         session["historial"].append(nueva_entrada)
-    session.modified = True
+        session.modified = True
 
     # Convertir la frecuencia en una lista de dígitos
     numero_resaltado = [int(digito) for digito in str(frecuencia)]
@@ -1080,11 +1158,21 @@ def resultado_opcion3():
         if "historial" not in session:
             session["historial"] = []
 
-        nueva_entrada = f"Comparación: {palabra1} + {palabra2} = {suma_total} | {palabra1} - {palabra2} = {resta_total}"
-        if nueva_entrada.lower() not in [entry.lower() for entry in session["historial"]]:
-            session["historial"].append(nueva_entrada)
+        texto_entrada = f"Comparación: {palabra1} + {palabra2} = {suma_total} | {palabra1} - {palabra2} = {resta_total}"
+        nueva_entrada = {
+            "tipo": "opcion3",
+            "texto": texto_entrada,
+            "parametros": {"palabra1": palabra1, "palabra2": palabra2}
+        }
 
-        session.modified = True
+        # Verificar si ya existe una entrada similar
+        if not any(
+            (isinstance(entry, dict) and entry.get("texto") == texto_entrada) or 
+            (isinstance(entry, str) and entry.lower() == texto_entrada.lower())
+            for entry in session["historial"]
+        ):
+            session["historial"].append(nueva_entrada)
+            session.modified = True
 
         # Preparar números resaltados para la calculadora
         numero_resaltado1 = [int(digito) for digito in str(suma_total1)]
