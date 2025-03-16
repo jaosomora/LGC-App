@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% import 'components/search_modal.html' as modal %}
+
 {% block title %}Interfaz LGC{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -23,7 +25,7 @@
 <div id="menu-content" class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
     <!-- Opción 1 -->
     <button
-        onclick="showModal(1)"
+        onclick="showSearchModal(1)"
         class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-primary-500 cursor-pointer animate-fadeIn">
         
         <!-- Ícono de acción para móviles (Animación wiggle corregida) -->
@@ -39,7 +41,7 @@
 
     <!-- Opción 2 -->
     <button
-        onclick="showModal(2)"
+        onclick="showSearchModal(2)"
         class="group relative block p-6 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow transition-all transform hover:-translate-y-1 hover:shadow-lg active:scale-95 focus:ring-2 focus:ring-green-500 cursor-pointer animate-fadeIn">
         
         <!-- Ícono de acción para móviles (Animación wiggle corregida) -->
@@ -100,170 +102,12 @@
 </div>
 {% endif %}
 </div>
-<!-- Modal -->
-<div
-    id="modal"
-    class="fixed inset-0 bg-black/60 backdrop-blur-md hidden flex items-center justify-center z-50">
-    <div class="bg-white dark:bg-gray-800 w-11/12 max-w-lg rounded-2xl shadow-lg p-6">
-        <h3 id="modal-title"
-            class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6 text-center">
-            ¿Qué deseas buscar?
-        </h3>
-        <div class="mb-6 relative">
-            <input
-                id="user-input"
-                type="text"
-                class="w-full px-5 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                placeholder="Ingresa aquí"
-                aria-describedby="input-error"
-                autofocus />
-            <!-- Mensaje de error -->
-            <p
-                id="input-error"
-                class="text-red-500 text-sm mt-2 hidden"
-                aria-hidden="true">
-                Solo use letras y espacios.
-            </p>
-        </div>
-        <div class="flex justify-between mt-6">
-            <button
-                id="confirm-button"
-                onclick="submitInput()"
-                class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 dark:hover:bg-blue-500 hover:shadow-lg transition-all w-[48%]">
-                Confirmar
-            </button>
-            <button
-                onclick="closeModal()"
-                class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-400 dark:hover:bg-gray-600 hover:shadow-lg transition-all w-[48%]">
-                Cancelar
-            </button>
-        </div>
-    </div>
-</div>
 
-<!-- Scripts -->
+<!-- Renderizar el modal compartido -->
+{{ modal.search_modal() }}
+
+<!-- Scripts para el manejo de los iconos wiggle -->
 <script>
-    let selectedOption = null;
-
-    // Listener global para la tecla Esc
-    document.addEventListener('keydown', (event) => {
-        const modal = document.getElementById('modal');
-        if (!modal.classList.contains('hidden') && event.key === 'Escape') {
-            closeModal();
-        }
-    });
-
-    // Listener global para la tecla Enter
-    document.addEventListener('keydown', (event) => {
-        const modal = document.getElementById('modal');
-        const userInput = document.getElementById('user-input');
-        const confirmButton = document.getElementById('confirm-button');
-
-        // Verificar si Enter se presiona con el modal activo
-        if (!modal.classList.contains('hidden') && event.key === 'Enter' && userInput === document.activeElement) {
-            confirmButton.click(); // Activar el botón "Confirmar"
-        }
-    });
-
-    function showModal(option) {
-    selectedOption = option;
-    const modal = document.getElementById('modal');
-    const title = document.getElementById('modal-title');
-    const userInput = document.getElementById('user-input');
-    const inputError = document.getElementById('input-error');
-
-    userInput.value = ''; // Resetear valor al abrir el modal
-    inputError.classList.add('hidden'); // Ocultar mensaje de error
-    userInput.classList.remove('bg-red-100'); // Quitar fondo rojo
-
-    // Configurar validación según la opción seleccionada
-    if (option === 1) {
-        title.innerText = 'Ingresa número';
-        userInput.placeholder = 'Escribe un número';
-        userInput.type = 'text'; // Usar text para validación
-        userInput.inputMode = 'numeric'; // Activar teclado numérico en móviles
-        userInput.oninput = () => {
-            // Validar solo números
-            userInput.value = userInput.value.replace(/[^0-9]/g, '');
-        };
-    } else if (option === 2) {
-        title.innerText = 'Ingresa la palabra o frase';
-        userInput.placeholder = 'Escribe aquí';
-        userInput.type = 'text';
-        userInput.inputMode = ''; // Quitar inputMode para texto
-        userInput.oninput = () => {
-            // Validar solo letras, espacios y caracteres válidos del español
-            const invalidCharacters = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(userInput.value);
-            if (invalidCharacters) {
-                userInput.classList.add('bg-red-100'); // Cambiar fondo a rojo claro
-                inputError.classList.remove('hidden'); // Mostrar mensaje de error
-            } else {
-                userInput.classList.remove('bg-red-100'); // Quitar fondo rojo
-                inputError.classList.add('hidden'); // Ocultar mensaje de error
-            }
-        };
-    }
-
-    // Mostrar modal y enfocar campo de entrada
-    modal.classList.remove('hidden');
-    document.getElementById('menu-content').classList.add('blur-sm');
-
-    // Asegurar que el foco funciona después de abrir el modal
-    setTimeout(() => {
-        userInput.focus();
-        userInput.click(); // Simula un clic para Safari
-    }, 300); // Retardo mayor para Safari
-}
-
-
-    function closeModal() {
-        const modal = document.getElementById('modal');
-        modal.classList.add('hidden');
-        document.getElementById('menu-content').classList.remove('blur-sm');
-    }
-
-    function submitInput() {
-        const userInput = document.getElementById('user-input').value.trim();
-        const inputError = document.getElementById('input-error');
-
-        // Validar entrada antes de enviar
-        if (selectedOption === 2 && /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(userInput)) {
-            inputError.classList.remove('hidden');
-            return;
-        }
-
-        if (!userInput) {
-            alert('Por favor, ingresa un valor válido.');
-            return;
-        }
-
-        const form = document.createElement('form');
-        form.method = 'POST';
-
-        if (selectedOption === 1) {
-            form.action = '/resultado_opcion1';
-            const inputField = document.createElement('input');
-            inputField.type = 'hidden';
-            inputField.name = 'frecuencia';
-            inputField.value = userInput;
-            form.appendChild(inputField);
-        } else if (selectedOption === 2) {
-            form.action = '/resultado_opcion2';
-            const inputField = document.createElement('input');
-            inputField.type = 'hidden';
-            inputField.name = 'palabra';
-            inputField.value = userInput;
-            form.appendChild(inputField);
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-
-        closeModal();
-    }
-
-
     document.addEventListener("DOMContentLoaded", function () {
         const toolButtons = document.querySelectorAll("#menu-content button");
         const wiggleIcons = document.querySelectorAll("#menu-content span");
@@ -282,6 +126,5 @@
             });
         }, 500);
     });
-
 </script>
 {% endblock %}

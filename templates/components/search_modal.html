@@ -1,5 +1,5 @@
 {% macro search_modal() %}
-<!-- Modal -->
+<!-- Modal de búsqueda reutilizable -->
 <div
     id="search-modal"
     class="fixed inset-0 bg-black/60 backdrop-blur-md hidden flex items-center justify-center z-50">
@@ -42,14 +42,16 @@
 <script>
     // Inicializar inmediatamente, sin esperar a DOMContentLoaded
     (function() {
+        let selectedOption = null;
+        
         // Definir la función showModal en el objeto window para que sea accesible globalmente
-        window.showModal = function(option) {
-            console.log("showModal llamado con opción:", option);
+        window.showSearchModal = function(option) {
+            selectedOption = option;
             
             // Asegurarse de que los elementos existan
             const modal = document.getElementById('search-modal');
             if (!modal) {
-                console.error("Modal no encontrado");
+                console.error("Modal de búsqueda no encontrado");
                 return;
             }
             
@@ -92,9 +94,6 @@
                 };
             }
 
-            // Guardar la opción
-            modal.setAttribute('data-option', option);
-
             // Mostrar modal
             modal.classList.remove('hidden');
             
@@ -112,7 +111,7 @@
         };
 
         // Función para cerrar el modal
-        function closeModal() {
+        window.closeSearchModal = function() {
             const modal = document.getElementById('search-modal');
             if (!modal) return;
             
@@ -125,15 +124,11 @@
         }
 
         // Función para enviar el formulario
-        function submitInput() {
-            const modal = document.getElementById('search-modal');
-            if (!modal) return;
-            
+        window.submitSearchInput = function() {
             const userInput = document.getElementById('user-input');
             if (!userInput) return;
             
             const inputValue = userInput.value.trim();
-            const selectedOption = parseInt(modal.getAttribute('data-option') || '0');
             
             if (!inputValue) {
                 alert('Por favor, ingresa un valor válido.');
@@ -176,19 +171,17 @@
 
         // Configurar event listeners cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("DOM cargado, configurando listeners");
+            console.log("DOM cargado, configurando listeners del modal de búsqueda");
             
             // Configurar botones
             const confirmButton = document.getElementById('confirm-button');
             if (confirmButton) {
-                confirmButton.addEventListener('click', submitInput);
-                console.log("Listener de confirmación configurado");
+                confirmButton.addEventListener('click', window.submitSearchInput);
             }
             
             const cancelButton = document.getElementById('cancel-button');
             if (cancelButton) {
-                cancelButton.addEventListener('click', closeModal);
-                console.log("Listener de cancelación configurado");
+                cancelButton.addEventListener('click', window.closeSearchModal);
             }
             
             // Teclas
@@ -197,26 +190,15 @@
                 if (!modal || modal.classList.contains('hidden')) return;
                 
                 if (event.key === 'Escape') {
-                    closeModal();
+                    window.closeSearchModal();
                 } else if (event.key === 'Enter') {
                     const userInput = document.getElementById('user-input');
                     if (userInput === document.activeElement) {
-                        submitInput();
+                        window.submitSearchInput();
                     }
                 }
             });
-            
-            // Verificar parámetro URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const openModal = urlParams.get('open_modal');
-            if (openModal) {
-                window.showModal(parseInt(openModal));
-            }
         });
-        
-        // Exponer funciones al objeto window
-        window.closeSearchModal = closeModal;
-        window.submitSearchInput = submitInput;
     })();
 </script>
 {% endmacro %}
