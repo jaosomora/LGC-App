@@ -1,0 +1,222 @@
+{% macro search_modal() %}
+<!-- Modal -->
+<div
+    id="search-modal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-md hidden flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 w-11/12 max-w-lg rounded-2xl shadow-lg p-6">
+        <h3 id="modal-title"
+            class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6 text-center">
+            ¿Qué deseas buscar?
+        </h3>
+        <div class="mb-6 relative">
+            <input
+                id="user-input"
+                type="text"
+                class="w-full px-5 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                placeholder="Ingresa aquí"
+                aria-describedby="input-error"
+                autofocus />
+            <!-- Mensaje de error -->
+            <p
+                id="input-error"
+                class="text-red-500 text-sm mt-2 hidden"
+                aria-hidden="true">
+                Solo use letras y espacios.
+            </p>
+        </div>
+        <div class="flex justify-between mt-6">
+            <button
+                id="confirm-button"
+                class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 dark:hover:bg-blue-500 hover:shadow-lg transition-all w-[48%]">
+                Confirmar
+            </button>
+            <button
+                id="cancel-button"
+                class="bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-gray-400 dark:hover:bg-gray-600 hover:shadow-lg transition-all w-[48%]">
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Inicializar inmediatamente, sin esperar a DOMContentLoaded
+    (function() {
+        // Definir la función showModal en el objeto window para que sea accesible globalmente
+        window.showModal = function(option) {
+            console.log("showModal llamado con opción:", option);
+            
+            // Asegurarse de que los elementos existan
+            const modal = document.getElementById('search-modal');
+            if (!modal) {
+                console.error("Modal no encontrado");
+                return;
+            }
+            
+            const title = document.getElementById('modal-title');
+            const userInput = document.getElementById('user-input');
+            const inputError = document.getElementById('input-error');
+            
+            if (!title || !userInput || !inputError) {
+                console.error("Elementos del modal no encontrados");
+                return;
+            }
+
+            userInput.value = ''; // Resetear valor
+            inputError.classList.add('hidden');
+            userInput.classList.remove('bg-red-100');
+
+            // Configurar según la opción
+            if (option === 1) {
+                title.innerText = 'Ingresa número';
+                userInput.placeholder = 'Escribe un número';
+                userInput.type = 'text';
+                userInput.inputMode = 'numeric';
+                userInput.oninput = function() {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                };
+            } else if (option === 2) {
+                title.innerText = 'Ingresa la palabra o frase';
+                userInput.placeholder = 'Escribe aquí';
+                userInput.type = 'text';
+                userInput.inputMode = '';
+                userInput.oninput = function() {
+                    const invalidCharacters = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(this.value);
+                    if (invalidCharacters) {
+                        this.classList.add('bg-red-100');
+                        inputError.classList.remove('hidden');
+                    } else {
+                        this.classList.remove('bg-red-100');
+                        inputError.classList.add('hidden');
+                    }
+                };
+            }
+
+            // Guardar la opción
+            modal.setAttribute('data-option', option);
+
+            // Mostrar modal
+            modal.classList.remove('hidden');
+            
+            // Aplicar blur si existe el elemento
+            const menuContent = document.getElementById('menu-content');
+            if (menuContent) {
+                menuContent.classList.add('blur-sm');
+            }
+
+            // Enfocar el input
+            setTimeout(function() {
+                userInput.focus();
+                userInput.click();
+            }, 300);
+        };
+
+        // Función para cerrar el modal
+        function closeModal() {
+            const modal = document.getElementById('search-modal');
+            if (!modal) return;
+            
+            modal.classList.add('hidden');
+            
+            const menuContent = document.getElementById('menu-content');
+            if (menuContent) {
+                menuContent.classList.remove('blur-sm');
+            }
+        }
+
+        // Función para enviar el formulario
+        function submitInput() {
+            const modal = document.getElementById('search-modal');
+            if (!modal) return;
+            
+            const userInput = document.getElementById('user-input');
+            if (!userInput) return;
+            
+            const inputValue = userInput.value.trim();
+            const selectedOption = parseInt(modal.getAttribute('data-option') || '0');
+            
+            if (!inputValue) {
+                alert('Por favor, ingresa un valor válido.');
+                return;
+            }
+
+            // Validar para opción 2
+            if (selectedOption === 2) {
+                const invalidChars = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(inputValue);
+                if (invalidChars) {
+                    const inputError = document.getElementById('input-error');
+                    if (inputError) inputError.classList.remove('hidden');
+                    return;
+                }
+            }
+
+            // Crear y enviar formulario
+            const form = document.createElement('form');
+            form.method = 'POST';
+            
+            const inputField = document.createElement('input');
+            inputField.type = 'hidden';
+            
+            if (selectedOption === 1) {
+                form.action = '/resultado_opcion1';
+                inputField.name = 'frecuencia';
+            } else if (selectedOption === 2) {
+                form.action = '/resultado_opcion2';
+                inputField.name = 'palabra';
+            } else {
+                console.error("Opción no válida:", selectedOption);
+                return;
+            }
+            
+            inputField.value = inputValue;
+            form.appendChild(inputField);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Configurar event listeners cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM cargado, configurando listeners");
+            
+            // Configurar botones
+            const confirmButton = document.getElementById('confirm-button');
+            if (confirmButton) {
+                confirmButton.addEventListener('click', submitInput);
+                console.log("Listener de confirmación configurado");
+            }
+            
+            const cancelButton = document.getElementById('cancel-button');
+            if (cancelButton) {
+                cancelButton.addEventListener('click', closeModal);
+                console.log("Listener de cancelación configurado");
+            }
+            
+            // Teclas
+            document.addEventListener('keydown', function(event) {
+                const modal = document.getElementById('search-modal');
+                if (!modal || modal.classList.contains('hidden')) return;
+                
+                if (event.key === 'Escape') {
+                    closeModal();
+                } else if (event.key === 'Enter') {
+                    const userInput = document.getElementById('user-input');
+                    if (userInput === document.activeElement) {
+                        submitInput();
+                    }
+                }
+            });
+            
+            // Verificar parámetro URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const openModal = urlParams.get('open_modal');
+            if (openModal) {
+                window.showModal(parseInt(openModal));
+            }
+        });
+        
+        // Exponer funciones al objeto window
+        window.closeSearchModal = closeModal;
+        window.submitSearchInput = submitInput;
+    })();
+</script>
+{% endmacro %}
