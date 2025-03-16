@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% import 'components/search_modal.html' as modal %}
+
 {% block title %}Resultados{% endblock %}
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -44,11 +46,21 @@
     </div>
     {% endif %}
 
-    <!-- Botón para compartir con margen superior para separarlo -->
-    <button id="share-button"
-        class="mt-6 bg-primary-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-primary-600 transition-all">
-        Compartir Resultado
-    </button>
+    <!-- Botones de acción con layout de flexbox para alinearlos en fila -->
+    <div class="mt-6 flex flex-wrap gap-4">
+        <!-- Botón para compartir resultado -->
+        <button id="share-button"
+            class="bg-primary-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-primary-600 transition-all">
+            Compartir Resultado
+        </button>
+        
+        <!-- Nuevo botón para nueva búsqueda - usa la misma opción que usó el usuario -->
+        <button id="new-search-button" 
+            onclick="showSearchModal({{ opcion }})"
+            class="bg-secondary text-white py-3 px-6 rounded-lg shadow-md hover:bg-secondary/90 transition-all">
+            Nueva Búsqueda
+        </button>
+    </div>
 
     <!-- Modal de respaldo para compartir -->
     <div id="share-modal"
@@ -84,8 +96,10 @@
         <div id="temporary-message"
             class="fixed bottom-5 right-5 bg-green-500 bg-opacity-70 text-white px-5 py-2 rounded-lg shadow-lg text-sm hidden opacity-0 transition-opacity duration-300 ease-in-out">
         </div>
-
     </div>
+
+    <!-- Incluir el modal de búsqueda -->
+    {{ modal.search_modal() }}
 
     <!-- Calculadora Visual -->
     <div class="mt-12">
