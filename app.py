@@ -647,7 +647,7 @@ def menu_principal():
     historial_unico = historial_normalizado
     historial_unico.sort(
         key=lambda x: ranking_dict.get(
-            normalizar_palabra_con_espacios(x["palabra"]).lower(), 0
+            normalizar_palabra_con_espacios(x["palabra"]).lower() if x["palabra"] is not None else "", 0
         ),
         reverse=True,
     )
@@ -946,7 +946,140 @@ def resultado_opcion1():
         total_invertido=int(str(frecuencia)[::-1])  # Calcular y enviar el total invertido
     )
 
+@app.route("/resultado_opcion3", methods=["POST"])
+def resultado_opcion3():
+    """
+    Procesa dos palabras o frases ingresadas en la opción 3 y genera los resultados comparativos.
+    """
+    palabra1 = request.form.get("palabra1")
+    palabra2 = request.form.get("palabra2")
+    
+    print(f"[DEBUG] Palabra 1 ingresada por el usuario: {palabra1}")
+    print(f"[DEBUG] Palabra 2 ingresada por el usuario: {palabra2}")
 
+    # Verificar si las palabras contienen caracteres válidos (alfabéticos y espacios)
+    if not palabra1 or not palabra2 or not all(char.isalpha() or char.isspace() for char in palabra1) or not all(char.isalpha() or char.isspace() for char in palabra2):
+        # Si alguna palabra no es válida, retorna al formulario con un mensaje de error
+        return render_template(
+            "opcion2.html",
+            error="Una o ambas palabras contienen caracteres no válidos. Por favor, ingrese solo letras y espacios.",
+        )
+
+    # Calcular potenciales y lupas para ambas palabras
+    potencial1 = calcular_potencial(palabra1)
+    lupa1 = calcular_lupa(potencial1)
+    detalle1 = detalle_potencial(palabra1)
+    
+    potencial2 = calcular_potencial(palabra2)
+    lupa2 = calcular_lupa(potencial2)
+    detalle2 = detalle_potencial(palabra2)
+
+    # Calcular frecuencia por palabra para ambas frases
+    frecuencias_por_palabra1, suma_total1 = calcular_frecuencia_por_palabra(palabra1)
+    frecuencias_por_palabra2, suma_total2 = calcular_frecuencia_por_palabra(palabra2)
+
+    # Crear la representación de frecuencias para cada palabra
+    salida_detallada1 = []
+    for palabra_actual, datos in frecuencias_por_palabra1.items():
+        letras_con_valores = [
+            f"{letra.upper()}={valor}" for letra, valor in zip(palabra_actual, datos["frecuencia_por_letra"])
+        ]
+        palabra_formateada = f"<strong>{palabra_actual}</strong>: [ {', '.join(letras_con_valores)} ]"
+        
+        if len(frecuencias_por_palabra1) > 1:
+            palabra_formateada += f" = {datos['suma']}"
+        
+        salida_detallada1.append(palabra_formateada)
+
+    salida_detallada2 = []
+    for palabra_actual, datos in frecuencias_por_palabra2.items():
+        letras_con_valores = [
+            f"{letra.upper()}={valor}" for letra, valor in zip(palabra_actual, datos["frecuencia_por_letra"])
+        ]
+        palabra_formateada = f"<strong>{palabra_actual}</strong>: [ {', '.join(letras_con_valores)} ]"
+        
+        if len(frecuencias_por_palabra2) > 1:
+            palabra_formateada += f" = {datos['suma']}"
+        
+        salida_detallada2.append(palabra_formateada)
+
+    # Calcular operaciones entre los totales
+    suma_total = suma_total1 + suma_total2
+    resta_total = abs(suma_total1 - suma_total2)  # Valor absoluto para evitar negativos
+
+    # Calcular lupas para las operaciones
+    lupa_suma = calcular_lupa(suma_total)
+    lupa_resta = calcular_lupa(resta_total)
+
+    # Guardar ambas palabras en la base de datos
+    palabra1_normalizada = normalizar_palabra_con_espacios(palabra1).lower()
+    palabra2_normalizada = normalizar_palabra_con_espacios(palabra2).lower()
+    
+    guardar_palabra(palabra1_normalizada)
+    guardar_palabra(palabra2_normalizada)
+    
+    actualizar_ranking(palabra1_normalizada)
+    actualizar_ranking(palabra2_normalizada)
+
+    # Cargar palabras y buscar coincidencias para ambos resultados
+    palabras = cargar_palabras()
+    
+    # Palabras relacionadas con la suma
+    palabras_suma = buscar_palabras_por_potencial(palabras, suma_total)
+    palabras_suma = list(set(normalizar_palabra_con_espacios(p) for p in palabras_suma))
+    palabras_suma = [p for p in palabras_suma if p.lower() not in [palabra1.lower(), palabra2.lower()]]
+    palabras_suma.sort(key=lambda p: calcular_potencial(p), reverse=True)
+    
+    # Palabras relacionadas con la resta
+    palabras_resta = buscar_palabras_por_potencial(palabras, resta_total)
+    palabras_resta = list(set(normalizar_palabra_con_espacios(p) for p in palabras_resta))
+    palabras_resta = [p for p in palabras_resta if p.lower() not in [palabra1.lower(), palabra2.lower()]]
+    palabras_resta.sort(key=lambda p: calcular_potencial(p), reverse=True)
+
+    # Actualizar ranking para palabras encontradas
+    for lista_palabras in [palabras_suma, palabras_resta]:
+        for palabra in lista_palabras:
+            actualizar_ranking(normalizar_palabra_con_espacios(palabra).lower())
+
+    # Actualizar historial de búsqueda
+    if "historial" not in session:
+        session["historial"] = []
+
+    nueva_entrada = f"Comparación: {palabra1} + {palabra2} = {suma_total} | {palabra1} - {palabra2} = {resta_total}"
+    if nueva_entrada.lower() not in [entry.lower() for entry in session["historial"]]:
+        session["historial"].append(nueva_entrada)
+
+    session.modified = True
+
+    # Preparar números resaltados para la calculadora
+    numero_resaltado1 = [int(digito) for digito in str(suma_total1)]
+    numero_resaltado2 = [int(digito) for digito in str(suma_total2)]
+    numero_resultado = [int(digito) for digito in str(suma_total)]
+    
+    # Renderizar resultados
+    return render_template(
+        "resultado.html",
+        opcion=3,
+        palabra1=palabra1,
+        palabra2=palabra2,
+        total1=suma_total1,
+        total2=suma_total2,
+        detalle1=detalle1,
+        detalle2=detalle2,
+        lupa1=lupa1,
+        lupa2=lupa2,
+        salida_detallada1=salida_detallada1,
+        salida_detallada2=salida_detallada2,
+        suma_total=suma_total,
+        resta_total=resta_total,
+        lupa_suma=lupa_suma,
+        lupa_resta=lupa_resta,
+        palabras_suma=palabras_suma,
+        palabras_resta=palabras_resta,
+        numero_resaltado1=numero_resaltado1,
+        numero_resaltado2=numero_resaltado2,
+        numero_resultado=numero_resultado
+    )
 
 @app.route("/embed_page")
 def embed_page():

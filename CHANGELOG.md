@@ -1,5 +1,25 @@
 # CHANGELOG
 
+## [1.3.9] - 2025-03-16
+### Añadido
+- **Nueva "Calculadora de Operaciones entre Palabras"**:
+  - Se implementó una tercera opción en el menú principal que permite comparar dos palabras o frases.
+  - **Ahora puedes visualizar claramente la suma y resta** de los valores numéricos entre dos palabras.
+  - **Ahora puedes descubrir palabras relacionadas** con los resultados de las operaciones.
+  - Se mejoró el modal de búsqueda para soportar la entrada de dos palabras simultáneamente.
+
+### Detalles técnicos
+- Extensión de la plantilla `resultado.html` para mostrar la comparación detallada.
+- Implementación de lógica en el backend para procesar ambas palabras y calcular operaciones.
+- Nueva ruta `/resultado_opcion3` sin afectar las funcionalidades existentes.
+- Adaptación del sistema de compartir resultados para soportar el nuevo formato de comparación.
+
+### Mejoras de interfaz
+- Diseño vertical y ordenado de los resultados, optimizado para dispositivos móviles.
+- Simplificación de la visualización, eliminando la calculadora numérica en la opción 3.
+- Consistencia visual con las opciones existentes, manteniendo la misma experiencia de usuario.
+
+
 ## [1.3.8] - 2025-03-16
 ### Mejoras y cambios principales
 - **Implementación de componentes modulares para mejorar el mantenimiento del código**:

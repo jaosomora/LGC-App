@@ -8,22 +8,67 @@
             class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6 text-center">
             ¿Qué deseas buscar?
         </h3>
-        <div class="mb-6 relative">
-            <input
-                id="user-input"
-                type="text"
-                class="w-full px-5 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
-                placeholder="Ingresa aquí"
-                aria-describedby="input-error"
-                autofocus />
-            <!-- Mensaje de error -->
-            <p
-                id="input-error"
-                class="text-red-500 text-sm mt-2 hidden"
-                aria-hidden="true">
-                Solo use letras y espacios.
-            </p>
+        
+        <!-- Contenedor para campos de entrada -->
+        <div id="input-container">
+            <!-- Campo de entrada único (usado en opciones 1 y 2) -->
+            <div class="mb-6 relative" id="single-input-container">
+                <input
+                    id="user-input"
+                    type="text"
+                    class="w-full px-5 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                    placeholder="Ingresa aquí"
+                    aria-describedby="input-error"
+                    autofocus />
+                <!-- Mensaje de error -->
+                <p
+                    id="input-error"
+                    class="text-red-500 text-sm mt-2 hidden"
+                    aria-hidden="true">
+                    Solo use letras y espacios.
+                </p>
+            </div>
+            
+            <!-- Campos de entrada dobles (usado en opción 3) - inicialmente oculto -->
+            <div class="mb-6 space-y-4 hidden" id="dual-input-container">
+                <div class="relative">
+                    <label for="first-word" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Primera palabra:
+                    </label>
+                    <input
+                        id="first-word"
+                        type="text"
+                        class="w-full px-5 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                        placeholder="Ingresa la primera palabra"
+                        aria-describedby="first-word-error" />
+                    <p
+                        id="first-word-error"
+                        class="text-red-500 text-sm mt-2 hidden"
+                        aria-hidden="true">
+                        Solo use letras y espacios.
+                    </p>
+                </div>
+                
+                <div class="relative">
+                    <label for="second-word" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Segunda palabra:
+                    </label>
+                    <input
+                        id="second-word"
+                        type="text"
+                        class="w-full px-5 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                        placeholder="Ingresa la segunda palabra"
+                        aria-describedby="second-word-error" />
+                    <p
+                        id="second-word-error"
+                        class="text-red-500 text-sm mt-2 hidden"
+                        aria-hidden="true">
+                        Solo use letras y espacios.
+                    </p>
+                </div>
+            </div>
         </div>
+        
         <div class="flex justify-between mt-6">
             <button
                 id="confirm-button"
@@ -58,40 +103,111 @@
             const title = document.getElementById('modal-title');
             const userInput = document.getElementById('user-input');
             const inputError = document.getElementById('input-error');
+            const singleInputContainer = document.getElementById('single-input-container');
+            const dualInputContainer = document.getElementById('dual-input-container');
+            const firstWord = document.getElementById('first-word');
+            const secondWord = document.getElementById('second-word');
             
-            if (!title || !userInput || !inputError) {
+            if (!title || !singleInputContainer || !dualInputContainer) {
                 console.error("Elementos del modal no encontrados");
                 return;
             }
 
-            userInput.value = ''; // Resetear valor
-            inputError.classList.add('hidden');
-            userInput.classList.remove('bg-red-100');
-
+            // Resetear valores
+            if (userInput) {
+                userInput.value = '';
+                userInput.classList.remove('bg-red-100');
+            }
+            if (inputError) {
+                inputError.classList.add('hidden');
+            }
+            if (firstWord) {
+                firstWord.value = '';
+                firstWord.classList.remove('bg-red-100');
+            }
+            if (secondWord) {
+                secondWord.value = '';
+                secondWord.classList.remove('bg-red-100');
+            }
+            
+            // Ocultar mensajes de error
+            const firstWordError = document.getElementById('first-word-error');
+            const secondWordError = document.getElementById('second-word-error');
+            if (firstWordError) firstWordError.classList.add('hidden');
+            if (secondWordError) secondWordError.classList.add('hidden');
+            
             // Configurar según la opción
-            if (option === 1) {
-                title.innerText = 'Ingresa número';
-                userInput.placeholder = 'Escribe un número';
-                userInput.type = 'text';
-                userInput.inputMode = 'numeric';
-                userInput.oninput = function() {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                };
-            } else if (option === 2) {
-                title.innerText = 'Ingresa la palabra o frase';
-                userInput.placeholder = 'Escribe aquí';
-                userInput.type = 'text';
-                userInput.inputMode = '';
-                userInput.oninput = function() {
-                    const invalidCharacters = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(this.value);
-                    if (invalidCharacters) {
-                        this.classList.add('bg-red-100');
-                        inputError.classList.remove('hidden');
-                    } else {
-                        this.classList.remove('bg-red-100');
-                        inputError.classList.add('hidden');
+            if (option === 1 || option === 2) {
+                // Opción 1 o 2: Mostrar input único, ocultar el doble
+                singleInputContainer.classList.remove('hidden');
+                dualInputContainer.classList.add('hidden');
+                
+                if (option === 1) {
+                    title.innerText = 'Ingresa número';
+                    userInput.placeholder = 'Escribe un número';
+                    userInput.type = 'text';
+                    userInput.inputMode = 'numeric';
+                    userInput.oninput = function() {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    };
+                } else if (option === 2) {
+                    title.innerText = 'Ingresa la palabra o frase';
+                    userInput.placeholder = 'Escribe aquí';
+                    userInput.type = 'text';
+                    userInput.inputMode = '';
+                    userInput.oninput = function() {
+                        const invalidCharacters = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(this.value);
+                        if (invalidCharacters) {
+                            this.classList.add('bg-red-100');
+                            if (inputError) inputError.classList.remove('hidden');
+                        } else {
+                            this.classList.remove('bg-red-100');
+                            if (inputError) inputError.classList.add('hidden');
+                        }
+                    };
+                }
+                
+                // Enfocar el input único
+                setTimeout(function() {
+                    if (userInput) {
+                        userInput.focus();
+                        userInput.click();
                     }
+                }, 300);
+                
+            } else if (option === 3) {
+                // Opción 3: Mostrar inputs dobles, ocultar el único
+                singleInputContainer.classList.add('hidden');
+                dualInputContainer.classList.remove('hidden');
+                
+                title.innerText = 'Ingresa dos palabras para comparar';
+                
+                // Configurar validación para ambas palabras
+                const setupWordValidation = function(inputElement, errorElement) {
+                    if (!inputElement || !errorElement) return;
+                    
+                    inputElement.oninput = function() {
+                        const invalidCharacters = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(this.value);
+                        if (invalidCharacters) {
+                            this.classList.add('bg-red-100');
+                            errorElement.classList.remove('hidden');
+                        } else {
+                            this.classList.remove('bg-red-100');
+                            errorElement.classList.add('hidden');
+                        }
+                    };
                 };
+                
+                setupWordValidation(firstWord, firstWordError);
+                setupWordValidation(secondWord, secondWordError);
+                
+                // Enfocar el primer input
+                setTimeout(function() {
+                    if (firstWord) {
+                        firstWord.focus();
+                        firstWord.click();
+                    }
+                }, 300);
             }
 
             // Mostrar modal
@@ -102,12 +218,6 @@
             if (menuContent) {
                 menuContent.classList.add('blur-sm');
             }
-
-            // Enfocar el input
-            setTimeout(function() {
-                userInput.focus();
-                userInput.click();
-            }, 300);
         };
 
         // Función para cerrar el modal
@@ -125,6 +235,65 @@
 
         // Función para enviar el formulario
         window.submitSearchInput = function() {
+            // Para opción 3 (comparación de palabras)
+            if (selectedOption === 3) {
+                const firstWord = document.getElementById('first-word');
+                const secondWord = document.getElementById('second-word');
+                const firstWordError = document.getElementById('first-word-error');
+                const secondWordError = document.getElementById('second-word-error');
+                
+                if (!firstWord || !secondWord) return;
+                
+                const firstValue = firstWord.value.trim();
+                const secondValue = secondWord.value.trim();
+                
+                // Validar que ambos campos tengan contenido
+                if (!firstValue || !secondValue) {
+                    alert('Por favor, ingresa ambas palabras para comparar.');
+                    return;
+                }
+                
+                // Validar caracteres para ambas palabras
+                const validateWord = function(value, errorElement) {
+                    const invalidChars = /[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/.test(value);
+                    if (invalidChars && errorElement) {
+                        errorElement.classList.remove('hidden');
+                        return false;
+                    }
+                    return true;
+                };
+                
+                const isFirstValid = validateWord(firstValue, firstWordError);
+                const isSecondValid = validateWord(secondValue, secondWordError);
+                
+                if (!isFirstValid || !isSecondValid) {
+                    return;
+                }
+                
+                // Crear y enviar formulario para opción 3
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '/resultado_opcion3';
+                
+                const firstInput = document.createElement('input');
+                firstInput.type = 'hidden';
+                firstInput.name = 'palabra1';
+                firstInput.value = firstValue;
+                
+                const secondInput = document.createElement('input');
+                secondInput.type = 'hidden';
+                secondInput.name = 'palabra2';
+                secondInput.value = secondValue;
+                
+                form.appendChild(firstInput);
+                form.appendChild(secondInput);
+                document.body.appendChild(form);
+                form.submit();
+                
+                return;
+            }
+            
+            // Para opciones 1 y 2 (código existente)
             const userInput = document.getElementById('user-input');
             if (!userInput) return;
             
@@ -192,9 +361,18 @@
                 if (event.key === 'Escape') {
                     window.closeSearchModal();
                 } else if (event.key === 'Enter') {
-                    const userInput = document.getElementById('user-input');
-                    if (userInput === document.activeElement) {
-                        window.submitSearchInput();
+                    // Para opción 3, solo enviar si se presiona Enter en el segundo campo
+                    if (selectedOption === 3) {
+                        const secondWord = document.getElementById('second-word');
+                        if (secondWord === document.activeElement) {
+                            window.submitSearchInput();
+                        }
+                    } else {
+                        // Para opciones 1 y 2, enviar si el input único está enfocado
+                        const userInput = document.getElementById('user-input');
+                        if (userInput === document.activeElement) {
+                            window.submitSearchInput();
+                        }
                     }
                 }
             });

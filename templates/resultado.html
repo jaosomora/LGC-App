@@ -5,21 +5,23 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <!-- Título principal de la página -->
-    <!-- Muestra la frase analizada en formato capitalizado usando el filtro 'title' -->
-    <div class="text-center mb-8">
-        <h2 class="text-3xl font-extrabold text-primary-900">Métricas para
-            '{{ palabra|title }}'</h2>
-    </div>
+    {% if opcion == 3 %}
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-primary-900">Comparación entre '{{ palabra1|title }}' y '{{ palabra2|title }}'</h2>
+        </div>
+    {% else %}
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-primary-900">Métricas para '{{ palabra|title }}'</h2>
+        </div>
+    {% endif %}
 
     <!-- Métricas principales -->
-    <!-- Diferencia entre opción 1 (resultado de un número único) y opción 2 (análisis de una frase) -->
     {% if opcion == 1 %}
     <div class="grid grid-cols-1 gap-4">
         <div
             class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
             <!-- Muestra el número calculado para la opción 1 -->
-            <p class="mt-4 text-gray-600"><strong>Número:</strong> {{ frecuencia
-                }}</p>
+            <p class="mt-4 text-gray-600"><strong>Número:</strong> {{ frecuencia }}</p>
             <!-- Muestra la lupa asociada al número calculado -->
             <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
         </div>
@@ -39,9 +41,81 @@
                 {% endfor %}
             </ul>
             <!-- Total y lupa de la frase analizada -->
-            <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total
-                }}</p>
+            <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total }}</p>
             <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
+        </div>
+    </div>
+    {% elif opcion == 3 %}
+    <!-- Resultados específicos para la opción 3 - Comparación de palabras -->
+    <div class="grid grid-cols-1 gap-6">
+        <!-- Palabra 1 -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
+            <h3 class="text-xl font-bold text-primary-900 mb-4">{{ palabra1|title }}</h3>
+            <ul class="mt-4 space-y-2">
+                {% for linea in salida_detallada1 %}
+                <li class="text-gray-600">
+                    {{ linea|safe }}
+                </li>
+                {% endfor %}
+            </ul>
+            <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total1 }}</p>
+            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa1 }}</p>
+        </div>
+        
+        <!-- Palabra 2 -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
+            <h3 class="text-xl font-bold text-primary-900 mb-4">{{ palabra2|title }}</h3>
+            <ul class="mt-4 space-y-2">
+                {% for linea in salida_detallada2 %}
+                <li class="text-gray-600">
+                    {{ linea|safe }}
+                </li>
+                {% endfor %}
+            </ul>
+            <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total2 }}</p>
+            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa2 }}</p>
+        </div>
+        
+        <!-- Suma -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-primary-300 hover:shadow-xl transition">
+            <h3 class="text-xl font-bold text-primary-900 mb-4">Suma</h3>
+            <div class="flex items-center space-x-2">
+                <span class="text-lg">{{ total1 }}</span>
+                <span class="text-2xl">+</span>
+                <span class="text-lg">{{ total2 }}</span>
+                <span class="text-2xl">=</span>
+                <span class="text-2xl font-bold">{{ suma_total }}</span>
+            </div>
+            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa_suma }}</p>
+            
+            <!-- Resultados de resonancia para la suma -->
+            {% if palabras_suma %}
+            <div class="mt-4">
+                <h4 class="font-medium text-gray-800">Palabras relacionadas:</h4>
+                <p class="text-gray-700 mt-2"><i>{{ palabras_suma | join(', ') }}</i></p>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Resta -->
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-accent-300 hover:shadow-xl transition">
+            <h3 class="text-xl font-bold text-accent-900 mb-4">Resta</h3>
+            <div class="flex items-center space-x-2">
+                <span class="text-lg">{{ total1 }}</span>
+                <span class="text-2xl">-</span>
+                <span class="text-lg">{{ total2 }}</span>
+                <span class="text-2xl">=</span>
+                <span class="text-2xl font-bold">{{ resta_total }}</span>
+            </div>
+            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa_resta }}</p>
+            
+            <!-- Resultados de resonancia para la resta -->
+            {% if palabras_resta %}
+            <div class="mt-4">
+                <h4 class="font-medium text-gray-800">Palabras relacionadas:</h4>
+                <p class="text-gray-700 mt-2"><i>{{ palabras_resta | join(', ') }}</i></p>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% endif %}
@@ -54,7 +128,7 @@
             Compartir Resultado
         </button>
         
-        <!-- Nuevo botón para nueva búsqueda - usa la misma opción que usó el usuario -->
+        <!-- Botón para nueva búsqueda - usa la misma opción que usó el usuario -->
         <button id="new-search-button" 
             onclick="showSearchModal({{ opcion }})"
             class="bg-secondary text-white py-3 px-6 rounded-lg shadow-md hover:bg-secondary/90 transition-all">
@@ -101,7 +175,8 @@
     <!-- Incluir el modal de búsqueda -->
     {{ modal.search_modal() }}
 
-    <!-- Calculadora Visual -->
+    <!-- Calculadora Visual - Solo para opciones 1 y 2 -->
+    {% if opcion != 3 %}
     <div class="mt-12">
         <h3
             class="text-center text-2xl font-bold text-gray-800 mb-6">Calculadora</h3>
@@ -123,8 +198,10 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
-    <!-- Secciones de Resonancias -->
+    <!-- Secciones de Resonancias - Solo para opciones 1 y 2 -->
+    {% if opcion != 3 %}
     <div class="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-6">
         <!-- Sección: Relación con palabras del pasado -->
         <div
@@ -149,8 +226,7 @@
                 <span class="text-secondary">({{ total_invertido }})</span>
             </h3>
             {% if palabras_invertidas %}
-            <p class="mt-4 text-gray-700"><i>{{ palabras_invertidas | join(', ')
-                    }}</i></p>
+            <p class="mt-4 text-gray-700"><i>{{ palabras_invertidas | join(', ') }}</i></p>
             {% else %}
             <p class="mt-4 text-gray-500">Sin resonancias desde el máximo
                 futuro.</p>
@@ -195,6 +271,7 @@
             elementos.</p>
         {% endif %}
     </div>
+    {% endif %}
 
     <!-- Botón para regresar al menú principal -->
     <div class="mt-12 text-center">
@@ -263,83 +340,92 @@
         }
     
         if (copyButton) {
-    copyButton.addEventListener('click', async () => {
-        const salidaDetallada = `{% for linea in salida_detallada %}{{ linea | striptags }}{% endfor %}`
-            .trim().split('\n').map(line => line.trim()).join('\n');
+            copyButton.addEventListener('click', async () => {
+                let textToCopy = '';
+                
+                // Determinar el texto según la opción
+                if ({{ opcion }} === 3) {
+                    textToCopy = `Comparación entre "{{ palabra1 }}" y "{{ palabra2 }}"\n\n` +
+                        `{{ palabra1 }}: Total: {{ total1 }}, Lupa: {{ lupa1 }}\n` +
+                        `{{ palabra2 }}: Total: {{ total2 }}, Lupa: {{ lupa2 }}\n\n` +
+                        `Suma ({{ total1 }} + {{ total2 }}): {{ suma_total }}, Lupa: {{ lupa_suma }}\n` +
+                        `Resta ({{ total1 }} - {{ total2 }}): {{ resta_total }}, Lupa: {{ lupa_resta }}\n\n` +
+                        `Convierte palabras en números: https://lgc.julianosoriom.com`;
+                } else {
+                    const salidaDetallada = `{% for linea in salida_detallada %}{{ linea | striptags }}{% endfor %}`
+                        .trim().split('\n').map(line => line.trim()).join('\n');
+                    
+                    textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}\n\nConvierte palabras en números: https://lgc.julianosoriom.com`;
+                }
 
-        const textToCopy = `Métricas para "{{ palabra }}"\n\n${salidaDetallada}\nTotal: {{ total }}\nLupa: {{ lupa }}\n\nConvierte palabras en números: https://lgc.julianosoriom.com`;
+                let copySuccess = false;
 
-        let copySuccess = false;
+                try {
+                    // Intentar copiar con la API moderna
+                    await navigator.clipboard.writeText(textToCopy);
+                    copySuccess = true;
+                } catch (err) {
+                    console.warn('navigator.clipboard falló, usando fallback:', err);
 
-        try {
-            // Intentar copiar con la API moderna
-            await navigator.clipboard.writeText(textToCopy);
-            copySuccess = true;
-        } catch (err) {
-            console.warn('navigator.clipboard falló, usando fallback:', err);
+                    // Método alternativo con un textarea oculto
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        copySuccess = true;
+                    } catch (err) {
+                        console.error('Error al copiar:', err);
+                    }
+                    document.body.removeChild(textArea);
+                }
 
-            // Método alternativo con un textarea oculto
-            const textArea = document.createElement('textarea');
-            textArea.value = textToCopy;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                copySuccess = true;
-            } catch (err) {
-                console.error('Error al copiar:', err);
-            }
-            document.body.removeChild(textArea);
+                // ✅ Primero, mostrar el mensaje de éxito
+                if (copySuccess) {
+                    showTemporaryMessage('¡Listo! Texto copiado');
+                } else {
+                    showTemporaryMessage('Error al copiar');
+                }
+
+                // ✅ Luego, cerrar el modal
+                setTimeout(() => {
+                    toggleShareModal();
+                }, 500); // Se da un pequeño tiempo para mostrar el mensaje antes de cerrar el modal
+            });
         }
-
-        // ✅ Primero, mostrar el mensaje de éxito
-        if (copySuccess) {
-            showTemporaryMessage('¡Listo! Texto copiado');
-        } else {
-            showTemporaryMessage('Error al copiar');
-        }
-
-        // ✅ Luego, cerrar el modal
-        setTimeout(() => {
-            toggleShareModal();
-        }, 500); // Se da un pequeño tiempo para mostrar el mensaje antes de cerrar el modal
-    });
-
-}
-
-
     
         // Compartir en WhatsApp
         if (whatsappButton) {
             whatsappButton.addEventListener('click', () => {
-                const salidaDetallada = `{% for linea in salida_detallada %}*{{ linea | striptags }}*{% endfor %}`
-                    .trim().split('\n').map(line => line.trim()).join('\n');
-    
-                const textForWhatsApp = [
-                    `Métricas para *{{ palabra }}*`,
-                    salidaDetallada,
-                    `Total: *{{ total }}*`,
-                    `Lupa: *{{ lupa }}*`,
-                    `Convierte palabras en números: https://lgc.julianosoriom.com`
-                ].join('\n\n');
-    
+                let textForWhatsApp = '';
+                
+                if ({{ opcion }} === 3) {
+                    textForWhatsApp = [
+                        `Comparación entre *{{ palabra1 }}* y *{{ palabra2 }}*`,
+                        `{{ palabra1 }}: Total: *{{ total1 }}*, Lupa: *{{ lupa1 }}*`,
+                        `{{ palabra2 }}: Total: *{{ total2 }}*, Lupa: *{{ lupa2 }}*`,
+                        `Suma ({{ total1 }} + {{ total2 }}): *{{ suma_total }}*, Lupa: *{{ lupa_suma }}*`,
+                        `Resta ({{ total1 }} - {{ total2 }}): *{{ resta_total }}*, Lupa: *{{ lupa_resta }}*`,
+                        `Convierte palabras en números: https://lgc.julianosoriom.com`
+                    ].join('\n\n');
+                } else {
+                    const salidaDetallada = `{% for linea in salida_detallada %}*{{ linea | striptags }}*{% endfor %}`
+                        .trim().split('\n').map(line => line.trim()).join('\n');
+        
+                    textForWhatsApp = [
+                        `Métricas para *{{ palabra }}*`,
+                        salidaDetallada,
+                        `Total: *{{ total }}*`,
+                        `Lupa: *{{ lupa }}*`,
+                        `Convierte palabras en números: https://lgc.julianosoriom.com`
+                    ].join('\n\n');
+                }
+
                 whatsappButton.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textForWhatsApp)}`;
                 toggleShareModal();
             });
         }
     });
-    </script>
-
-<!-- Código del botón flotante de Ko-fi -->
-<!-- 
-<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
-<script>
-  kofiWidgetOverlay.draw('julianosoriom', {
-    'type': 'floating-chat',
-    'floating-chat.donateButton.text': '¿Un café?',
-    'floating-chat.donateButton.background-color': '#3B82F6',
-    'floating-chat.donateButton.text-color': '#FFFFFF'
-  });
 </script>
--->
 {% endblock %}
