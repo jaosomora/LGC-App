@@ -161,6 +161,10 @@ ENV=PRODUCTION
 # Clave secreta para las sesiones de Flask
 # Por defecto: Se usa una clave predeterminada
 SECRET_KEY=tu-clave-secreta-personalizada
+
+# Credenciales de acceso al panel de administración
+ADMIN_USER=tu_nombre_de_usuario
+ADMIN_PASSWORD=tu_contraseña_segura
 ```
 
 #### Para el sistema de feedback por correo (opcionales)
@@ -175,17 +179,29 @@ SMTP_PASSWORD=tu-contraseña-de-aplicacion
 # Nota: Si no se configuran, el feedback se guardará automáticamente en la base de datos
 ```
 
+#### Para el sistema de analytics (opcionales)
+
+```env
+# Habilitar analytics incluso en entorno de desarrollo
+ENABLE_ANALYTICS=1
+
+# ID de Google Analytics (si no se configura, se usa uno predeterminado)
+ANALYTICS_ID=G-XXXXXXXXXXXX
+```
+
 ### Configuración automática según el entorno
 
 1. **En entorno local**:
    - Base de datos: Se crea en `./palabras.db` (directorio actual)
    - Configuración de sesiones: Se usa SameSite=Lax y conexiones no seguras
    - Debug: Mensajes detallados en la consola
+   - Panel de estadísticas: Accesible sin autenticación
 
 2. **En Render (producción)**:
    - Base de datos: Se crea en `/mnt/data/palabras.db` (ubicación persistente)
    - Configuración de sesiones: Se usa SameSite=None y conexiones seguras
    - CORS: Configurado para permitir conexiones desde dominios específicos
+   - Panel de estadísticas: Protegido con autenticación básica (requiere ADMIN_USER y ADMIN_PASSWORD)
 
 ### Cómo configurar variables en diferentes entornos
 
@@ -196,6 +212,8 @@ Para desarrollo local, puedes crear un archivo `.env` en la raíz del proyecto:
 ```env
 ENV=DEVELOPMENT
 SECRET_KEY=tu-clave-secreta
+ADMIN_USER=admin
+ADMIN_PASSWORD=password
 ```
 
 **Nota**: No es necesario crear este archivo para que la aplicación funcione, ya que usa valores predeterminados seguros.
@@ -209,6 +227,41 @@ En Render, ve a la sección "Environment" de tu servicio web y añade las variab
 Los valores mínimos recomendados son:
 - `ENV=PRODUCTION`
 - `SECRET_KEY=tu-clave-secreta-personalizada` (opcional pero recomendado)
+- `ADMIN_USER=tu_nombre_de_usuario` (requerido para acceder al panel de estadísticas)
+- `ADMIN_PASSWORD=tu_contraseña_segura` (requerido para acceder al panel de estadísticas)
+
+## 📊 Acceso al Panel de Estadísticas
+
+Interfaz LGC incluye un panel de estadísticas que muestra métricas de uso detalladas complementarias a Google Analytics.
+
+### Acceso en entorno de desarrollo
+
+En entorno de desarrollo o local, puedes acceder al panel simplemente visitando:
+
+```
+http://localhost:8080/admin/stats
+```
+
+### Acceso en entorno de producción
+
+En producción, el panel está protegido con autenticación básica. Para acceder:
+
+1. Configura las variables de entorno `ADMIN_USER` y `ADMIN_PASSWORD` en tu servidor Render
+2. Visita la URL:
+
+```
+https://tu-dominio.com/admin/stats
+```
+
+3. Introduce las credenciales cuando el navegador las solicite
+
+### Características del panel
+
+- **Eventos específicos**: Muestra eventos particulares de la aplicación
+- **Métricas básicas**: Vistas de página, sesiones únicas y vistas por sesión
+- **Distribución de usuarios**: Estadísticas por dispositivo, sistema operativo y navegador
+- **Botón de actualización**: Permite refrescar los datos sin recargar la página completa
+- **Enlace a Google Analytics**: Acceso rápido a estadísticas más detalladas
 
 ## 🚀 Despliegue en Render
 
@@ -236,6 +289,8 @@ En la sección "Environment" de tu servicio, añade las siguientes variables:
 ```
 ENV=PRODUCTION
 SECRET_KEY=clave-secreta-personalizada
+ADMIN_USER=tu_nombre_de_usuario
+ADMIN_PASSWORD=tu_contraseña_segura
 
 # Para funcionalidad de feedback por correo (opcional)
 SMTP_SERVER=smtp.gmail.com
@@ -276,7 +331,8 @@ LGC-App/
 │   └── embed.html             # Para integración externa
 ├── blueprints/                # Módulos Blueprint de Flask
 │   ├── __init__.py
-│   └── feedback_blueprint.py  # Funcionalidad para feedback
+│   ├── feedback_blueprint.py  # Funcionalidad para feedback
+│   └── analytics_blueprint.py # Funcionalidad para análisis y estadísticas
 ├── tailwind.config.js         # Configuración de Tailwind CSS
 └── README.md                  # Este archivo
 ```
@@ -288,6 +344,7 @@ La aplicación utiliza SQLite como base de datos local que almacena:
 - **Palabras procesadas**: Todas las palabras y frases analizadas
 - **Ranking**: Estadísticas de uso y búsqueda
 - **Feedback**: Comentarios y sugerencias de los usuarios (si se usa el método de almacenamiento en DB)
+- **Analytics**: Datos de uso y eventos específicos de la aplicación
 
 ### Ubicación de la base de datos:
 - **Desarrollo local**: `./palabras.db` (en el directorio del proyecto)
@@ -307,6 +364,9 @@ Compara dos palabras diferentes para analizar su suma y diferencia numérica, de
 ### 4. Sistema de feedback
 Envía comentarios, sugerencias o reporta problemas directamente desde la aplicación.
 
+### 5. Analytics y estadísticas
+Seguimiento detallado del uso de la aplicación con panel administrativo protegido.
+
 ## ⚠️ Solución de problemas comunes
 
 ### La aplicación no arranca
@@ -318,6 +378,11 @@ Envía comentarios, sugerencias o reporta problemas directamente desde la aplica
 - Verifica las credenciales SMTP en las variables de entorno
 - Si usas Gmail, asegúrate de haber generado una "Contraseña de aplicación" específica
 - Como alternativa, el feedback siempre se guarda en la base de datos local
+
+### No puedo acceder al panel de estadísticas
+- En entorno de desarrollo, verifica que la URL sea correcta: `/admin/stats`
+- En producción, asegúrate de haber configurado correctamente `ADMIN_USER` y `ADMIN_PASSWORD`
+- Comprueba los logs del servidor para ver si hay errores de autenticación
 
 ### Problemas en Render
 - Revisa los logs del servicio en el dashboard de Render

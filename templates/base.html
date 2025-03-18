@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,163 +62,133 @@
             }
             
             // Función para registrar uso de características específicas
-function trackFeatureUsage(featureName, details = {}) {
-    try {
-        // Enviar a Google Analytics
-        if (typeof gtag === 'function') {
-            gtag('event', featureName, details);
-        }
-        
-        // Registrar en nuestra base de datos
-        fetch('/api/stats/app-event', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                feature: featureName,
-                details: details
-            })
-        }).catch(error => console.error('Error registrando uso de característica:', error));
-    } catch (error) {
-        console.error('Error en trackFeatureUsage:', error);
-    }
-}
+            function trackFeatureUsage(featureName, details = {}) {
+                try {
+                    // Enviar a Google Analytics
+                    if (typeof gtag === 'function') {
+                        gtag('event', featureName, details);
+                    }
+                    
+                    // Registrar en nuestra base de datos
+                    fetch('/api/stats/app-event', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            feature: featureName,
+                            details: details
+                        })
+                    }).catch(error => console.error('Error registrando uso de característica:', error));
+                } catch (error) {
+                    console.error('Error en trackFeatureUsage:', error);
+                }
+            }
         </script>
         {% endif %}
     </head>
 
     <body class="min-h-screen flex flex-col">
-
-        <body class="min-h-screen flex flex-col">
-            
-            <!-- Banner de consentimiento de cookies -->
-            <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg border-t border-gray-200 dark:border-gray-700 p-4 z-50 hidden transform transition-transform duration-500 ease-in-out">
-                <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div class="text-sm text-gray-700 dark:text-gray-300">
-                        Usamos cookies para analizar nuestro tráfico y mejorar tu experiencia. 
-                        <a href="/privacy-policy" class="text-primary-600 dark:text-primary-400 hover:underline">Política de privacidad</a>
-                    </div>
-                    <div class="flex space-x-3">
-                        <button id="accept-cookies" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Aceptar
-                        </button>
-                        <button id="reject-cookies" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                            Rechazar
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Header fijo con transición -->
-            <div id="header"
-                class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md transition-all border-b-2 border-gray-200">
-                <div class="flex justify-between items-center px-8 py-4">
-                    <!-- Logo -->
-                    <div class="flex items-center gap-4">
-                        <h1 class="text-2xl font-bold font-sans">
-                            <a href="/"
-                                class="hover:opacity-80 transition-opacity">
-                                <span class="text-gray-900">Interfaz</span><span
-                                    class="text-primary-600">LGC</span>
-                            </a>
-                        </h1>
-                    </div>
-
-                    <!-- Navegación con "Ahora puedes" -->
-                    <nav class="flex items-center font-sans">
-                        <a
-                            href="https://julianosoriom.notion.site/Novedades-Interfaz-LGC-18b36143fa8380f7893ed0c0d2a76133?pvs=4"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="text-primary-600 hover:-translate-y-0.5 transition-transform flex items-center gap-1.5">
-
-                            <div class="flex items-center">
-                                <!-- Ícono de "Novedades" con animación dinámica -->
-                                <svg id="bell-icon"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24" height="24" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor"
-                                    stroke-width="2"
-                                    class="w-4 h-4 mx-1 animate-bell hover:animate-bell-fast">
-                                    <path
-                                        d="M12 2C13.933 2 15.5 3.567 15.5 5.5V6.1C17.611 7.055 19 9.244 19 12V16L21 18V19H3V18L5 16V12C5 9.244 6.389 7.055 8.5 6.1V5.5C8.5 3.567 10.067 2 12 2Z"></path>
-                                    <path d="M10 22H14"
-                                        stroke-linecap="round"></path>
-                                </svg>
-                                <!-- Texto con tamaño ajustado -->
-                                <span
-                                    class="font-sans text-sm font-medium">Ahora
-                                    puedes</span>
-                            </div>
+        <!-- Header fijo con transición -->
+        <div id="header"
+            class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-md transition-all border-b-2 border-gray-200">
+            <div class="flex justify-between items-center px-8 py-4">
+                <!-- Logo -->
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-bold font-sans">
+                        <a href="/"
+                            class="hover:opacity-80 transition-opacity">
+                            <span class="text-gray-900">Interfaz</span><span
+                                class="text-primary-600">LGC</span>
                         </a>
-                    </nav>
-
+                    </h1>
                 </div>
-            </div>
 
-            <!-- Ajustamos el margin superior para evitar solapamiento con el header -->
-            <main class="flex-grow max-w-7xl mx-auto p-6 md:p-8 mt-16">
-                {% block content %}
+                <!-- Navegación con "Ahora puedes" -->
+<nav class="flex items-center font-sans">
+    <a href="https://julianosoriom.notion.site/Novedades-Interfaz-LGC-18b36143fa8380f7893ed0c0d2a76133?pvs=4" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       class="text-primary-600 hover:-translate-y-0.5 transition-transform flex items-center gap-1.5">
+        <div class="flex items-center">
+            <!-- Ícono de "Novedades" con animación dinámica -->
+            <svg id="bell-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24" height="24" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor"
+                stroke-width="2"
+                class="w-4 h-4 mx-1 animate-bell hover:animate-bell-fast">
+                <path d="M12 2C13.933 2 15.5 3.567 15.5 5.5V6.1C17.611 7.055 19 9.244 19 12V16L21 18V19H3V18L5 16V12C5 9.244 6.389 7.055 8.5 6.1V5.5C8.5 3.567 10.067 2 12 2Z"></path>
+                <path d="M10 22H14" stroke-linecap="round"></path>
+            </svg>
+            <!-- Texto con tamaño ajustado -->
+            <span class="font-sans text-sm font-medium">Ahora puedes</span>
+        </div>
+    </a>
+</nav>
+            </div>
+        </div>
+
+        <!-- Ajustamos el margin superior para evitar solapamiento con el header -->
+        <main class="flex-grow max-w-7xl mx-auto p-6 md:p-8 mt-16">
+            {% block content %}
+            <div
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div
-                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div
-                        class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 md:p-6 hover:shadow-lg transition-all">
-                        <a href="/opcion1"
-                            class="block w-full bg-primary text-white py-3 rounded-lg shadow hover:bg-primary/90 transition">
-                            Explorar Frecuencia Lógica de una Palabra
-                        </a>
-                        <p class="mt-4 text-gray-600 text-sm">
-                            "Descubre cómo cada palabra resuena en su contexto, a través de su frecuencia numérica."
-                        </p>
-                    </div>
-                    <div
-                        class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 md:p-6 hover:shadow-lg transition-all">
-                        <a href="/opcion2"
-                            class="block w-full bg-secondary text-white py-3 rounded-lg shadow hover:bg-secondary/90 transition">
-                            Ralentizar Potencial en Expresión Concreta
-                        </a>
-                        <p class="mt-4 text-gray-600 text-sm">
-                            "Convierte números abstractos en palabras, conectando con su despliegue lógico en el espacio-tiempo."
-                        </p>
-                    </div>
+                    class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 md:p-6 hover:shadow-lg transition-all">
+                    <a href="/opcion1"
+                        class="block w-full bg-primary text-white py-3 rounded-lg shadow hover:bg-primary/90 transition">
+                        Explorar Frecuencia Lógica de una Palabra
+                    </a>
+                    <p class="mt-4 text-gray-600 text-sm">
+                        "Descubre cómo cada palabra resuena en su contexto, a través de su frecuencia numérica."
+                    </p>
                 </div>
-
-                <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div
-                        class="bg-white shadow-md rounded-lg p-4 md:p-6 hover:shadow-lg transition-all">
-                        <h5 class="text-lg font-semibold text-primary">Potencial
-                            Calculado</h5>
-                        <p class="text-gray-700 mt-2">42</p>
-                    </div>
-                    <div
-                        class="bg-white shadow-md rounded-lg p-4 md:p-6 hover:shadow-lg transition-all">
-                        <h5
-                            class="text-lg font-semibold text-primary">Frecuencia
-                            Encontrada</h5>
-                        <p class="text-gray-700 mt-2">88</p>
-                    </div>
+                <div
+                    class="flex flex-col items-center text-center bg-white shadow-md rounded-lg p-4 md:p-6 hover:shadow-lg transition-all">
+                    <a href="/opcion2"
+                        class="block w-full bg-secondary text-white py-3 rounded-lg shadow hover:bg-secondary/90 transition">
+                        Ralentizar Potencial en Expresión Concreta
+                    </a>
+                    <p class="mt-4 text-gray-600 text-sm">
+                        "Convierte números abstractos en palabras, conectando con su despliegue lógico en el espacio-tiempo."
+                    </p>
                 </div>
+            </div>
 
-                <div class="history-section mt-6">
-                    <h3 class="text-lg font-semibold text-gray-900">Historial de
-                        Búsquedas</h3>
-                    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                        <ul class="divide-y divide-gray-200">
-                            {% for item in historial %}
-                            <li
-                                class="py-4 px-4 hover:bg-gray-50 transition-all">
-                                <p class="text-gray-900">{{ item }}</p>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
+            <div class="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div
+                    class="bg-white shadow-md rounded-lg p-4 md:p-6 hover:shadow-lg transition-all">
+                    <h5 class="text-lg font-semibold text-primary">Potencial
+                        Calculado</h5>
+                    <p class="text-gray-700 mt-2">42</p>
                 </div>
-                {% endblock %}
-            </main>
+                <div
+                    class="bg-white shadow-md rounded-lg p-4 md:p-6 hover:shadow-lg transition-all">
+                    <h5
+                        class="text-lg font-semibold text-primary">Frecuencia
+                        Encontrada</h5>
+                    <p class="text-gray-700 mt-2">88</p>
+                </div>
+            </div>
 
-            <!-- Nota: El modal ha sido eliminado de aquí y será importado cuando sea necesario -->
+            <div class="history-section mt-6">
+                <h3 class="text-lg font-semibold text-gray-900">Historial de
+                    Búsquedas</h3>
+                <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                    <ul class="divide-y divide-gray-200">
+                        {% for item in historial %}
+                        <li
+                            class="py-4 px-4 hover:bg-gray-50 transition-all">
+                            <p class="text-gray-900">{{ item }}</p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endblock %}
+        </main>
 
-            <footer
-            class="w-full bg-gray-900 text-gray-100 dark:bg-gray-700 dark:text-gray-300 border-t-4 border-gray-200 dark:border-gray-700 mt-auto">
+        <footer
+        class="w-full bg-gray-900 text-gray-100 dark:bg-gray-700 dark:text-gray-300 border-t-4 border-gray-200 dark:border-gray-700 mt-auto">
             <div class="max-w-7xl mx-auto px-8 py-4">
                 <div
                     class="grid grid-cols-1 sm:grid-cols-4 gap-6 items-center text-sm">
@@ -234,7 +203,7 @@ function trackFeatureUsage(featureName, details = {}) {
                             </a>
                         </p>
                     </div>
-        
+    
                     <!-- ¿Quieres apoyar el proyecto? -->
                     <div class="flex justify-center sm:justify-center">
                         <a href="https://ko-fi.com/julianosoriom"
@@ -244,7 +213,7 @@ function trackFeatureUsage(featureName, details = {}) {
                             ¿Quieres apoyar el proyecto?
                         </a>
                     </div>
-        
+    
                     <!-- Enviar Feedback -->
                     <div class="flex justify-center sm:justify-center">
                         <button id="open-feedback-button"
@@ -253,7 +222,7 @@ function trackFeatureUsage(featureName, details = {}) {
                             Enviar Feedback
                         </button>
                     </div>
-        
+    
                     <!-- Newsletter -->
                     <div class="flex justify-center sm:justify-end">
                         <a href="https://www.julianosoriom.com/newsletter-lgc"
@@ -267,110 +236,143 @@ function trackFeatureUsage(featureName, details = {}) {
             </div>
         </footer>
 
-            <!-- Renderizar el modal de feedback -->
-            {{ feedback_modal.feedback_modal() }}
+        <!-- Renderizar el modal de feedback -->
+        {{ feedback_modal.feedback_modal() }}
 
-            <!-- Scripts -->
-            <script>
+        <!-- Scripts -->
+        <script>
+            document.addEventListener("scroll", function () {
+                const header = document.getElementById("header");
+                if (window.scrollY > 10) {
+                    header.classList.add("shadow-lg", "bg-white/90");
+                } else {
+                    header.classList.remove("shadow-lg", "bg-white/90");
+                }
+            });
+
+            document.addEventListener("DOMContentLoaded", function () {
+                const bellIcon = document.getElementById("bell-icon");
+
+                bellIcon.addEventListener("touchstart", function () {
+                    bellIcon.classList.remove("animate-bell");
+                    bellIcon.classList.add("animate-bell-fast");
+
+                    // Volver a la animación normal después de 2 segundos
+                    setTimeout(() => {
+                        bellIcon.classList.remove("animate-bell-fast");
+                        bellIcon.classList.add("animate-bell");
+                    }, 2000);
+                });
+            });
+        </script>
+
+        <!-- Script para el modal de feedback -->
+        <script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
         
-        document.addEventListener("scroll", function () {
-        const header = document.getElementById("header");
-        if (window.scrollY > 10) {
-            header.classList.add("shadow-lg", "bg-white/90");
-        } else {
-            header.classList.remove("shadow-lg", "bg-white/90");
-        }
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const bellIcon = document.getElementById("bell-icon");
-
-        bellIcon.addEventListener("touchstart", function () {
-            bellIcon.classList.remove("animate-bell");
-            bellIcon.classList.add("animate-bell-fast");
-
-            // Volver a la animación normal después de 2 segundos
-            setTimeout(() => {
-                bellIcon.classList.remove("animate-bell-fast");
-                bellIcon.classList.add("animate-bell");
-            }, 2000);
-        });
-    });
-    </script>
-
-            <!-- Script para el modal de feedback -->
-            <script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
-            
-            <!-- Script para el consentimiento de cookies -->
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    // Verificar si el usuario ya ha dado su consentimiento
-                    const cookieConsent = localStorage.getItem('cookieConsent');
-                    
-                    if (cookieConsent === null) {
-                        // Mostrar el banner si aún no ha decidido
-                        document.getElementById('cookie-banner').classList.remove('hidden');
-                    } else if (cookieConsent === 'accepted') {
-                        // Si aceptó anteriormente, inicializar Analytics
-                        {% if analytics_id %}
-                        initializeAnalytics();
-                        {% endif %}
-                    }
-                    
-                    // Manejar clic en "Aceptar"
-                    document.getElementById('accept-cookies').addEventListener('click', function() {
+        <!-- Script para el consentimiento de cookies -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log("DOM cargado, configurando banner de cookies");
+                
+                // Verificar si el usuario ya ha dado su consentimiento
+                const cookieConsent = localStorage.getItem('cookieConsent');
+                const cookieBanner = document.getElementById('cookie-banner');
+                
+                if (!cookieBanner) {
+                    console.error("Elemento cookie-banner no encontrado");
+                    return;
+                }
+                
+                console.log("Banner encontrado, estado actual:", cookieBanner.classList.contains('hidden') ? "oculto" : "visible");
+                
+                if (cookieConsent === null) {
+                    // Mostrar el banner si aún no ha decidido
+                    cookieBanner.classList.remove('hidden');
+                    console.log("Banner mostrado");
+                } else if (cookieConsent === 'accepted') {
+                    // Si aceptó anteriormente, inicializar Analytics
+                    {% if analytics_id %}
+                    initializeAnalytics();
+                    {% endif %}
+                }
+                
+                // Manejar clic en "Aceptar"
+                const acceptButton = document.getElementById('accept-cookies');
+                if (acceptButton) {
+                    acceptButton.addEventListener('click', function() {
                         localStorage.setItem('cookieConsent', 'accepted');
-                        document.getElementById('cookie-banner').classList.add('hidden');
+                        cookieBanner.classList.add('hidden');
                         
                         // Inicializar Analytics después de aceptar
                         {% if analytics_id %}
                         initializeAnalytics();
                         {% endif %}
                     });
-                    
-                    // Manejar clic en "Rechazar"
-                    document.getElementById('reject-cookies').addEventListener('click', function() {
+                }
+                
+                // Manejar clic en "Rechazar"
+                const rejectButton = document.getElementById('reject-cookies');
+                if (rejectButton) {
+                    rejectButton.addEventListener('click', function() {
                         localStorage.setItem('cookieConsent', 'rejected');
-                        document.getElementById('cookie-banner').classList.add('hidden');
+                        cookieBanner.classList.add('hidden');
+                    });
+                }
+                
+                // Añadir tracking a los botones de opciones principales
+                {% if analytics_id %}
+                try {
+                    // Tracking de opción 1
+                    const opcion1Links = document.querySelectorAll('a[href="/opcion1"]');
+                    opcion1Links.forEach(link => {
+                        link.addEventListener('click', function() {
+                            trackFeatureUsage('opcion1_busqueda_frecuencia');
+                        });
                     });
                     
-                    // Añadir tracking a los botones de opciones principales
-                    {% if analytics_id %}
-                    try {
-                        // Tracking de opción 1
-                        const opcion1Links = document.querySelectorAll('a[href="/opcion1"]');
-                        opcion1Links.forEach(link => {
-                            link.addEventListener('click', function() {
-                                trackFeatureUsage('opcion1_busqueda_frecuencia');
-                            });
+                    // Tracking de opción 2
+                    const opcion2Links = document.querySelectorAll('a[href="/opcion2"]');
+                    opcion2Links.forEach(link => {
+                        link.addEventListener('click', function() {
+                            trackFeatureUsage('opcion2_analisis_potencial');
                         });
-                        
-                        // Tracking de opción 2
-                        const opcion2Links = document.querySelectorAll('a[href="/opcion2"]');
-                        opcion2Links.forEach(link => {
-                            link.addEventListener('click', function() {
-                                trackFeatureUsage('opcion2_analisis_potencial');
-                            });
+                    });
+                    
+                    // Tracking de envío de feedback
+                    const feedbackBtn = document.getElementById('open-feedback-button');
+                    if (feedbackBtn) {
+                        feedbackBtn.addEventListener('click', function() {
+                            trackFeatureUsage('feedback_button');
                         });
-                        
-                        // Tracking de envío de feedback
-                        const feedbackBtn = document.getElementById('open-feedback-button');
-                        if (feedbackBtn) {
-                            feedbackBtn.addEventListener('click', function() {
-                                trackFeatureUsage('feedback_button');
-                            });
-                        }
-                        
-                        // Si estamos en una página de resultados, registrar
-                        if (window.location.pathname.includes('resultado')) {
-                            trackFeatureUsage('view_results');
-                        }
-                    } catch (e) {
-                        console.error('Error al configurar tracking de eventos:', e);
                     }
-                    {% endif %}
-                });
-            </script>
-        </body>
-
-    </html>
+                    
+                    // Si estamos en una página de resultados, registrar
+                    if (window.location.pathname.includes('resultado')) {
+                        trackFeatureUsage('view_results');
+                    }
+                } catch (e) {
+                    console.error('Error al configurar tracking de eventos:', e);
+                }
+                {% endif %}
+            });
+        </script>
+        
+        <!-- Banner de consentimiento de cookies (movido al final del body) -->
+        <div id="cookie-banner" style="position: fixed !important; z-index: 99999 !important; bottom: 0 !important; left: 0 !important; right: 0 !important; max-width: 100% !important; width: 100% !important;" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg border-t border-gray-200 dark:border-gray-700 p-4 z-[9999] hidden transform transition-transform duration-500 ease-in-out">
+            <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-sm text-gray-700 dark:text-gray-300">
+                    Usamos cookies para analizar nuestro tráfico y mejorar tu experiencia. 
+                    <a href="/privacy-policy" class="text-primary-600 dark:text-primary-400 hover:underline">Política de privacidad</a>
+                </div>
+                <div class="flex space-x-3">
+                    <button id="accept-cookies" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Aceptar
+                    </button>
+                    <button id="reject-cookies" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        Rechazar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

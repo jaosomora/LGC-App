@@ -1251,7 +1251,13 @@ def embed_page():
     historial = session.get("historial", [])
     return render_template("embed.html", historial=historial)
 
-# Al inicio del archivo app.py después de las importaciones
+@app.route("/privacy-policy")
+def privacy_policy():
+    """
+    Muestra la página de política de privacidad.
+    """
+    return render_template("privacy_policy.html")
+
 @app.before_request
 def validate_request():
     """
