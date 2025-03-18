@@ -1,6 +1,16 @@
 import os
 import sys
 import subprocess
+# Importar logging
+import logging
+from dotenv import load_dotenv
+load_dotenv()  # Carga variables del archivo .env
+
+# Configurar el logger principal
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
 # Verificar e instalar dependencias automáticamente
 def instalar_dependencias():
@@ -40,6 +50,12 @@ archivo_ranking = os.path.join(
 
 # Inicializar Flask
 app = Flask(__name__)
+
+# Registrar el blueprint de feedback
+from blueprints.feedback_blueprint import feedback_bp
+app.register_blueprint(feedback_bp)
+logging.info("Blueprint de feedback registrado correctamente")
+
 
 # Configuración de la base de datos SQLite
 if os.getenv("RENDER") and os.getenv("ENV") == "PRODUCTION":

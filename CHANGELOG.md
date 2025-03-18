@@ -1,5 +1,35 @@
 # CHANGELOG
 
+## [1.3.13] - 2025-03-18
+### Añadido
+- **Sistema de Feedback de Usuarios**:
+  - Implementado botón "Enviar Feedback" en el footer.
+  - Creado componente modal para recopilar feedback de usuarios.
+  - Añadido sistema de respaldo para almacenar feedback en la base de datos cuando el email falla.
+  - Integrado formulario de feedback en todas las páginas de la aplicación.
+  - Implementada lógica para transmitir los comentarios al correo info@julianosoriom.com.
+
+### Mejorado
+- **Estructura Modular del Código**:
+  - Creado directorio blueprint para organizar funcionalidades relacionadas.
+  - Implementado feedback_blueprint.py para modularizar la funcionalidad de feedback.
+  - Mejorada la gestión de excepciones con mensajes detallados en logs.
+  - Añadido sistema de logging específico para la funcionalidad de feedback.
+
+### Optimizado
+- **Interfaz de Usuario**:
+  - Reorganizado el footer para mejor equilibrio visual con la nueva funcionalidad.
+  - Optimizados estilos consistentes con el sistema de diseño existente.
+  - Mejorada la experiencia en dispositivos móviles.
+
+### Documentación
+- **README**:
+  - Completamente reescrito para facilitar instalación y uso.
+  - Añadida documentación de características automáticas y configuración.
+  - Mejoradas instrucciones para despliegue local y en Render.
+  - Agregada sección de solución de problemas comunes.
+
+
 ## [1.3.12] - 2025-03-16
 ### Mejorado
 - **Diseño de Páginas de Resultados**:
@@ -8,11 +38,6 @@
   - Implementada tipografía más grande y bold para mayor impacto visual.
   - Agregado soporte para modo claro y oscuro en los títulos.
   - Mejora de la responsividad del título para diferentes tamaños de pantalla.
-
-### Características
-- Los títulos ahora utilizan clases de Tailwind para un diseño moderno y adaptativo.
-- Introducida marca de texto con fondo de color para destacar palabras principales.
-- Títulos centrados con transición suave entre tamaños de pantalla.
 
 
 ## [1.3.11] - 2025-03-16
