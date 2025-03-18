@@ -56,6 +56,10 @@ from blueprints.feedback_blueprint import feedback_bp
 app.register_blueprint(feedback_bp)
 logging.info("Blueprint de feedback registrado correctamente")
 
+# Registrar el blueprint de analytics
+from blueprints.analytics_blueprint import analytics_bp
+app.register_blueprint(analytics_bp)
+logging.info("Blueprint de analytics registrado correctamente")
 
 # Configuración de la base de datos SQLite
 if os.getenv("RENDER") and os.getenv("ENV") == "PRODUCTION":

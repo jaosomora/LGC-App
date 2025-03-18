@@ -12,11 +12,105 @@
 
         <title>{% block title %}Explora el Potencial y la Frecuencia de las
             Palabras{% endblock %}</title>
+
+        <!-- Google Analytics (carga condicional) -->
+        {% if analytics_id %}
+        <script>
+            // Función para inicializar Google Analytics
+            function initializeAnalytics() {
+                // Google Analytics
+                const script1 = document.createElement('script');
+                script1.async = true;
+                script1.src = "https://www.googletagmanager.com/gtag/js?id={{ analytics_id }}";
+                document.head.appendChild(script1);
+                
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '{{ analytics_id }}');
+                
+                // Registrar vista inicial de página
+                trackPageView();
+            }
+            
+            // Función para registrar vistas de página
+            function trackPageView() {
+                try {
+                    // Enviar a Google Analytics
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'page_view', {
+                            page_title: document.title,
+                            page_location: window.location.href,
+                            page_path: window.location.pathname
+                        });
+                    }
+                    
+                    // Registrar en nuestra base de datos
+                    fetch('/api/stats/page-view', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            path: window.location.pathname,
+                            device_type: '{{ device_info.device_type }}',
+                            os: '{{ device_info.os }}',
+                            browser: '{{ device_info.browser }}',
+                            feature: 'page_view'
+                        })
+                    }).catch(error => console.error('Error registrando estadísticas:', error));
+                } catch (error) {
+                    console.error('Error en trackPageView:', error);
+                }
+            }
+            
+            // Función para registrar uso de características específicas
+            function trackFeatureUsage(featureName) {
+                try {
+                    // Enviar a Google Analytics
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'feature_used', { 'feature_name': featureName });
+                    }
+                    
+                    // Registrar en nuestra base de datos
+                    fetch('/api/stats/page-view', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            path: window.location.pathname,
+                            device_type: '{{ device_info.device_type }}',
+                            os: '{{ device_info.os }}',
+                            browser: '{{ device_info.browser }}',
+                            feature: featureName
+                        })
+                    }).catch(error => console.error('Error registrando uso de característica:', error));
+                } catch (error) {
+                    console.error('Error en trackFeatureUsage:', error);
+                }
+            }
+        </script>
+        {% endif %}
     </head>
 
     <body class="min-h-screen flex flex-col">
 
         <body class="min-h-screen flex flex-col">
+            
+            <!-- Banner de consentimiento de cookies -->
+            <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg border-t border-gray-200 dark:border-gray-700 p-4 z-50 hidden transform transition-transform duration-500 ease-in-out">
+                <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="text-sm text-gray-700 dark:text-gray-300">
+                        Usamos cookies para analizar nuestro tráfico y mejorar tu experiencia. 
+                        <a href="/privacy-policy" class="text-primary-600 dark:text-primary-400 hover:underline">Política de privacidad</a>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button id="accept-cookies" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Aceptar
+                        </button>
+                        <button id="reject-cookies" class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                            Rechazar
+                        </button>
+                    </div>
+                </div>
+            </div>
 
             <!-- Header fijo con transición -->
             <div id="header"
@@ -209,6 +303,77 @@
 
             <!-- Script para el modal de feedback -->
             <script src="{{ url_for('static', filename='js/feedback.js') }}"></script>
+            
+            <!-- Script para el consentimiento de cookies -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Verificar si el usuario ya ha dado su consentimiento
+                    const cookieConsent = localStorage.getItem('cookieConsent');
+                    
+                    if (cookieConsent === null) {
+                        // Mostrar el banner si aún no ha decidido
+                        document.getElementById('cookie-banner').classList.remove('hidden');
+                    } else if (cookieConsent === 'accepted') {
+                        // Si aceptó anteriormente, inicializar Analytics
+                        {% if analytics_id %}
+                        initializeAnalytics();
+                        {% endif %}
+                    }
+                    
+                    // Manejar clic en "Aceptar"
+                    document.getElementById('accept-cookies').addEventListener('click', function() {
+                        localStorage.setItem('cookieConsent', 'accepted');
+                        document.getElementById('cookie-banner').classList.add('hidden');
+                        
+                        // Inicializar Analytics después de aceptar
+                        {% if analytics_id %}
+                        initializeAnalytics();
+                        {% endif %}
+                    });
+                    
+                    // Manejar clic en "Rechazar"
+                    document.getElementById('reject-cookies').addEventListener('click', function() {
+                        localStorage.setItem('cookieConsent', 'rejected');
+                        document.getElementById('cookie-banner').classList.add('hidden');
+                    });
+                    
+                    // Añadir tracking a los botones de opciones principales
+                    {% if analytics_id %}
+                    try {
+                        // Tracking de opción 1
+                        const opcion1Links = document.querySelectorAll('a[href="/opcion1"]');
+                        opcion1Links.forEach(link => {
+                            link.addEventListener('click', function() {
+                                trackFeatureUsage('opcion1_busqueda_frecuencia');
+                            });
+                        });
+                        
+                        // Tracking de opción 2
+                        const opcion2Links = document.querySelectorAll('a[href="/opcion2"]');
+                        opcion2Links.forEach(link => {
+                            link.addEventListener('click', function() {
+                                trackFeatureUsage('opcion2_analisis_potencial');
+                            });
+                        });
+                        
+                        // Tracking de envío de feedback
+                        const feedbackBtn = document.getElementById('open-feedback-button');
+                        if (feedbackBtn) {
+                            feedbackBtn.addEventListener('click', function() {
+                                trackFeatureUsage('feedback_button');
+                            });
+                        }
+                        
+                        // Si estamos en una página de resultados, registrar
+                        if (window.location.pathname.includes('resultado')) {
+                            trackFeatureUsage('view_results');
+                        }
+                    } catch (e) {
+                        console.error('Error al configurar tracking de eventos:', e);
+                    }
+                    {% endif %}
+                });
+            </script>
         </body>
 
     </html>

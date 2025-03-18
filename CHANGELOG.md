@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## [1.3.14] - 2025-03-18
+### Añadido
+- **Sistema de Analítica y Seguimiento**:
+  - Implementado Google Analytics con consentimiento de cookies.
+  - Añadido banner de cookies para cumplimiento de normativas.
+  - Creado sistema de seguimiento local para análisis detallado.
+  - Desarrollado panel administrativo de estadísticas.
+  - Añadido seguimiento de dispositivos, sistemas operativos y navegadores.
+  - Implementada funcionalidad para medir uso de características específicas.
+
+### Mejorado
+- **Estructura Modular**:
+  - Creado blueprint `analytics_blueprint.py` para centralizar la funcionalidad de analítica.
+  - Implementado sistema de logging específico para estadísticas.
+  - Optimizada la recopilación de datos para minimizar el impacto en rendimiento.
+
+### Optimizado
+- **Rendimiento y Privacidad**:
+  - Los scripts de análisis solo se cargan con consentimiento explícito.
+  - Implementada carga asíncrona de Google Analytics.
+  - Datos de uso almacenados de forma anónima para proteger la privacidad.
+  
+
 ## [1.3.13] - 2025-03-18
 ### Añadido
 - **Sistema de Feedback de Usuarios**:
