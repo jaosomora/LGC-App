@@ -6,6 +6,7 @@ import os
 import logging
 import sqlite3
 import json
+import uuid
 import functools
 from datetime import datetime
 from flask import Blueprint, request, render_template, session, jsonify, g, current_app, Response
