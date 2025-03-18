@@ -63,29 +63,26 @@
             }
             
             // Función para registrar uso de características específicas
-            function trackFeatureUsage(featureName) {
-                try {
-                    // Enviar a Google Analytics
-                    if (typeof gtag === 'function') {
-                        gtag('event', 'feature_used', { 'feature_name': featureName });
-                    }
-                    
-                    // Registrar en nuestra base de datos
-                    fetch('/api/stats/page-view', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            path: window.location.pathname,
-                            device_type: '{{ device_info.device_type }}',
-                            os: '{{ device_info.os }}',
-                            browser: '{{ device_info.browser }}',
-                            feature: featureName
-                        })
-                    }).catch(error => console.error('Error registrando uso de característica:', error));
-                } catch (error) {
-                    console.error('Error en trackFeatureUsage:', error);
-                }
-            }
+function trackFeatureUsage(featureName, details = {}) {
+    try {
+        // Enviar a Google Analytics
+        if (typeof gtag === 'function') {
+            gtag('event', featureName, details);
+        }
+        
+        // Registrar en nuestra base de datos
+        fetch('/api/stats/app-event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                feature: featureName,
+                details: details
+            })
+        }).catch(error => console.error('Error registrando uso de característica:', error));
+    } catch (error) {
+        console.error('Error en trackFeatureUsage:', error);
+    }
+}
         </script>
         {% endif %}
     </head>

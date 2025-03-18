@@ -5,9 +5,10 @@ Proporciona rutas y funciones para recopilar datos de uso de la aplicación.
 import os
 import logging
 import sqlite3
-import uuid
+import json
+import functools
 from datetime import datetime
-from flask import Blueprint, request, render_template, session, jsonify, g, current_app
+from flask import Blueprint, request, render_template, session, jsonify, g, current_app, Response
 
 # Configurar logger específico para analytics
 analytics_logger = logging.getLogger('analytics')
@@ -20,6 +21,26 @@ analytics_logger.addHandler(handler)
 
 # Crear el blueprint
 analytics_bp = Blueprint('analytics', __name__)
+
+# Decorador para requerir autenticación de administrador
+def admin_required(f):
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth = request.authorization
+        admin_user = os.getenv("ADMIN_USER", "admin")
+        admin_password = os.getenv("ADMIN_PASSWORD")
+        
+        # Si estamos en desarrollo, permitir acceso sin autenticación
+        if os.getenv("ENV") in ["DEVELOPMENT", "LOCAL"] and not admin_password:
+            return f(*args, **kwargs)
+        
+        if not auth or auth.username != admin_user or auth.password != admin_password:
+            return Response(
+                'Acceso no autorizado', 401,
+                {'WWW-Authenticate': 'Basic realm="Login Required"'}
+            )
+        return f(*args, **kwargs)
+    return decorated_function
 
 def get_device_info(user_agent_string):
     """
@@ -156,18 +177,71 @@ def register_page_view():
         analytics_logger.error(f"Error al registrar estadísticas: {str(e)}", exc_info=True)
         return jsonify({"success": False, "message": str(e)}), 500
 
+@analytics_bp.route("/api/stats/app-event", methods=["POST"])
+def register_app_event():
+    """
+    Endpoint para registrar eventos específicos de la aplicación.
+    Captura métricas que son difíciles de configurar en Google Analytics.
+    """
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"success": False, "message": "No data provided"}), 400
+        
+        # Extraer información relevante
+        feature = data.get('feature', '')
+        details = data.get('details', {})
+        
+        # Obtener la ruta de la base de datos desde app
+        db_path = current_app.config.get('SQLALCHEMY_DATABASE_URI', '').replace('sqlite:///', '')
+        if not db_path:
+            from app import db_path  # Fallback
+        
+        analytics_logger.info(f"Registrando evento específico: {feature} con detalles: {details}")
+        
+        # Guardar en la base de datos
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
+        
+        # Crear tabla si no existe
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS app_specific_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                feature TEXT,
+                details TEXT,
+                session_id TEXT
+            )
+        ''')
+        
+        # Generar o reutilizar ID de sesión
+        session_id = session.get('analytics_session_id')
+        if not session_id:
+            session_id = str(uuid.uuid4())
+            session['analytics_session_id'] = session_id
+        
+        # Insertar datos
+        cursor.execute(
+            "INSERT INTO app_specific_events (feature, details, session_id) VALUES (?, ?, ?)",
+            (feature, json.dumps(details), session_id)
+        )
+        
+        connection.commit()
+        connection.close()
+        
+        return jsonify({"success": True}), 200
+        
+    except Exception as e:
+        analytics_logger.error(f"Error al registrar evento específico: {str(e)}", exc_info=True)
+        return jsonify({"success": False, "message": str(e)}), 500
+
 @analytics_bp.route("/admin/stats", methods=["GET"])
+@admin_required
 def view_stats():
     """
     Panel simple para visualizar estadísticas de uso.
-    Solo accesible en modo desarrollo o con password.
+    Protegido por autenticación básica.
     """
-    # Seguridad básica - solo disponible en desarrollo o con contraseña
-    if os.getenv("ENV") not in ["DEVELOPMENT", "LOCAL"]:
-        password = request.args.get('password')
-        if password != os.getenv("ADMIN_PASSWORD", "admin-password"):
-            return "Acceso no autorizado", 403
-    
     try:
         # Obtener la ruta de la base de datos desde app
         db_path = current_app.config.get('SQLALCHEMY_DATABASE_URI', '').replace('sqlite:///', '')
@@ -188,7 +262,7 @@ def view_stats():
                 'browser_breakdown': [],
                 'feature_usage': [],
                 'daily_stats': []
-            })
+            }, app_events=[])
         
         # Estadísticas generales
         cursor.execute("SELECT COUNT(*) FROM analytics")
@@ -217,6 +291,28 @@ def view_stats():
         cursor.execute("SELECT DATE(timestamp) as day, COUNT(*) as views, COUNT(DISTINCT session_id) as sessions FROM analytics GROUP BY day ORDER BY day DESC LIMIT 30")
         daily_stats = cursor.fetchall()
         
+        # Cargar eventos específicos de la aplicación (últimos 50)
+        cursor.execute("""
+            SELECT feature, details, timestamp 
+            FROM app_specific_events 
+            ORDER BY timestamp DESC 
+            LIMIT 50
+        """)
+        
+        app_events = []
+        for row in cursor.fetchall():
+            try:
+                details_json = json.loads(row[1]) if row[1] else {}
+                details_str = ", ".join([f"{k}: {v}" for k, v in details_json.items()]) if isinstance(details_json, dict) else str(details_json)
+            except:
+                details_str = str(row[1])
+                
+            app_events.append({
+                'feature': row[0],
+                'details': details_str,
+                'timestamp': row[2]
+            })
+        
         connection.close()
         
         # Preparar datos para la plantilla
@@ -233,7 +329,7 @@ def view_stats():
         analytics_logger.info(f"Mostrando estadísticas: {total_views} vistas, {unique_sessions} sesiones")
         
         # Renderizar stats.html
-        return render_template("admin/stats.html", stats=stats)
+        return render_template("admin/stats.html", stats=stats, app_events=app_events)
         
     except Exception as e:
         analytics_logger.error(f"Error al mostrar estadísticas: {str(e)}", exc_info=True)
