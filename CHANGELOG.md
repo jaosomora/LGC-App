@@ -1,5 +1,27 @@
 # CHANGELOG
 
+## [1.3.15] - 2025-03-19
+### Mejorado
+- **Sistema de Analítica y Seguridad**:
+  - Implementada autenticación básica HTTP para proteger el panel de estadísticas.
+  - Creado nuevo endpoint específico para eventos personalizados de la aplicación.
+  - Separada la captura de eventos específicos del flujo general de analytics.
+  - Mejorada la visualización de eventos específicos de la aplicación en el panel administrativo.
+
+### Optimizado
+- **Panel de Estadísticas**:
+  - Rediseñado el panel de estadísticas para mostrar primero los eventos específicos.
+  - Añadido botón de actualización manual para refrescar datos sin recargar toda la página.
+  - Integrado enlace directo a Google Analytics para análisis más detallados.
+  - Mejorada la visualización de datos para facilitar la interpretación.
+
+### Seguridad
+- **Gestión de Credenciales**:
+  - Migradas credenciales de acceso administrativo a variables de entorno.
+  - Eliminadas contraseñas hardcodeadas para mayor seguridad.
+  - Implementada verificación de entorno para facilitar el desarrollo local.
+
+
 ## [1.3.14] - 2025-03-18
 ### Añadido
 - **Sistema de Analítica y Seguimiento**:
