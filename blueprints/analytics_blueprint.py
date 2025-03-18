@@ -252,9 +252,36 @@ def view_stats():
         connection = sqlite3.connect(db_path)
         cursor = connection.cursor()
         
-        # Verificar si la tabla existe
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='analytics'")
-        if not cursor.fetchone():
+        # Asegurarse de que las tablas necesarias existen
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS analytics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                path TEXT,
+                device_type TEXT,
+                os TEXT,
+                browser TEXT,
+                feature TEXT,
+                session_id TEXT
+            )
+        ''')
+        
+        # Crear la tabla de eventos específicos si no existe
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS app_specific_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                feature TEXT,
+                details TEXT,
+                session_id TEXT
+            )
+        ''')
+        
+        connection.commit()
+        
+        # Verificar si hay datos en la tabla de analytics
+        cursor.execute("SELECT COUNT(*) FROM analytics")
+        if cursor.fetchone()[0] == 0:
             return render_template("admin/stats.html", stats={
                 'total_views': 0,
                 'unique_sessions': 0,
@@ -292,27 +319,36 @@ def view_stats():
         cursor.execute("SELECT DATE(timestamp) as day, COUNT(*) as views, COUNT(DISTINCT session_id) as sessions FROM analytics GROUP BY day ORDER BY day DESC LIMIT 30")
         daily_stats = cursor.fetchall()
         
-        # Cargar eventos específicos de la aplicación (últimos 50)
-        cursor.execute("""
-            SELECT feature, details, timestamp 
-            FROM app_specific_events 
-            ORDER BY timestamp DESC 
-            LIMIT 50
-        """)
-        
+        # Inicializar app_events como una lista vacía por defecto
         app_events = []
-        for row in cursor.fetchall():
+        
+        # Verificar si la tabla app_specific_events existe y tiene datos
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='app_specific_events'")
+        if cursor.fetchone():
             try:
-                details_json = json.loads(row[1]) if row[1] else {}
-                details_str = ", ".join([f"{k}: {v}" for k, v in details_json.items()]) if isinstance(details_json, dict) else str(details_json)
-            except:
-                details_str = str(row[1])
+                # Cargar eventos específicos de la aplicación (últimos 50)
+                cursor.execute("""
+                    SELECT feature, details, timestamp 
+                    FROM app_specific_events 
+                    ORDER BY timestamp DESC 
+                    LIMIT 50
+                """)
                 
-            app_events.append({
-                'feature': row[0],
-                'details': details_str,
-                'timestamp': row[2]
-            })
+                for row in cursor.fetchall():
+                    try:
+                        details_json = json.loads(row[1]) if row[1] else {}
+                        details_str = ", ".join([f"{k}: {v}" for k, v in details_json.items()]) if isinstance(details_json, dict) else str(details_json)
+                    except:
+                        details_str = str(row[1])
+                        
+                    app_events.append({
+                        'feature': row[0],
+                        'details': details_str,
+                        'timestamp': row[2]
+                    })
+            except Exception as e:
+                analytics_logger.error(f"Error al cargar eventos específicos: {str(e)}")
+                # Continuar con app_events vacío en caso de error
         
         connection.close()
         
