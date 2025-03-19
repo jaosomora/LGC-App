@@ -610,7 +610,6 @@ def cargar_palabras():
     return [p.palabra for p in palabras]
 
 
-# Rutas para la aplicación Flask
 @app.route("/")
 def menu_principal():
     """
@@ -636,6 +635,8 @@ def menu_principal():
 
     # Normalizar las palabras en el historial para evitar duplicados
     historial_normalizado = []
+    palabras_vistas = set()  # Conjunto para rastrear entradas únicas normalizadas
+
     for entry in historial:
         try:
             # Detectar si es formato nuevo o antiguo
@@ -646,18 +647,22 @@ def menu_principal():
                 
                 # Extraer palabra para buscar en ranking
                 if "Palabra:" in texto:
-                    palabra_extraida = texto.split("Palabra:")[1].split("->")[0].strip().lower()
+                    palabra_raw = texto.split("Palabra:")[1].split("->")[0].strip()
+                    palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                 elif "Frecuencia:" in texto:
-                    palabra_extraida = texto.split("Frecuencia:")[1].split("->")[0].strip().lower()
+                    palabra_raw = texto.split("Frecuencia:")[1].split("->")[0].strip()
+                    palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                 
-                # Mantener el formato nuevo
-                historial_normalizado.append({
-                    "tipo": entry["tipo"],
-                    "texto": texto,
-                    "parametros": entry["parametros"],
-                    "palabra": palabra_extraida,
-                    "puntuacion": ranking_dict.get(palabra_extraida, None),
-                })
+                # Añadir solo si no se ha visto antes
+                if palabra_extraida not in palabras_vistas:
+                    palabras_vistas.add(palabra_extraida)
+                    historial_normalizado.append({
+                        "tipo": entry["tipo"],
+                        "texto": texto,
+                        "parametros": entry["parametros"],
+                        "palabra": palabra_extraida,
+                        "puntuacion": ranking_dict.get(palabra_extraida, None),
+                    })
             else:
                 # Formato antiguo (string)
                 palabra_extraida = None
@@ -667,11 +672,13 @@ def menu_principal():
                 # Extraer palabra o frecuencia del historial
                 if isinstance(entry, str):
                     if "Palabra:" in entry:
-                        palabra_extraida = entry.split("Palabra:")[1].split("->")[0].strip().lower()
+                        palabra_raw = entry.split("Palabra:")[1].split("->")[0].strip()
+                        palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                         tipo = "opcion2"
                         parametros = {"frase": palabra_extraida}
                     elif "Frecuencia:" in entry:
-                        palabra_extraida = entry.split("Frecuencia:")[1].split("->")[0].strip().lower()
+                        palabra_raw = entry.split("Frecuencia:")[1].split("->")[0].strip()
+                        palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                         tipo = "opcion1"
                         parametros = {"frecuencia": palabra_extraida}
                     elif "Comparación:" in entry:
@@ -683,24 +690,28 @@ def menu_principal():
                             tipo = "opcion3"
                             parametros = {"palabra1": palabra1, "palabra2": palabra2}
                     
-                    # Agregar al historial normalizado con su puntuación correspondiente
-                    historial_normalizado.append({
-                        "tipo": tipo,
-                        "texto": entry,
-                        "parametros": parametros,
-                        "item": entry,  # Mantener compatibilidad con versión anterior
-                        "palabra": palabra_extraida,
-                        "puntuacion": ranking_dict.get(palabra_extraida, None),
-                    })
+                    # Añadir solo si no se ha visto antes
+                    if palabra_extraida not in palabras_vistas:
+                        palabras_vistas.add(palabra_extraida)
+                        historial_normalizado.append({
+                            "tipo": tipo,
+                            "texto": entry,
+                            "parametros": parametros,
+                            "item": entry,  # Mantener compatibilidad con versión anterior
+                            "palabra": palabra_extraida,
+                            "puntuacion": ranking_dict.get(palabra_extraida, None),
+                        })
                 elif isinstance(entry, dict) and "item" in entry:
                     # Formato intermedio (dict con item)
                     item = entry["item"]
                     if "Palabra:" in item:
-                        palabra_extraida = item.split("Palabra:")[1].split("->")[0].strip().lower()
+                        palabra_raw = item.split("Palabra:")[1].split("->")[0].strip()
+                        palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                         tipo = "opcion2"
                         parametros = {"frase": palabra_extraida}
                     elif "Frecuencia:" in item:
-                        palabra_extraida = item.split("Frecuencia:")[1].split("->")[0].strip().lower()
+                        palabra_raw = item.split("Frecuencia:")[1].split("->")[0].strip()
+                        palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                         tipo = "opcion1"
                         parametros = {"frecuencia": palabra_extraida}
                     elif "Comparación:" in item:
@@ -712,14 +723,16 @@ def menu_principal():
                             tipo = "opcion3"
                             parametros = {"palabra1": palabra1, "palabra2": palabra2}
                     
-                    # Copiar todas las propiedades existentes y añadir nuevas
-                    entry_copy = entry.copy()
-                    entry_copy["tipo"] = tipo
-                    entry_copy["texto"] = item
-                    entry_copy["parametros"] = parametros
-                    entry_copy["palabra"] = palabra_extraida
-                    entry_copy["puntuacion"] = ranking_dict.get(palabra_extraida, None)
-                    historial_normalizado.append(entry_copy)
+                    # Añadir solo si no se ha visto antes
+                    if palabra_extraida not in palabras_vistas:
+                        palabras_vistas.add(palabra_extraida)
+                        entry_copy = entry.copy()
+                        entry_copy["tipo"] = tipo
+                        entry_copy["texto"] = item
+                        entry_copy["parametros"] = parametros
+                        entry_copy["palabra"] = palabra_extraida
+                        entry_copy["puntuacion"] = ranking_dict.get(palabra_extraida, None)
+                        historial_normalizado.append(entry_copy)
                 else:
                     # Formato no reconocido, añadir como está
                     historial_normalizado.append(entry)

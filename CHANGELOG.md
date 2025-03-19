@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## [1.3.18] - 2025-03-21
+### Corregido
+- **Historial de Búsquedas**:
+  - Resuelto problema de duplicación de entradas en el historial
+  - Implementada normalización unificada para prevenir duplicados con variaciones de acentos
+  - Mejorado el seguimiento de búsquedas únicas en todas las opciones
+
+### Optimizado
+- **Sistema de Historial**:
+  - Refinado el proceso de extracción y comparación de palabras
+  - Agregado conjunto de seguimiento para eliminar entradas repetidas
+  - Mantenida la estructura original de los datos de historial
+
 ## [1.3.17] - 2025-03-20
 ### Corregido
 - **Normalización de Palabras**:
