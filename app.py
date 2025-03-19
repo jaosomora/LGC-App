@@ -861,12 +861,11 @@ def resultado_opcion2():
     palabras_encontradas = list(
         set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas)
     )
+    # Normalizar la palabra buscada una vez para comparaciones
+    palabra_norm = normalizar_palabra_con_espacios(palabra).lower()
     palabras_encontradas = [
-        p for p in palabras_encontradas if p.lower() != palabra.lower()
-    ]  # Excluir la palabra buscada
-    palabras_encontradas = [
-        p for p in palabras_encontradas if p != palabra
-    ]  # Eliminar duplicados normalizando
+        p for p in palabras_encontradas if normalizar_palabra_con_espacios(p).lower() != palabra_norm
+    ]  # Excluir la palabra buscada usando normalización
     palabras_encontradas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     if palabras_encontradas:
@@ -886,11 +885,8 @@ def resultado_opcion2():
         set(normalizar_palabra_con_espacios(p) for p in palabras_invertidas)
     )
     palabras_invertidas = [
-        p for p in palabras_invertidas if p.lower() != palabra.lower()
-    ]  # Excluir la palabra buscada
-    palabras_invertidas = [
-        p for p in palabras_invertidas if p != palabra
-    ]  # Eliminar duplicados normalizando
+        p for p in palabras_invertidas if normalizar_palabra_con_espacios(p).lower() != palabra_norm
+    ]  # Excluir la palabra buscada usando normalización
     palabras_invertidas.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
     if palabras_invertidas:
@@ -993,11 +989,15 @@ def resultado_opcion1():
         set(normalizar_palabra_con_espacios(p) for p in palabras_encontradas)
     )
 
+    # Normalizar la frecuencia para comparación
+    frecuencia_norm = normalizar_palabra_con_espacios(str(frecuencia)).lower()
+
     # Filtrar palabras no válidas
     palabras_encontradas = [
         p
         for p in palabras_encontradas
         if calcular_potencial(p) == frecuencia and all(letra.isalpha() for letra in p)
+        and normalizar_palabra_con_espacios(p).lower() != frecuencia_norm
     ]
 
     if not palabras_encontradas:
@@ -1044,6 +1044,30 @@ def resultado_opcion1():
     total = frecuencia  # Total es igual a la frecuencia ingresada
     total_invertido = int(str(frecuencia)[::-1])  # Invertir el total
     
+    # Buscar palabras que coincidan con el total invertido
+    palabras_invertidas = buscar_palabras_por_potencial(palabras, total_invertido)
+    palabras_invertidas = list(
+        set(normalizar_palabra_con_espacios(p) for p in palabras_invertidas)
+    )
+    
+    # Filtrar palabras invertidas correctamente usando normalización
+    palabras_invertidas = [
+        p for p in palabras_invertidas
+        if normalizar_palabra_con_espacios(p).lower() != frecuencia_norm
+        and calcular_potencial(p) == total_invertido and all(letra.isalpha() for letra in p)
+    ]
+    
+    palabras_invertidas.sort(key=lambda p: calcular_potencial(p), reverse=True)
+
+    if palabras_invertidas:
+        for palabra_invertida in palabras_invertidas:
+            palabra_normalizada = normalizar_palabra_con_espacios(
+                palabra_invertida
+            ).lower()
+            actualizar_ranking(palabra_normalizada)
+
+    print(f"[DEBUG] Palabras con total invertido: {palabras_invertidas}")
+    
     # Renderizado de resultados
     return render_template(
         "resultado.html",
@@ -1057,7 +1081,8 @@ def resultado_opcion1():
         opcion=1,  # Identificar opción 1 en el template
         numero_resaltado=numero_resaltado,  # Enviar lista de dígitos
         total=frecuencia,  # Enviar el total como la frecuencia ingresada
-        total_invertido=int(str(frecuencia)[::-1])  # Calcular y enviar el total invertido
+        total_invertido=total_invertido,  # Calcular y enviar el total invertido
+        palabras_invertidas=palabras_invertidas  # Agregar palabras invertidas al template
     )
 
 @app.route("/resultado_opcion3", methods=["GET", "POST"])
@@ -1168,16 +1193,28 @@ def resultado_opcion3():
         # Cargar palabras y buscar coincidencias para ambos resultados
         palabras = cargar_palabras()
         
+        # Normalizar las palabras para comparación
+        palabra1_norm = normalizar_palabra_con_espacios(palabra1).lower()
+        palabra2_norm = normalizar_palabra_con_espacios(palabra2).lower()
+        
         # Palabras relacionadas con la suma
         palabras_suma = buscar_palabras_por_potencial(palabras, suma_total)
         palabras_suma = list(set(normalizar_palabra_con_espacios(p) for p in palabras_suma))
-        palabras_suma = [p for p in palabras_suma if p.lower() not in [palabra1.lower(), palabra2.lower()]]
+        palabras_suma = [
+            p for p in palabras_suma 
+            if normalizar_palabra_con_espacios(p).lower() != palabra1_norm and
+               normalizar_palabra_con_espacios(p).lower() != palabra2_norm
+        ]
         palabras_suma.sort(key=lambda p: calcular_potencial(p), reverse=True)
         
         # Palabras relacionadas con la resta
         palabras_resta = buscar_palabras_por_potencial(palabras, resta_total)
         palabras_resta = list(set(normalizar_palabra_con_espacios(p) for p in palabras_resta))
-        palabras_resta = [p for p in palabras_resta if p.lower() not in [palabra1.lower(), palabra2.lower()]]
+        palabras_resta = [
+            p for p in palabras_resta 
+            if normalizar_palabra_con_espacios(p).lower() != palabra1_norm and
+               normalizar_palabra_con_espacios(p).lower() != palabra2_norm
+        ]
         palabras_resta.sort(key=lambda p: calcular_potencial(p), reverse=True)
 
         # Actualizar ranking para palabras encontradas

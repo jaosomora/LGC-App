@@ -1,5 +1,32 @@
 # CHANGELOG
 
+## [1.3.17] - 2025-03-20
+### Corregido
+- **Normalización de Palabras**:
+  - Solucionado bug donde las palabras con/sin acentos (ej. "acción"/"accion") aparecían duplicadas en los resultados.
+  - Mejorada la comparación de palabras utilizando normalización consistente en todas las funciones.
+  - Actualizado el algoritmo de filtrado para reconocer variantes de palabras con tilde como equivalentes.
+
+### Optimizado
+- **Sistema de Búsqueda**:
+  - Refinado el proceso de normalización de palabras para comparaciones más precisas.
+  - Implementada normalización uniforme en las tres rutas de búsqueda (opciones 1, 2 y 3).
+  - Mejorado el filtrado de resultados para eliminar falsos positivos debido a la normalización.
+
+
+## [1.3.16] - 2025-03-20
+### Corregido
+- **Funcionalidad de Palabras Invertidas**:
+  - Solucionado bug donde no se mostraban las "Palabras desde el Futuro" cuando se buscaba directamente un número.
+  - Añadida búsqueda de palabras con valor invertido en la función `resultado_opcion1`.
+  - Implementado paso de valores invertidos al template para visualización correcta.
+
+### Mejorado
+- **Renderizado de Resultados**:
+  - Actualizada la plantilla para mostrar consistentemente las palabras relacionadas, tanto con valor directo como invertido.
+  - Optimizado el renderizado para mantener consistencia en ambas rutas de búsqueda.
+
+
 ## [1.3.15] - 2025-03-19
 ### Mejorado
 - **Sistema de Analítica y Seguridad**:
