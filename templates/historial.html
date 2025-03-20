@@ -36,9 +36,13 @@
                            class="hover:text-primary-600 transition-colors duration-200 hover:underline">
                             {{ entry.item }}
                         </a>
-                    {% elif 'Frecuencia:' in entry.item %}
-                        <!-- Para entradas de frecuencia (opción 1) con formato antiguo -->
-                        {% set frecuencia = entry.item.split('Frecuencia:')[1].split('->')[0].strip() %}
+                        {% elif 'Frecuencia:' in entry.item or 'Número:' in entry.item %}
+                        <!-- Para entradas de número (opción 1) con formato antiguo -->
+                        {% if 'Frecuencia:' in entry.item %}
+                            {% set frecuencia = entry.item.split('Frecuencia:')[1].split('->')[0].strip() %}
+                        {% else %}
+                            {% set frecuencia = entry.item.split('Número:')[1].split('->')[0].strip() %}
+                        {% endif %}
                         <a href="{{ url_for('resultado_opcion1', frecuencia=frecuencia) }}"
                            class="hover:text-primary-600 transition-colors duration-200 hover:underline">
                             {{ entry.item }}
