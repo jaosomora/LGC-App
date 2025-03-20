@@ -649,9 +649,14 @@ def menu_principal():
                 if "Palabra:" in texto:
                     palabra_raw = texto.split("Palabra:")[1].split("->")[0].strip()
                     palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
-                elif "Frecuencia:" in texto:
-                    palabra_raw = texto.split("Frecuencia:")[1].split("->")[0].strip()
+                elif "Frecuencia:" in texto or "Número:" in texto:
+                    if "Frecuencia:" in texto:
+                        palabra_raw = texto.split("Frecuencia:")[1].split("->")[0].strip()
+                    else:
+                        palabra_raw = texto.split("Número:")[1].split("->")[0].strip()
                     palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
+                    tipo = "opcion1"
+                    parametros = {"frecuencia": palabra_extraida}
                 
                 # Añadir solo si no se ha visto antes
                 if palabra_extraida not in palabras_vistas:
@@ -676,8 +681,11 @@ def menu_principal():
                         palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                         tipo = "opcion2"
                         parametros = {"frase": palabra_extraida}
-                    elif "Frecuencia:" in entry:
-                        palabra_raw = entry.split("Frecuencia:")[1].split("->")[0].strip()
+                    elif "Frecuencia:" in entry or "Número:" in entry:
+                        if "Frecuencia:" in entry:
+                            palabra_raw = entry.split("Frecuencia:")[1].split("->")[0].strip()
+                        else:
+                            palabra_raw = entry.split("Número:")[1].split("->")[0].strip()
                         palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                         tipo = "opcion1"
                         parametros = {"frecuencia": palabra_extraida}
@@ -709,8 +717,11 @@ def menu_principal():
                         palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                         tipo = "opcion2"
                         parametros = {"frase": palabra_extraida}
-                    elif "Frecuencia:" in item:
-                        palabra_raw = item.split("Frecuencia:")[1].split("->")[0].strip()
+                    elif "Frecuencia:" in item or "Número:" in item:
+                        if "Frecuencia:" in item:
+                            palabra_raw = item.split("Frecuencia:")[1].split("->")[0].strip()
+                        else:
+                            palabra_raw = item.split("Número:")[1].split("->")[0].strip()
                         palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                         tipo = "opcion1"
                         parametros = {"frecuencia": palabra_extraida}
@@ -1035,7 +1046,7 @@ def resultado_opcion1():
     if "historial" not in session:
         session["historial"] = []
 
-    texto_entrada = f"Frecuencia: {frecuencia} -> Potencial: {frecuencia}, Lupa: {lupa}"
+    texto_entrada = f"Número: {frecuencia} -> Potencial: {frecuencia}, Lupa: {lupa}"
     nueva_entrada = {
         "tipo": "opcion1",
         "texto": texto_entrada,
