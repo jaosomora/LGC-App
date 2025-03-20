@@ -1,5 +1,20 @@
 # CHANGELOG
 
+
+## [1.3.19] - 2025-03-21
+### Cambiado
+- **Interfaz de Usuario**:
+  - Cambiada la nomenclatura de "Frecuencia" a "Número" en toda la aplicación
+  - Actualizado el procesamiento del historial para manejar ambos términos
+  - Mejorada la consistencia visual de la interfaz con la nueva terminología
+
+### Corregido
+- **Historial de Búsquedas**:
+  - Solucionado problema donde entradas con "Número:" no aparecían correctamente en el historial
+  - Implementada compatibilidad con entradas antiguas que usaban "Frecuencia:"
+  - Optimizado el sistema de enlaces en el historial para mantener funcionalidad con ambos formatos
+
+
 ## [1.3.18] - 2025-03-21
 ### Corregido
 - **Historial de Búsquedas**:
