@@ -82,7 +82,7 @@
                 <thead class="bg-gray-50 dark:bg-gray-700">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Palabra o Frecuencia
+                            Palabra o Número
                         </th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Cuántas veces se ha buscado
@@ -110,6 +110,13 @@
                                 <!-- Para entradas de frecuencia (opción 1) con formato antiguo -->
                                 {% set frecuencia = entry.item.split('Frecuencia:')[1].split('->')[0].strip() %}
                                 <a href="{{ url_for('resultado_opcion1', frecuencia=frecuencia) }}"
+                                   class="block hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 hover:underline">
+                                    {{ entry.item }}
+                                </a>
+                            {% elif 'item' in entry and 'Número:' in entry.item %}
+                                <!-- Para entradas con el nuevo formato -->
+                                {% set numero = entry.item.split('Número:')[1].split('->')[0].strip() %}
+                                <a href="{{ url_for('resultado_opcion1', frecuencia=numero) }}"
                                    class="block hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-200 hover:underline">
                                     {{ entry.item }}
                                 </a>

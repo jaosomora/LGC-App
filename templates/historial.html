@@ -43,6 +43,13 @@
                            class="hover:text-primary-600 transition-colors duration-200 hover:underline">
                             {{ entry.item }}
                         </a>
+                    {% elif 'Número:' in entry.item %}
+                        <!-- Para entradas con el nuevo formato -->
+                        {% set numero = entry.item.split('Número:')[1].split('->')[0].strip() %}
+                        <a href="{{ url_for('resultado_opcion1', frecuencia=numero) }}"
+                           class="hover:text-primary-600 transition-colors duration-200 hover:underline">
+                            {{ entry.item }}
+                        </a>
                     {% elif 'Comparación:' in entry.item %}
                         <!-- Para entradas de comparación (opción 3) con formato antiguo -->
                         {% set comparacion = entry.item.split('Comparación:')[1].split('=')[0].strip() %}

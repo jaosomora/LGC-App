@@ -645,12 +645,16 @@ def menu_principal():
                 palabra_extraida = None
                 texto = entry["texto"]
                 
+                # En la función menu_principal(), busca esta sección (alrededor de línea 510-520):
                 # Extraer palabra para buscar en ranking
                 if "Palabra:" in texto:
                     palabra_raw = texto.split("Palabra:")[1].split("->")[0].strip()
                     palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                 elif "Frecuencia:" in texto:
                     palabra_raw = texto.split("Frecuencia:")[1].split("->")[0].strip()
+                    palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
+                elif "Número:" in texto:  # AGREGAR ESTE BLOQUE si no existe
+                    palabra_raw = texto.split("Número:")[1].split("->")[0].strip()
                     palabra_extraida = normalizar_palabra_con_espacios(palabra_raw).lower()
                 
                 # Añadir solo si no se ha visto antes
@@ -1035,7 +1039,7 @@ def resultado_opcion1():
     if "historial" not in session:
         session["historial"] = []
 
-    texto_entrada = f"Frecuencia: {frecuencia} -> Potencial: {frecuencia}, Lupa: {lupa}"
+    texto_entrada = f"Número: {frecuencia} -> Potencial: {frecuencia}, Lupa: {lupa}"
     nueva_entrada = {
         "tipo": "opcion1",
         "texto": texto_entrada,
