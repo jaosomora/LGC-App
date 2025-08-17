@@ -46,17 +46,27 @@
             class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
             <!-- Resultados formateados para la opción 2 -->
             <!-- Cada línea muestra una palabra analizada con su detalle -->
-            <ul class="mt-4 space-y-2">
-                {% for linea in salida_detallada %}
-                <li class="text-gray-600">
-                    <!-- 'safe' se usa para renderizar contenido HTML seguro (negritas en palabras) -->
-                    {{ linea|safe }}
+            <ul class="mt-4 space-y-4">
+                {% for item in salida_detallada %}
+                <li>
+                    <strong>{{ item.palabra|title }}</strong>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        {% for par in item.letras %}
+                        <span class="px-2 py-1 bg-gray-200 rounded-md">{{ par.char }} = {{ par.valor }}</span>
+                        {% endfor %}
+                    </div>
+                    {% if item.suma %}<div class="mt-2 font-semibold">= {{ item.suma }}</div>{% endif %}
                 </li>
                 {% endfor %}
             </ul>
-            <!-- Total y lupa de la frase analizada -->
-            <p class="mt-4 text-gray-600"><strong>Total:</strong> {{ total }}</p>
-            <p class="mt-4 text-gray-600"><strong>Lupa:</strong> {{ lupa }}</p>
+        </div>
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
+            <p class="text-gray-600 font-semibold">Total</p>
+            <p class="mt-2 text-2xl text-gray-800">{{ total }}</p>
+        </div>
+        <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-300 hover:shadow-xl transition">
+            <p class="text-gray-600 font-semibold">Lupa</p>
+            <p class="mt-2 text-2xl text-gray-800">{{ lupa }}</p>
         </div>
     </div>
     {% elif opcion == 3 %}
@@ -388,8 +398,8 @@
                 } else {
                     // Crear un array con cada línea de salida_detallada
                     const salidaArray = [
-                        {% for linea in salida_detallada %}
-                        "{{ linea | striptags }}",
+                        {% for item in salida_detallada %}
+                        "{{ item.palabra|title|escapejs }}: {% for par in item.letras %}{{ par.char }}={{ par.valor }}{% if not loop.last %}, {% endif %}{% endfor %}{% if item.suma %} = {{ item.suma }}{% endif %}",
                         {% endfor %}
                     ];
                     
@@ -473,8 +483,8 @@
                 } else {
                     // Crear un array con cada línea de salida_detallada
                     const salidaArray = [
-                        {% for linea in salida_detallada %}
-                        "*{{ linea | striptags }}*",
+                        {% for item in salida_detallada %}
+                        "*{{ item.palabra|title|escapejs }}: {% for par in item.letras %}{{ par.char }}={{ par.valor }}{% if not loop.last %}, {% endif %}{% endfor %}{% if item.suma %} = {{ item.suma }}{% endif %}*",
                         {% endfor %}
                     ];
                     

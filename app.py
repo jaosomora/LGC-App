@@ -819,17 +819,14 @@ def resultado_opcion2():
     # Crear la nueva representación de frecuencias para cada palabra
     salida_detallada = []
     for palabra_actual, datos in frecuencias_por_palabra.items():
-        letras_con_valores = [
-            f"{letra.upper()}={valor}" for letra, valor in zip(palabra_actual, datos["frecuencia_por_letra"])
-        ]
-        # Formatear la palabra o frase en negrita
-        palabra_formateada = f"<strong>{palabra_actual}</strong>: [ {', '.join(letras_con_valores)} ]"
-    
-        # Agregar "= suma" solo para frases con múltiples palabras
-        if len(frecuencias_por_palabra) > 1:
-            palabra_formateada += f" = {datos['suma']}"
-    
-        salida_detallada.append(palabra_formateada)
+        salida_detallada.append({
+            "palabra": palabra_actual,
+            "letras": [
+                {"char": letra.upper(), "valor": valor}
+                for letra, valor in zip(palabra_actual, datos["frecuencia_por_letra"])
+            ],
+            "suma": datos["suma"] if len(frecuencias_por_palabra) > 1 else None,
+        })
 
 
     # Verificar si hay más de una palabra
