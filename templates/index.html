@@ -91,7 +91,7 @@
                         <tr class="text-th-text/40 text-left">
                             <th class="pb-2 pr-4">#</th>
                             <th class="pb-2 pr-4">Palabra</th>
-                            <th class="pb-2 pr-4">Letras (valores)</th>
+                            <th class="pb-2 pr-4">Letras (números)</th>
                             <th class="pb-2 text-right">Total</th>
                         </tr>
                     </thead>
@@ -100,6 +100,9 @@
                 </table>
             </div>
 
+            <!-- Suma y Resta del conversor (multi-palabra) -->
+            <div id="conversor-operations" class="glass-card p-5 hidden"></div>
+
             <div id="comparison-results" class="hidden space-y-4">
                 <div id="comparison-word1" class="glass-card p-5 overflow-x-auto"></div>
                 <div id="comparison-word2" class="glass-card p-5 overflow-x-auto"></div>
@@ -107,7 +110,6 @@
             </div>
 
             <div id="action-buttons" class="flex gap-3 flex-wrap">
-                <button id="btn-guardar" class="glass-button-primary">Guardar búsqueda</button>
                 <button id="btn-compartir" class="glass-button">Compartir</button>
             </div>
 
@@ -115,6 +117,17 @@
                 <h3 class="text-sm font-semibold mb-3 text-th-text/50 uppercase tracking-wider">Calculadora</h3>
                 <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto" id="calc-grid"></div>
             </div>
+
+            <!-- Mapa de letras (dentro de resultados, auto-expandido) -->
+            <details id="letter-map-panel" class="glass-card group" open>
+                <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
+                    <span>Mapa (A=1 ... Z=27)</span>
+                    <svg class="w-4 h-4 text-th-text/40 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <div class="px-4 pb-4">
+                    <div class="grid grid-cols-9 gap-1 text-center" id="letter-map"></div>
+                </div>
+            </details>
 
             <details id="related-panel" class="glass-card group">
                 <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
@@ -136,17 +149,6 @@
                 </div>
             </details>
         </section>
-
-        <!-- Mapa de letras (oculto hasta que se escriba) -->
-        <details id="letter-map-panel" class="glass-card group hidden">
-            <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
-                <span>Mapa (A=1 ... Z=27, Ñ=15)</span>
-                <svg class="w-4 h-4 text-th-text/40 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </summary>
-            <div class="px-4 pb-4">
-                <div class="grid grid-cols-9 gap-1 text-center" id="letter-map"></div>
-            </div>
-        </details>
 
         <!-- Historial y Ranking (oculto hasta que se escriba) -->
         <details id="history-panel" class="glass-card group hidden">

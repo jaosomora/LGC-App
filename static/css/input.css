@@ -156,6 +156,21 @@
     @apply animate-pulse-glow;
   }
 
+  /* ── Chips de letras (desglose visual) ── */
+  .letter-chip {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    @apply inline-flex items-center gap-0.5 px-2 py-0.5 rounded-lg text-xs;
+  }
+  .letter-chip .chip-letter {
+    color: rgb(var(--c-text));
+    @apply font-bold text-sm;
+  }
+  .letter-chip .chip-value {
+    color: rgb(var(--c-accent));
+    @apply font-semibold text-xs;
+  }
+
   /* ── Calculadora ── */
   .calc-cell {
     background: var(--glass-bg);

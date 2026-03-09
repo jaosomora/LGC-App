@@ -45,6 +45,13 @@
     return normalizar(texto).split("").filter(c => /[a-zñ]/i.test(c)).length;
   }
 
+  // ── Renderizar chips de letras (visual amigable) ──
+  function renderLetterChips(letras) {
+    return `<div class="flex flex-wrap gap-1">${letras.map(l =>
+      `<span class="letter-chip"><span class="chip-letter">${l.letra}</span><span class="chip-value">${l.valor}</span></span>`
+    ).join("")}</div>`;
+  }
+
   // ── Estado ──
   let currentMode = "conversor";
   let isNumericInput = false;
@@ -115,7 +122,6 @@
     $("#word1-input").addEventListener("input", () => onCalcInput());
     $("#word2-input").addEventListener("input", () => onCalcInput());
     $("#btn-limpiar").addEventListener("click", clearAll);
-    $("#btn-guardar").addEventListener("click", saveManual);
   }
 
   // ── Input unificado: detecta texto vs número ──
@@ -126,7 +132,6 @@
     saved = false;
     lastInput = trimmed;
 
-    // Detectar si es solo dígitos → modo numérico
     if (/^\d+$/.test(trimmed)) {
       const num = parseInt(trimmed, 10);
       if (num <= 0) { clearResults(); return; }
@@ -175,10 +180,52 @@
 
     showQuickMetrics(nLetras, nPalabras, pot, lupa);
     renderBreakdownTable(desglose, pot, lupa);
+    renderConversorOperations(desglose, pot);
     renderCalcGrid(pot);
     renderLetterMap(texto);
+    // Auto-expandir mapa en modo texto
+    const mapPanel = $("#letter-map-panel");
+    if (mapPanel) mapPanel.open = true;
     showResults();
     hideComparison();
+  }
+
+  // ── Render: Conversor suma/resta (cuando hay 2+ palabras) ──
+  function renderConversorOperations(desglose, potTotal) {
+    const panel = $("#conversor-operations");
+    if (desglose.length < 2) {
+      panel.classList.add("hidden");
+      return;
+    }
+
+    const suma = desglose.reduce((s, d) => s + d.suma, 0);
+    const valores = desglose.map(d => d.suma);
+    const max = Math.max(...valores);
+    const min = Math.min(...valores);
+    const resta = max - min;
+    const lupaSuma = calcularLupa(suma);
+    const lupaResta = calcularLupa(resta);
+
+    panel.classList.remove("hidden");
+    panel.innerHTML = `
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-th-text/50 text-sm">Suma</span>
+          <div class="text-right">
+            <span class="text-2xl font-bold text-th-accent">${suma}</span>
+            <span class="text-th-text/40 text-sm ml-2">Lupa: ${lupaSuma}</span>
+          </div>
+        </div>
+        <hr class="border-th">
+        <div class="flex items-center justify-between">
+          <span class="text-th-text/50 text-sm">Resta</span>
+          <div class="text-right">
+            <span class="text-2xl font-bold text-th-muted">${resta}</span>
+            <span class="text-th-text/40 text-sm ml-2">Lupa: ${lupaResta}</span>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   // ── Render: Buscador (número directo) ──
@@ -186,8 +233,12 @@
     const lupa = calcularLupa(num);
     showQuickMetricsNumeric(num, lupa);
     $("#breakdown-card").classList.add("hidden");
+    $("#conversor-operations").classList.add("hidden");
     renderCalcGrid(num);
     renderLetterMap("");
+    // Cerrar mapa en modo numérico
+    const mapPanel = $("#letter-map-panel");
+    if (mapPanel) mapPanel.open = false;
     showResults();
     hideComparison();
   }
@@ -205,6 +256,7 @@
     showQuickMetricsCalc(pot1, pot2, suma, resta, lupaSuma);
 
     $("#breakdown-card").classList.add("hidden");
+    $("#conversor-operations").classList.add("hidden");
     $("#comparison-results").classList.remove("hidden");
 
     $("#comparison-word1").innerHTML = buildWordCard("Palabra 1", w1, d1, pot1, lupa1);
@@ -233,6 +285,8 @@
 
     renderCalcGrid(suma);
     renderLetterMap(`${w1} ${w2}`);
+    const mapPanel = $("#letter-map-panel");
+    if (mapPanel) mapPanel.open = true;
     showResults();
   }
 
@@ -241,7 +295,7 @@
       <tr class="border-b border-th-div">
         <td class="py-1.5 pr-3 text-th-text/40">${i + 1}</td>
         <td class="py-1.5 pr-3 font-medium">${escapeHtml(d.palabra)}</td>
-        <td class="py-1.5 pr-3 text-th-text/60 text-xs">${d.letras.map(l => `${l.letra}(${l.valor})`).join(" + ")}</td>
+        <td class="py-1.5 pr-3">${renderLetterChips(d.letras)}</td>
         <td class="py-1.5 text-right font-semibold">${d.suma}</td>
       </tr>
     `).join("");
@@ -249,7 +303,7 @@
       <h4 class="text-xs font-semibold text-th-text/40 uppercase tracking-wider mb-3">${label}</h4>
       <table class="w-full text-sm">
         <thead><tr class="text-th-text/30 text-left text-xs">
-          <th class="pb-1.5">#</th><th class="pb-1.5">Palabra</th><th class="pb-1.5">Letras</th><th class="pb-1.5 text-right">Total</th>
+          <th class="pb-1.5">#</th><th class="pb-1.5">Palabra</th><th class="pb-1.5">Letras (números)</th><th class="pb-1.5 text-right">Total</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>
@@ -270,14 +324,14 @@
       <tr class="border-b border-th-div">
         <td class="py-2 pr-4 text-th-text/40">${i + 1}</td>
         <td class="py-2 pr-4 font-medium">${escapeHtml(d.palabra)}</td>
-        <td class="py-2 pr-4 text-th-text/60 text-xs">${d.letras.map(l => `${l.letra}(${l.valor})`).join(" + ")}</td>
+        <td class="py-2 pr-4">${renderLetterChips(d.letras)}</td>
         <td class="py-2 text-right font-semibold">${d.suma}</td>
       </tr>
     `).join("");
 
     tfoot.innerHTML = `
       <tr>
-        <td colspan="3" class="py-2 text-right font-semibold text-th-text/50">Frecuencia resultante</td>
+        <td colspan="3" class="py-2 text-right font-semibold text-th-text/50">Resultado</td>
         <td class="py-2 text-right font-bold text-th-accent text-lg">${pot}</td>
       </tr>
       <tr>
@@ -401,12 +455,10 @@
     const data = await fetchSearchRaw(potencial, excluir);
     if (!data) return;
 
-    // Palabras relacionadas
     const rc = $("#related-content");
     rc.innerHTML = renderWordList(data.palabras_relacionadas, "Palabras con el mismo potencial");
     $("#related-count").textContent = data.palabras_relacionadas.length ? `(${data.palabras_relacionadas.length})` : "";
 
-    // Invertido
     $("#inverted-value").textContent = `→ ${data.total_invertido}`;
     const ic = $("#inverted-content");
     ic.innerHTML = renderWordList(data.palabras_invertidas, `Palabras con potencial ${data.total_invertido}`);
@@ -421,7 +473,6 @@
     `;
   }
 
-  // Permitir clic en palabras relacionadas para buscarlas
   window.lgcClickWord = function(word) {
     if (currentMode !== "conversor") {
       $$("[data-mode]").forEach(b => {
@@ -436,26 +487,12 @@
     onInputChange(word);
   };
 
-  // ── Auto-guardado (5 segundos) ──
+  // ── Auto-guardado (2 segundos) ──
   function scheduleAutoSave(texto) {
     clearTimeout(autoSaveTimer);
     autoSaveTimer = setTimeout(() => {
       if (!saved && texto.trim()) saveWord(texto);
-    }, 5000);
-  }
-
-  function saveManual() {
-    if (saved || !lastInput.trim()) return;
-    if (currentMode === "calculadora") {
-      const w1 = $("#word1-input").value.trim();
-      const w2 = $("#word2-input").value.trim();
-      if (w1) saveWord(w1);
-      if (w2) saveWord(w2);
-    } else {
-      saveWord(lastInput);
-    }
-    saved = true;
-    showToast("Búsqueda guardada");
+    }, 2000);
   }
 
   async function saveWord(texto) {
@@ -577,7 +614,6 @@
   // ── Helpers UI ──
   function showResults() {
     $("#results-area").classList.remove("hidden");
-    $("#letter-map-panel").classList.remove("hidden");
     $("#history-panel").classList.remove("hidden");
   }
 
@@ -586,7 +622,6 @@
   function clearResults() {
     $("#results-area").classList.add("hidden");
     $("#quick-metrics").classList.add("hidden");
-    $("#letter-map-panel").classList.add("hidden");
     $("#history-panel").classList.add("hidden");
     renderLetterMap("");
     lastPotencial = null;
