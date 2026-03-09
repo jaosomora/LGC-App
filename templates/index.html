@@ -46,29 +46,23 @@
         <!-- Hero -->
         <section class="text-center mb-2">
             <h2 class="text-2xl sm:text-3xl font-bold leading-tight">
-                Explora el <span class="text-th-accent">potencial logico</span> de las palabras
+                Explora el <span class="text-th-accent">potencial lógico</span> de las palabras
             </h2>
-            <p class="text-th-text/40 text-sm mt-2">Las palabras encuentran su expresion mas abstracta y universal en los numeros</p>
+            <p class="text-th-text/40 text-sm mt-2">Las palabras encuentran su expresión más abstracta y universal en los números</p>
         </section>
 
         <!-- Selector de modo -->
         <div id="mode-selector" class="flex justify-center gap-2">
             <button data-mode="conversor" class="glass-pill active" aria-pressed="true">Conversor</button>
-            <button data-mode="buscador" class="glass-pill" aria-pressed="false">Buscador</button>
             <button data-mode="calculadora" class="glass-pill" aria-pressed="false">Calculadora</button>
         </div>
 
-        <!-- Area de input -->
+        <!-- Área de input -->
         <section id="input-area" class="glass-card p-5 sm:p-6">
             <div id="input-conversor" class="mode-input">
-                <label for="word-input" class="block text-sm text-th-text/50 mb-2">Escribe una palabra o frase</label>
+                <label for="word-input" class="block text-sm text-th-text/50 mb-2">Escribe una palabra, frase o número</label>
                 <textarea id="word-input" class="glass-input w-full text-lg resize-none" rows="2"
-                    placeholder="Escribe aqui..." autocomplete="off" spellcheck="false"></textarea>
-            </div>
-            <div id="input-buscador" class="mode-input hidden">
-                <label for="number-input" class="block text-sm text-th-text/50 mb-2">Escribe un numero</label>
-                <input type="text" id="number-input" class="glass-input w-full text-lg"
-                    placeholder="Ej: 42" inputmode="numeric" autocomplete="off">
+                    placeholder="Escribe aquí..." autocomplete="off" spellcheck="false"></textarea>
             </div>
             <div id="input-calculadora" class="mode-input hidden">
                 <label for="word1-input" class="block text-sm text-th-text/50 mb-2">Primera palabra</label>
@@ -113,7 +107,7 @@
             </div>
 
             <div id="action-buttons" class="flex gap-3 flex-wrap">
-                <button id="btn-guardar" class="glass-button-primary">Guardar busqueda</button>
+                <button id="btn-guardar" class="glass-button-primary">Guardar búsqueda</button>
                 <button id="btn-compartir" class="glass-button">Compartir</button>
             </div>
 
@@ -143,10 +137,10 @@
             </details>
         </section>
 
-        <!-- Mapa de letras -->
-        <details class="glass-card group">
+        <!-- Mapa de letras (oculto hasta que se escriba) -->
+        <details id="letter-map-panel" class="glass-card group hidden">
             <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
-                <span>Mapa (A=1 ... Z=27, N=15)</span>
+                <span>Mapa (A=1 ... Z=27, Ñ=15)</span>
                 <svg class="w-4 h-4 text-th-text/40 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </summary>
             <div class="px-4 pb-4">
@@ -154,8 +148,8 @@
             </div>
         </details>
 
-        <!-- Historial y Ranking -->
-        <details class="glass-card group">
+        <!-- Historial y Ranking (oculto hasta que se escriba) -->
+        <details id="history-panel" class="glass-card group hidden">
             <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
                 <span>Historial y Ranking</span>
                 <svg class="w-4 h-4 text-th-text/40 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -177,7 +171,7 @@
     <!-- Footer -->
     <footer class="glass-panel border-t border-th mt-auto">
         <div class="max-w-3xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-3 text-sm text-th-text/40">
-            <span>Hecho por <span class="text-th-text font-semibold">Julian Osorio Mora</span></span>
+            <span>Hecho por <span class="text-th-text font-semibold">Julián Osorio Mora</span></span>
             <div class="flex gap-4">
                 <a href="https://ko-fi.com/julianosoriom" target="_blank" rel="noopener" class="hover:text-th-text transition-colors">Apoyar</a>
                 <a href="https://t.me/ampliando_marcos" target="_blank" rel="noopener" class="hover:text-th-text transition-colors">Telegram</a>
@@ -202,7 +196,7 @@
     <div id="cookie-banner" class="fixed bottom-0 inset-x-0 glass-panel border-t border-th p-4 z-40 hidden">
         <div class="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-3 text-sm">
             <p class="text-th-text/60">Usamos cookies para mejorar tu experiencia.
-                <a href="/privacy-policy" class="text-th-accent hover:underline">Politica de privacidad</a>
+                <a href="/privacy-policy" class="text-th-accent hover:underline">Política de privacidad</a>
             </p>
             <div class="flex gap-2">
                 <button id="cookie-accept" class="glass-button-primary text-xs px-4 py-1.5">Aceptar</button>

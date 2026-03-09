@@ -1,10 +1,10 @@
 /**
- * app.js — Interfaz LGC: SPA con calculos en tiempo real.
+ * app.js — Interfaz LGC: SPA con cálculos en tiempo real.
  */
 (function () {
   "use strict";
 
-  // ── Mapa de valores (duplicado del backend para calculos instantaneos) ──
+  // ── Mapa de valores (duplicado del backend para cálculos instantáneos) ──
   const VALORES = {
     A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:11,L:12,M:13,
     N:14,"Ñ":15,O:16,P:17,Q:18,R:19,S:20,T:21,U:22,V:23,W:24,X:25,Y:26,Z:27
@@ -12,7 +12,7 @@
 
   const LETRAS_ORDEN = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
 
-  // ── Normalizacion (replica del backend) ──
+  // ── Normalización (réplica del backend) ──
   function normalizar(texto) {
     let t = texto.trim().replace(/\s+/g, " ").toLowerCase();
     t = t.replace(/ñ/g, "__Ñ__");
@@ -47,6 +47,7 @@
 
   // ── Estado ──
   let currentMode = "conversor";
+  let isNumericInput = false;
   let debounceTimer = null;
   let autoSaveTimer = null;
   let lastPotencial = null;
@@ -57,7 +58,7 @@
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
 
-  // ── Inicializacion ──
+  // ── Inicialización ──
   document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initModeSelector();
@@ -79,7 +80,6 @@
       document.documentElement.setAttribute("data-theme", next);
       localStorage.setItem("lgc_theme", next);
     });
-    // Escuchar cambios de preferencia del sistema
     matchMedia("(prefers-color-scheme: light)").addEventListener("change", e => {
       if (!localStorage.getItem("lgc_theme")) {
         document.documentElement.setAttribute("data-theme", e.matches ? "light" : "dark");
@@ -106,45 +106,42 @@
 
   function focusCurrentInput() {
     if (currentMode === "conversor") $("#word-input").focus();
-    else if (currentMode === "buscador") $("#number-input").focus();
     else $("#word1-input").focus();
   }
 
   // ── Listeners de input ──
   function initInputListeners() {
-    $("#word-input").addEventListener("input", () => onInputChange(getConversorValue(), "conversor"));
-    $("#number-input").addEventListener("input", (e) => {
-      e.target.value = e.target.value.replace(/[^\d]/g, "");
-      onInputChange(e.target.value, "buscador");
-    });
+    $("#word-input").addEventListener("input", () => onInputChange($("#word-input").value));
     $("#word1-input").addEventListener("input", () => onCalcInput());
     $("#word2-input").addEventListener("input", () => onCalcInput());
     $("#btn-limpiar").addEventListener("click", clearAll);
     $("#btn-guardar").addEventListener("click", saveManual);
   }
 
-  function getConversorValue() { return $("#word-input").value; }
-
-  function onInputChange(value, mode) {
+  // ── Input unificado: detecta texto vs número ──
+  function onInputChange(value) {
     const trimmed = value.trim();
     if (!trimmed) { clearResults(); return; }
 
     saved = false;
     lastInput = trimmed;
 
-    if (mode === "conversor") {
+    // Detectar si es solo dígitos → modo numérico
+    if (/^\d+$/.test(trimmed)) {
+      const num = parseInt(trimmed, 10);
+      if (num <= 0) { clearResults(); return; }
+      isNumericInput = true;
+      lastPotencial = num;
+      renderBuscadorResults(num);
+      debouncedSearch(num, "");
+      scheduleAutoSave(String(num));
+    } else {
+      isNumericInput = false;
       const pot = calcularPotencial(trimmed);
       lastPotencial = pot;
       renderConversorResults(trimmed, pot);
       debouncedSearch(pot, normalizar(trimmed));
       scheduleAutoSave(trimmed);
-    } else if (mode === "buscador") {
-      const num = parseInt(trimmed, 10);
-      if (isNaN(num) || num <= 0) { clearResults(); return; }
-      lastPotencial = num;
-      renderBuscadorResults(num);
-      debouncedSearch(num, "");
-      scheduleAutoSave(String(num));
     }
   }
 
@@ -155,6 +152,7 @@
 
     saved = false;
     lastInput = `${w1} | ${w2}`;
+    isNumericInput = false;
 
     const pot1 = calcularPotencial(w1);
     const pot2 = calcularPotencial(w2);
@@ -168,7 +166,7 @@
     scheduleAutoSave(w2);
   }
 
-  // ── Render: Conversor ──
+  // ── Render: Conversor (texto) ──
   function renderConversorResults(texto, pot) {
     const desglose = desglosePorPalabra(texto);
     const lupa = calcularLupa(pot);
@@ -183,10 +181,10 @@
     hideComparison();
   }
 
-  // ── Render: Buscador ──
+  // ── Render: Buscador (número directo) ──
   function renderBuscadorResults(num) {
     const lupa = calcularLupa(num);
-    showQuickMetrics(0, 0, num, lupa);
+    showQuickMetricsNumeric(num, lupa);
     $("#breakdown-card").classList.add("hidden");
     renderCalcGrid(num);
     renderLetterMap("");
@@ -289,23 +287,25 @@
     `;
   }
 
-  // ── Metricas rapidas ──
+  // ── Métricas rápidas ──
   function showQuickMetrics(letras, palabras, pot, lupa) {
     const el = $("#quick-metrics");
     el.classList.remove("hidden");
-    if (currentMode === "buscador") {
-      el.innerHTML = `
-        <span class="glass-badge">Numero: <strong class="text-th-accent font-semibold">${pot}</strong></span>
-        <span class="glass-badge">Lupa: <strong class="text-th-muted">${lupa}</strong></span>
-        <button id="btn-limpiar" class="ml-auto text-th-text/40 hover:text-th-text transition-colors text-xs">Limpiar</button>
-      `;
-      el.querySelector("#btn-limpiar").addEventListener("click", clearAll);
-    } else {
-      $("#metric-letras").textContent = letras;
-      $("#metric-palabras").textContent = palabras;
-      $("#metric-potencial").textContent = pot;
-      $("#metric-lupa").textContent = lupa;
-    }
+    $("#metric-letras").textContent = letras;
+    $("#metric-palabras").textContent = palabras;
+    $("#metric-potencial").textContent = pot;
+    $("#metric-lupa").textContent = lupa;
+  }
+
+  function showQuickMetricsNumeric(num, lupa) {
+    const el = $("#quick-metrics");
+    el.classList.remove("hidden");
+    el.innerHTML = `
+      <span class="glass-badge">Número: <strong class="text-th-accent font-semibold">${num}</strong></span>
+      <span class="glass-badge">Lupa: <strong class="text-th-muted">${lupa}</strong></span>
+      <button id="btn-limpiar" class="ml-auto text-th-text/40 hover:text-th-text transition-colors text-xs">Limpiar</button>
+    `;
+    el.querySelector("#btn-limpiar").addEventListener("click", clearAll);
   }
 
   function showQuickMetricsCalc(pot1, pot2, suma, resta, lupaSuma) {
@@ -365,7 +365,7 @@
     });
   }
 
-  // ── API: Busqueda debounced ──
+  // ── API: Búsqueda debounced ──
   function debouncedSearch(potencial, excluir) {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => fetchSearch(potencial, excluir), 300);
@@ -433,7 +433,7 @@
       currentMode = "conversor";
     }
     $("#word-input").value = word;
-    onInputChange(word, "conversor");
+    onInputChange(word);
   };
 
   // ── Auto-guardado (5 segundos) ──
@@ -455,7 +455,7 @@
       saveWord(lastInput);
     }
     saved = true;
-    showToast("Busqueda guardada");
+    showToast("Búsqueda guardada");
   }
 
   async function saveWord(texto) {
@@ -492,7 +492,7 @@
     const hist = getHistory();
     const el = $("#history-list");
     if (!hist.length) {
-      el.innerHTML = `<p class="text-th-text/30 text-sm">Aun no has realizado busquedas</p>`;
+      el.innerHTML = `<p class="text-th-text/30 text-sm">Aún no has realizado búsquedas</p>`;
       return;
     }
     el.innerHTML = hist.slice(0, 20).map(h => `
@@ -512,14 +512,14 @@
       const data = await res.json();
       const el = $("#ranking-list");
       if (!data.ranking.length) {
-        el.innerHTML = `<p class="text-th-text/30 text-sm">Sin datos aun</p>`;
+        el.innerHTML = `<p class="text-th-text/30 text-sm">Sin datos aún</p>`;
         return;
       }
       el.innerHTML = data.ranking.map(r => `
         <div class="flex items-center justify-between py-1.5 border-b border-th-div text-sm cursor-pointer hover:bg-th-surface/5 rounded px-2 -mx-2"
              onclick="window.lgcClickWord('${escapeHtml(r.palabra)}')">
           <span class="truncate">${escapeHtml(r.palabra)}</span>
-          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-th-accent/15 border border-th-accent/30 text-th-accent">${r.puntuacion} busquedas</span>
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-th-accent/15 border border-th-accent/30 text-th-accent">${r.puntuacion} búsquedas</span>
         </div>
       `).join("");
     } catch { /* silencioso */ }
@@ -553,8 +553,8 @@
   function buildShareText() {
     const pot = lastPotencial || 0;
     const lupa = calcularLupa(pot);
-    if (currentMode === "buscador") {
-      return `Interfaz LGC\nNumero: ${pot}\nLupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
+    if (isNumericInput) {
+      return `Interfaz LGC\nNúmero: ${pot}\nLupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
     }
     return `Interfaz LGC\n"${lastInput}" → Potencial: ${pot} | Lupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
   }
@@ -575,21 +575,28 @@
   }
 
   // ── Helpers UI ──
-  function showResults() { $("#results-area").classList.remove("hidden"); }
+  function showResults() {
+    $("#results-area").classList.remove("hidden");
+    $("#letter-map-panel").classList.remove("hidden");
+    $("#history-panel").classList.remove("hidden");
+  }
+
   function hideComparison() { $("#comparison-results").classList.add("hidden"); }
 
   function clearResults() {
     $("#results-area").classList.add("hidden");
     $("#quick-metrics").classList.add("hidden");
+    $("#letter-map-panel").classList.add("hidden");
+    $("#history-panel").classList.add("hidden");
     renderLetterMap("");
     lastPotencial = null;
     lastInput = "";
+    isNumericInput = false;
     saved = false;
   }
 
   function clearAll() {
     $("#word-input").value = "";
-    $("#number-input").value = "";
     $("#word1-input").value = "";
     $("#word2-input").value = "";
     clearResults();
