@@ -1,10 +1,10 @@
 /**
- * app.js — Interfaz LGC: SPA con cálculos en tiempo real.
+ * app.js — Interfaz LGC: SPA con calculos en tiempo real.
  */
 (function () {
   "use strict";
 
-  // ── Mapa de valores (duplicado del backend para cálculos instantáneos) ──
+  // ── Mapa de valores (duplicado del backend para calculos instantaneos) ──
   const VALORES = {
     A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:10,K:11,L:12,M:13,
     N:14,"Ñ":15,O:16,P:17,Q:18,R:19,S:20,T:21,U:22,V:23,W:24,X:25,Y:26,Z:27
@@ -12,7 +12,7 @@
 
   const LETRAS_ORDEN = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("");
 
-  // ── Normalización (réplica del backend) ──
+  // ── Normalizacion (replica del backend) ──
   function normalizar(texto) {
     let t = texto.trim().replace(/\s+/g, " ").toLowerCase();
     t = t.replace(/ñ/g, "__Ñ__");
@@ -57,14 +57,13 @@
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => document.querySelectorAll(sel);
 
-  // ── Inicialización ──
+  // ── Inicializacion ──
   document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initModeSelector();
     initInputListeners();
     initLetterMap();
     initCalcGrid();
-    initFeedback();
     initShare();
     initCookies();
     initHistory();
@@ -179,6 +178,7 @@
     showQuickMetrics(nLetras, nPalabras, pot, lupa);
     renderBreakdownTable(desglose, pot, lupa);
     renderCalcGrid(pot);
+    renderLetterMap(texto);
     showResults();
     hideComparison();
   }
@@ -189,6 +189,7 @@
     showQuickMetrics(0, 0, num, lupa);
     $("#breakdown-card").classList.add("hidden");
     renderCalcGrid(num);
+    renderLetterMap("");
     showResults();
     hideComparison();
   }
@@ -233,6 +234,7 @@
     `;
 
     renderCalcGrid(suma);
+    renderLetterMap(`${w1} ${w2}`);
     showResults();
   }
 
@@ -287,13 +289,13 @@
     `;
   }
 
-  // ── Métricas rápidas ──
+  // ── Metricas rapidas ──
   function showQuickMetrics(letras, palabras, pot, lupa) {
     const el = $("#quick-metrics");
     el.classList.remove("hidden");
     if (currentMode === "buscador") {
       el.innerHTML = `
-        <span class="glass-badge">Número: <strong class="text-th-accent font-semibold">${pot}</strong></span>
+        <span class="glass-badge">Numero: <strong class="text-th-accent font-semibold">${pot}</strong></span>
         <span class="glass-badge">Lupa: <strong class="text-th-muted">${lupa}</strong></span>
         <button id="btn-limpiar" class="ml-auto text-th-text/40 hover:text-th-text transition-colors text-xs">Limpiar</button>
       `;
@@ -342,14 +344,28 @@
   function initLetterMap() {
     const map = $("#letter-map");
     map.innerHTML = LETRAS_ORDEN.map(l => `
-      <div class="glass-letter-cell">
+      <div class="glass-letter-cell" data-letter="${l}">
         <span class="font-bold text-sm">${l}</span>
         <span class="text-[10px] text-th-text/40">${VALORES[l]}</span>
       </div>
     `).join("");
   }
 
-  // ── API: Búsqueda debounced ──
+  function renderLetterMap(texto) {
+    const activeLetters = new Set();
+    if (texto) {
+      const norm = normalizar(texto).toUpperCase();
+      for (const c of norm) {
+        if (VALORES[c] !== undefined) activeLetters.add(c);
+      }
+    }
+    $$(".glass-letter-cell").forEach(cell => {
+      const letter = cell.dataset.letter;
+      cell.classList.toggle("glass-letter-cell-active", activeLetters.has(letter));
+    });
+  }
+
+  // ── API: Busqueda debounced ──
   function debouncedSearch(potencial, excluir) {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => fetchSearch(potencial, excluir), 300);
@@ -394,32 +410,6 @@
     $("#inverted-value").textContent = `→ ${data.total_invertido}`;
     const ic = $("#inverted-content");
     ic.innerHTML = renderWordList(data.palabras_invertidas, `Palabras con potencial ${data.total_invertido}`);
-
-    // Territorios
-    const tc = $("#territories-content");
-    if (data.territorios.length) {
-      tc.innerHTML = data.territorios.map(t =>
-        `<div class="flex justify-between py-1 border-b border-th-div text-sm">
-          <span>${escapeHtml(t.pais)}</span>
-          <span class="text-th-text/40">+${t.codigo}</span>
-        </div>`
-      ).join("");
-    } else {
-      tc.innerHTML = `<p class="text-th-text/30 text-sm">Sin coincidencias</p>`;
-    }
-
-    // Elementos
-    const ec = $("#elements-content");
-    if (data.elementos.length) {
-      ec.innerHTML = data.elementos.map(e =>
-        `<div class="flex justify-between py-1 border-b border-th-div text-sm">
-          <span><strong>${escapeHtml(e.nombre)}</strong> (${escapeHtml(e.simbolo)})</span>
-          <span class="text-th-text/40">${e.tipo_coincidencia === "potencial_nombre" ? "Potencial del nombre" : `Nº atómico ${e.numero_atomico}`}</span>
-        </div>`
-      ).join("");
-    } else {
-      ec.innerHTML = `<p class="text-th-text/30 text-sm">Sin coincidencias</p>`;
-    }
   }
 
   function renderWordList(words, title) {
@@ -465,7 +455,7 @@
       saveWord(lastInput);
     }
     saved = true;
-    showToast("Búsqueda guardada");
+    showToast("Busqueda guardada");
   }
 
   async function saveWord(texto) {
@@ -502,7 +492,7 @@
     const hist = getHistory();
     const el = $("#history-list");
     if (!hist.length) {
-      el.innerHTML = `<p class="text-th-text/30 text-sm">Aún no has realizado búsquedas</p>`;
+      el.innerHTML = `<p class="text-th-text/30 text-sm">Aun no has realizado busquedas</p>`;
       return;
     }
     el.innerHTML = hist.slice(0, 20).map(h => `
@@ -522,55 +512,17 @@
       const data = await res.json();
       const el = $("#ranking-list");
       if (!data.ranking.length) {
-        el.innerHTML = `<p class="text-th-text/30 text-sm">Sin datos aún</p>`;
+        el.innerHTML = `<p class="text-th-text/30 text-sm">Sin datos aun</p>`;
         return;
       }
       el.innerHTML = data.ranking.map(r => `
         <div class="flex items-center justify-between py-1.5 border-b border-th-div text-sm cursor-pointer hover:bg-th-surface/5 rounded px-2 -mx-2"
              onclick="window.lgcClickWord('${escapeHtml(r.palabra)}')">
           <span class="truncate">${escapeHtml(r.palabra)}</span>
-          <span class="glass-badge text-xs">${r.puntuacion}×</span>
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-th-accent/15 border border-th-accent/30 text-th-accent">${r.puntuacion} busquedas</span>
         </div>
       `).join("");
     } catch { /* silencioso */ }
-  }
-
-  // ── Feedback ──
-  function initFeedback() {
-    const modal = $("#feedback-modal");
-    const open = () => { modal.classList.remove("hidden"); modal.classList.add("flex"); $("#feedback-text").focus(); };
-    const close = () => { modal.classList.add("hidden"); modal.classList.remove("flex"); $("#feedback-text").value = ""; };
-
-    $("#open-feedback-btn").addEventListener("click", open);
-    $("#close-feedback-btn").addEventListener("click", close);
-    modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
-
-    $("#submit-feedback-btn").addEventListener("click", async () => {
-      const text = $("#feedback-text").value.trim();
-      if (!text) return;
-      const msg = $("#feedback-msg");
-      try {
-        const res = await fetch("/api/feedback", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ feedback: text }),
-        });
-        if (res.ok) {
-          msg.textContent = "¡Gracias por tu feedback!";
-          msg.className = "text-sm mt-2 text-th-text";
-          msg.classList.remove("hidden");
-          setTimeout(close, 1500);
-        } else throw new Error();
-      } catch {
-        msg.textContent = "Error al enviar. Intenta de nuevo.";
-        msg.className = "text-sm mt-2 text-th-error";
-        msg.classList.remove("hidden");
-      }
-    });
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !modal.classList.contains("hidden")) close();
-    });
   }
 
   // ── Compartir ──
@@ -602,9 +554,9 @@
     const pot = lastPotencial || 0;
     const lupa = calcularLupa(pot);
     if (currentMode === "buscador") {
-      return `🔢 Interfaz LGC\nNúmero: ${pot}\nLupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
+      return `Interfaz LGC\nNumero: ${pot}\nLupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
     }
-    return `🔤 Interfaz LGC\n"${lastInput}" → Potencial: ${pot} | Lupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
+    return `Interfaz LGC\n"${lastInput}" → Potencial: ${pot} | Lupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
   }
 
   // ── Cookies ──
@@ -629,6 +581,7 @@
   function clearResults() {
     $("#results-area").classList.add("hidden");
     $("#quick-metrics").classList.add("hidden");
+    renderLetterMap("");
     lastPotencial = null;
     lastInput = "";
     saved = false;

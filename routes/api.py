@@ -94,22 +94,3 @@ def ranking():
     })
 
 
-@api_bp.route("/feedback", methods=["POST"])
-def feedback():
-    """Recibe feedback del usuario. Guarda en BD."""
-    from models import Feedback
-
-    data = request.get_json(silent=True) or {}
-    contenido = data.get("feedback", "").strip()
-    if not contenido:
-        return jsonify({"error": "feedback vacío"}), 400
-
-    entry = Feedback(
-        contenido=contenido,
-        ip=request.remote_addr,
-        user_agent=request.headers.get("User-Agent", ""),
-        referer=request.headers.get("Referer", ""),
-    )
-    db.session.add(entry)
-    db.session.commit()
-    return jsonify({"success": True, "message": "Feedback recibido"})
