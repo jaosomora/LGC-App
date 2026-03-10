@@ -183,9 +183,9 @@
     renderConversorOperations(desglose, pot);
     renderCalcGrid(pot);
     renderLetterMap(texto);
-    // Auto-expandir mapa en modo texto
+    // Mostrar y auto-expandir mapa en modo texto
     const mapPanel = $("#letter-map-panel");
-    if (mapPanel) mapPanel.open = true;
+    if (mapPanel) { mapPanel.classList.remove("hidden"); mapPanel.open = true; }
     showResults();
     hideComparison();
   }
@@ -236,9 +236,9 @@
     $("#conversor-operations").classList.add("hidden");
     renderCalcGrid(num);
     renderLetterMap("");
-    // Cerrar mapa en modo numérico
+    // Ocultar mapa en modo numérico
     const mapPanel = $("#letter-map-panel");
-    if (mapPanel) mapPanel.open = false;
+    if (mapPanel) { mapPanel.open = false; mapPanel.classList.add("hidden"); }
     showResults();
     hideComparison();
   }
@@ -286,7 +286,7 @@
     renderCalcGrid(suma);
     renderLetterMap(`${w1} ${w2}`);
     const mapPanel = $("#letter-map-panel");
-    if (mapPanel) mapPanel.open = true;
+    if (mapPanel) { mapPanel.classList.remove("hidden"); mapPanel.open = true; }
     showResults();
   }
 
@@ -345,10 +345,14 @@
   function showQuickMetrics(letras, palabras, pot, lupa) {
     const el = $("#quick-metrics");
     el.classList.remove("hidden");
-    $("#metric-letras").textContent = letras;
-    $("#metric-palabras").textContent = palabras;
-    $("#metric-potencial").textContent = pot;
-    $("#metric-lupa").textContent = lupa;
+    el.innerHTML = `
+      <span class="glass-badge">Letras: <strong>${letras}</strong></span>
+      <span class="glass-badge">Palabras: <strong>${palabras}</strong></span>
+      <span class="glass-badge">Potencial: <strong class="text-th-accent font-semibold">${pot}</strong></span>
+      <span class="glass-badge">Lupa: <strong class="text-th-muted">${lupa}</strong></span>
+      <button id="btn-limpiar" class="ml-auto text-th-text/40 hover:text-th-text transition-colors text-xs">Limpiar</button>
+    `;
+    el.querySelector("#btn-limpiar").addEventListener("click", clearAll);
   }
 
   function showQuickMetricsNumeric(num, lupa) {
