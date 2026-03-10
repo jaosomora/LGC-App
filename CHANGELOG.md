@@ -1,6 +1,39 @@
 # CHANGELOG
 
 
+## [2.0.0] - 2026-03-09
+### Reescritura completa
+- **Arquitectura SPA**: Aplicación reconstruida como Single Page Application con vanilla JS (IIFE), eliminando navegación multi-página.
+- **Nuevo sistema de diseño**: Glass morphism con modo oscuro/claro, acento naranja, orbes animados de fondo y tipografía Inter.
+- **CSS Custom Properties**: Variables de tema con valores RGB separados para compatibilidad con opacidad de Tailwind.
+
+### Nuevas funcionalidades
+- **Conversor inteligente**: Fusión de Conversor y Buscador en un solo input con detección automática texto/número vía regex (`/^\d+$/`).
+- **Modo Comparar**: Renombrado de "Calculadora" a "Comparar" para mayor claridad. Permite comparar dos palabras con suma y resta.
+- **Suma y Resta en Conversor**: Para frases multi-palabra, muestra automáticamente suma y resta de los potenciales.
+- **Chips de letras**: Desglose visual con chips individuales (letra en color suave + número en naranja) en lugar de texto plano.
+- **Mapa interactivo**: Mapa de letras (A=1 ... Z=27) con resaltado dinámico de letras activas y auto-expansión en modo texto.
+- **Calculadora visual**: Grid 0-9 con resaltado de dígitos del resultado.
+- **Limpiar historial**: Botón dentro de Historial y Ranking para borrar el historial local.
+- **Auto-guardado**: Guardado automático a los 2 segundos sin botón manual.
+
+### Mejoras de UX
+- **Compartir rediseñado**: Modal con botón WhatsApp (naranja + ícono) y Copiar resultado (solo texto+resultado+lupa, sin URL). Auto-cierra tras copiar con confirmación toast.
+- **Botón Compartir naranja**: Estilo primario consistente con la identidad visual.
+- **Footer sticky**: Siempre visible al fondo con flexbox.
+- **Ranking con badges**: Números completos con badge naranja en lugar de posiciones.
+- **Ortografía correcta**: Tildes en todos los textos estáticos (lógico, búsqueda, número, Julián, etc.).
+- **Novedades**: Enlace actualizado al canal de Telegram.
+
+### Eliminado
+- Modelo y endpoint de Feedback.
+- Resonancia Geográfica y Resonancia Elemental.
+- Modo Buscador separado (fusionado en Conversor).
+- Botón "Guardar búsqueda" (reemplazado por auto-guardado).
+- Argentinismos en textos ("Escribí" → "Escribe").
+
+---
+
 ## [1.3.19] - 2025-03-21
 ### Cambiado
 - **Interfaz de Usuario**:
