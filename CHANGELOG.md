@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## [2.0.1] - 2026-03-10
+### Mejorado
+- **Comparar — Labels**: Labels actualizados a "Primera palabra o frase" / "Segunda palabra o frase" con placeholder "Escribe aquí..." consistente con Conversor.
+- **Comparar — Paneles**: Los paneles "Palabras Relacionadas" y "Total Invertido" ahora se llenan correctamente usando el total (suma) en modo Comparar.
+- **Orden por frecuencia**: Las palabras relacionadas e invertidas se ordenan de más buscada a menos buscada (por ranking), tanto en Conversor como en Comparar.
+
+### Corregido
+- **Exclusión en Comparar**: Corregido bug donde las palabras buscadas no se excluían de sus propios resultados en modo Comparar (el backend ahora parsea múltiples términos separados por coma).
+
+---
+
 ## [2.0.0] - 2026-03-09
 ### Reescritura completa
 - **Arquitectura SPA**: Aplicación reconstruida como Single Page Application con vanilla JS (IIFE), eliminando navegación multi-página.
