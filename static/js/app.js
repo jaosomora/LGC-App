@@ -523,7 +523,17 @@
     renderHistory();
   }
 
-  function initHistory() { renderHistory(); }
+  function initHistory() {
+    renderHistory();
+    const btnClear = $("#btn-clear-history");
+    if (btnClear) {
+      btnClear.addEventListener("click", () => {
+        localStorage.removeItem("lgc_historial");
+        renderHistory();
+        showToast("Historial limpiado");
+      });
+    }
+  }
 
   function renderHistory() {
     const hist = getHistory();
@@ -579,11 +589,21 @@
     });
 
     $("#share-copy").addEventListener("click", async () => {
+      const text = buildShareText();
       try {
-        await navigator.clipboard.writeText(buildShareText());
-        $("#share-msg").classList.remove("hidden");
-        setTimeout(() => $("#share-msg").classList.add("hidden"), 2000);
-      } catch { /* fallback */ }
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Fallback: textarea oculto
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.cssText = "position:fixed;opacity:0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+      }
+      showToast("Copiado al portapapeles");
+      close();
     });
   }
 
@@ -591,9 +611,9 @@
     const pot = lastPotencial || 0;
     const lupa = calcularLupa(pot);
     if (isNumericInput) {
-      return `Interfaz LGC\nNúmero: ${pot}\nLupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
+      return `${pot} → Lupa: ${lupa}`;
     }
-    return `Interfaz LGC\n"${lastInput}" → Potencial: ${pot} | Lupa: ${lupa}\n\nhttps://www.julianosoriom.com`;
+    return `${lastInput} → Resultado: ${pot} | Lupa: ${lupa}`;
   }
 
   // ── Cookies ──

@@ -163,7 +163,7 @@
     @apply inline-flex items-center gap-0.5 px-2 py-0.5 rounded-lg text-xs;
   }
   .letter-chip .chip-letter {
-    color: rgb(var(--c-text));
+    color: rgb(var(--c-text) / 0.5);
     @apply font-bold text-sm;
   }
   .letter-chip .chip-value {
