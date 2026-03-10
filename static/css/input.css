@@ -1,3 +1,198 @@
+/* ── Theme Variables ─────────────────────────────────────────────── */
+:root {
+  --c-bg: 13 13 13;
+  --c-surface: 255 255 255;
+  --c-text: 255 255 255;
+  --c-accent: 249 115 22;
+  --c-muted: 163 163 163;
+  --c-error: 248 113 113;
+
+  --glass-bg: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-bg-hover: rgba(255,255,255,0.08);
+  --glass-bg-active: rgba(255,255,255,0.12);
+  --glass-bg-input: rgba(255,255,255,0.06);
+  --glass-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  --glass-divider: rgba(255,255,255,0.06);
+  --placeholder-color: rgba(255,255,255,0.30);
+  --overlay-bg: rgba(0,0,0,0.60);
+
+  --orb-1: rgba(255,255,255,0.03);
+  --orb-2: rgba(255,255,255,0.02);
+  --orb-3: rgba(255,255,255,0.025);
+
+  --glow-lo: rgba(249,115,22,0.3);
+  --glow-hi: rgba(249,115,22,0.6);
+
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --c-bg: 245 245 245;
+  --c-surface: 255 255 255;
+  --c-text: 23 23 23;
+  --c-accent: 234 88 12;
+  --c-muted: 115 115 115;
+  --c-error: 220 38 38;
+
+  --glass-bg: rgba(255,255,255,0.70);
+  --glass-border: rgba(0,0,0,0.08);
+  --glass-bg-hover: rgba(255,255,255,0.85);
+  --glass-bg-active: rgba(255,255,255,0.90);
+  --glass-bg-input: rgba(255,255,255,0.85);
+  --glass-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  --glass-divider: rgba(0,0,0,0.06);
+  --placeholder-color: rgba(0,0,0,0.35);
+  --overlay-bg: rgba(0,0,0,0.30);
+
+  --orb-1: rgba(249,115,22,0.06);
+  --orb-2: rgba(251,146,60,0.04);
+  --orb-3: rgba(249,115,22,0.05);
+
+  --glow-lo: rgba(234,88,12,0.2);
+  --glow-hi: rgba(234,88,12,0.45);
+
+  color-scheme: light;
+}
+
+/* ── Tailwind ─────────────────────────────────────────────────────── */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+@layer components {
+  /* ── Paneles ── */
+  .glass-panel {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+  }
+
+  .glass-card {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    box-shadow: var(--glass-shadow);
+  }
+
+  /* ── Inputs ── */
+  .glass-input {
+    background: var(--glass-bg-input);
+    border: 1px solid var(--glass-border);
+    color: rgb(var(--c-text));
+    @apply rounded-xl px-4 py-3 transition-all duration-200 outline-none;
+  }
+  .glass-input::placeholder { color: var(--placeholder-color); }
+  .glass-input:focus {
+    box-shadow: 0 0 0 2px rgb(var(--c-accent) / 0.3);
+    border-color: rgb(var(--c-accent) / 0.3);
+  }
+
+  /* ── Pills ── */
+  .glass-pill {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: rgb(var(--c-text) / 0.5);
+    @apply px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 cursor-pointer;
+  }
+  .glass-pill:hover {
+    background: var(--glass-bg-hover);
+    color: rgb(var(--c-text));
+  }
+  .glass-pill.active {
+    background: rgb(var(--c-accent) / 0.12);
+    border-color: rgb(var(--c-accent) / 0.25);
+    color: rgb(var(--c-accent));
+  }
+
+  /* ── Botones ── */
+  .glass-button {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: rgb(var(--c-text) / 0.7);
+    @apply px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200;
+  }
+  .glass-button:hover {
+    background: var(--glass-bg-hover);
+    color: rgb(var(--c-text));
+  }
+
+  .glass-button-primary {
+    background: rgb(var(--c-accent));
+    border: 1px solid rgb(var(--c-accent));
+    color: #ffffff;
+    @apply px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200;
+  }
+  .glass-button-primary:hover {
+    background: rgb(var(--c-accent) / 0.85);
+  }
+
+  /* ── Badges ── */
+  .glass-badge {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: rgb(var(--c-text) / 0.6);
+    @apply inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm;
+  }
+
+  /* ── Mapa de letras ── */
+  .glass-letter-cell {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    @apply flex flex-col items-center justify-center py-1.5 px-1 rounded-lg transition-all duration-300;
+  }
+  .glass-letter-cell-active {
+    background: rgb(var(--c-accent) / 0.15);
+    border-color: rgb(var(--c-accent) / 0.4);
+    color: rgb(var(--c-accent));
+    @apply animate-pulse-glow;
+  }
+
+  /* ── Chips de letras (desglose visual) ── */
+  .letter-chip {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    @apply inline-flex items-center gap-0.5 px-2 py-0.5 rounded-lg text-xs;
+  }
+  .letter-chip .chip-letter {
+    color: rgb(var(--c-text) / 0.5);
+    @apply font-bold text-sm;
+  }
+  .letter-chip .chip-value {
+    color: rgb(var(--c-accent));
+    @apply font-semibold text-xs;
+  }
+
+  /* ── Calculadora ── */
+  .calc-cell {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: rgb(var(--c-text) / 0.4);
+    @apply flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-xl transition-all duration-300;
+  }
+  .calc-cell-active {
+    background: rgb(var(--c-accent) / 0.15);
+    border-color: rgb(var(--c-accent) / 0.4);
+    color: rgb(var(--c-accent));
+    @apply animate-pulse-glow;
+  }
+
+  /* ── Toggle icons (CSS-driven, no FOUC) ── */
+  #icon-moon { display: none; }
+  [data-theme="light"] #icon-sun { display: none; }
+  [data-theme="light"] #icon-moon { display: block; }
+}
+
+@layer utilities {
+  .border-th { border-color: var(--glass-border); }
+  .border-th-div { border-color: var(--glass-divider); }
+  .bg-overlay { background: var(--overlay-bg); }
+}

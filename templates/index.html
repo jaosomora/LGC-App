@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaz LGC</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      (function(){
+        var t = localStorage.getItem('lgc_theme');
+        if (!t) t = matchMedia('(prefers-color-scheme:light)').matches ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+      })();
+    </script>
+</head>
+<body class="min-h-screen flex flex-col bg-th-bg text-th-text font-sans antialiased">
+
+    <!-- Orbes de fondo animados -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10" aria-hidden="true">
+        <div class="absolute w-[500px] h-[500px] rounded-full blur-[120px] -top-48 -left-48 animate-float-slow" style="background:var(--orb-1)"></div>
+        <div class="absolute w-[400px] h-[400px] rounded-full blur-[100px] top-1/2 -right-48 animate-float-slower" style="background:var(--orb-2)"></div>
+        <div class="absolute w-[300px] h-[300px] rounded-full blur-[80px] bottom-20 left-1/3 animate-float-medium" style="background:var(--orb-3)"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-panel sticky top-0 z-50 border-b border-th">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="text-xl font-bold tracking-tight">
+                <span class="text-th-text">Interfaz</span><span class="text-th-accent">LGC</span>
+            </a>
+            <nav class="flex items-center gap-3 text-sm">
+                <a href="https://t.me/+2r4BtHRNc5A4MzYx" target="_blank" rel="noopener"
+                   class="text-th-text/50 hover:text-th-text transition-colors">Novedades</a>
+                <button id="theme-toggle" class="p-1.5 rounded-lg text-th-text/50 hover:text-th-text transition-colors" aria-label="Cambiar tema">
+                    <svg id="icon-sun" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    <svg id="icon-moon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido principal -->
+    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-6 sm:py-10 space-y-6">
+
+        <!-- Hero -->
+        <section class="text-center mb-2">
+            <h2 class="text-2xl sm:text-3xl font-bold leading-tight">
+                Explora el <span class="text-th-accent">potencial lógico</span> de las palabras
+            </h2>
+            <p class="text-th-text/40 text-sm mt-2">Las palabras encuentran su expresión más abstracta y universal en los números</p>
+        </section>
+
+        <!-- Selector de modo -->
+        <div id="mode-selector" class="flex justify-center gap-2">
+            <button data-mode="conversor" class="glass-pill active" aria-pressed="true">Conversor</button>
+            <button data-mode="comparar" class="glass-pill" aria-pressed="false">Comparar</button>
+        </div>
+
+        <!-- Área de input -->
+        <section id="input-area" class="glass-card p-5 sm:p-6">
+            <div id="input-conversor" class="mode-input">
+                <label for="word-input" class="block text-sm text-th-text/50 mb-2">Escribe una palabra, frase o número</label>
+                <textarea id="word-input" class="glass-input w-full text-lg resize-none" rows="2"
+                    placeholder="Escribe aquí..." autocomplete="off" spellcheck="false"></textarea>
+            </div>
+            <div id="input-comparar" class="mode-input hidden">
+                <label for="word1-input" class="block text-sm text-th-text/50 mb-2">Primera palabra</label>
+                <input type="text" id="word1-input" class="glass-input w-full text-lg mb-3"
+                    placeholder="Primera palabra..." autocomplete="off" spellcheck="false">
+                <label for="word2-input" class="block text-sm text-th-text/50 mb-2">Segunda palabra</label>
+                <input type="text" id="word2-input" class="glass-input w-full text-lg"
+                    placeholder="Segunda palabra..." autocomplete="off" spellcheck="false">
+            </div>
+
+            <div id="quick-metrics" class="hidden mt-4 flex flex-wrap gap-3 text-sm">
+                <span class="glass-badge">Letras: <strong id="metric-letras">0</strong></span>
+                <span class="glass-badge">Palabras: <strong id="metric-palabras">0</strong></span>
+                <span class="glass-badge">Potencial: <strong id="metric-potencial" class="text-th-accent font-semibold">0</strong></span>
+                <span class="glass-badge">Lupa: <strong id="metric-lupa" class="text-th-muted">0</strong></span>
+                <button id="btn-limpiar" class="ml-auto text-th-text/40 hover:text-th-text transition-colors text-xs">Limpiar</button>
+            </div>
+        </section>
+
+        <!-- Resultados primarios -->
+        <section id="results-area" class="space-y-4 hidden">
+
+            <div id="breakdown-card" class="glass-card p-5 overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-th-text/40 text-left">
+                            <th class="pb-2 pr-4">#</th>
+                            <th class="pb-2 pr-4">Palabra</th>
+                            <th class="pb-2 pr-4">Letras (números)</th>
+                            <th class="pb-2 text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="breakdown-body"></tbody>
+                    <tfoot id="breakdown-footer" class="border-t border-th"></tfoot>
+                </table>
+            </div>
+
+            <!-- Suma y Resta del conversor (multi-palabra) -->
+            <div id="conversor-operations" class="glass-card p-5 hidden"></div>
+
+            <div id="comparison-results" class="hidden space-y-4">
+                <div id="comparison-word1" class="glass-card p-5 overflow-x-auto"></div>
+                <div id="comparison-word2" class="glass-card p-5 overflow-x-auto"></div>
+                <div id="comparison-operations" class="glass-card p-5"></div>
+            </div>
+
+            <div id="action-buttons" class="flex gap-3 flex-wrap">
+                <button id="btn-compartir" class="glass-button-primary">Compartir</button>
+            </div>
+
+            <div id="calculator-section" class="glass-card p-5">
+                <h3 class="text-sm font-semibold mb-3 text-th-text/50 uppercase tracking-wider">Calculadora</h3>
+                <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto" id="calc-grid"></div>
+            </div>
+
+            <!-- Mapa de letras (dentro de resultados, auto-expandido) -->
+            <details id="letter-map-panel" class="glass-card group" open>
+                <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
+                    <span>Mapa (A=1 ... Z=27)</span>
+                    <svg class="w-4 h-4 text-th-text/40 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <div class="px-4 pb-4">
+                    <div class="grid grid-cols-9 gap-1 text-center" id="letter-map"></div>
+                </div>
+            </details>
+
+            <details id="related-panel" class="glass-card group">
+                <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
+                    <span>Palabras Relacionadas <span id="related-count" class="text-th-accent font-normal"></span></span>
+                    <svg class="w-4 h-4 text-th-text/40 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <div class="px-4 pb-4" id="related-content">
+                    <p class="text-th-text/30 text-sm">Buscando...</p>
+                </div>
+            </details>
+
+            <details id="inverted-panel" class="glass-card group">
+                <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
+                    <span>Total Invertido <span id="inverted-value" class="text-th-accent font-normal"></span></span>
+                    <svg class="w-4 h-4 text-th-text/40 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </summary>
+                <div class="px-4 pb-4" id="inverted-content">
+                    <p class="text-th-text/30 text-sm">Buscando...</p>
+                </div>
+            </details>
+        </section>
+
+        <!-- Historial y Ranking (oculto hasta que se escriba) -->
+        <details id="history-panel" class="glass-card group hidden">
+            <summary class="p-4 cursor-pointer font-semibold text-sm flex items-center justify-between">
+                <span>Historial y Ranking</span>
+                <svg class="w-4 h-4 text-th-text/40 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="px-4 pb-4 space-y-4">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-xs font-semibold text-th-text/40 uppercase tracking-wider">Tu historial</h4>
+                        <button id="btn-clear-history" class="text-xs text-th-text/30 hover:text-th-accent transition-colors">Limpiar</button>
+                    </div>
+                    <div id="history-list" class="space-y-1"></div>
+                </div>
+                <div>
+                    <h4 class="text-xs font-semibold text-th-text/40 uppercase tracking-wider mb-2">Ranking global</h4>
+                    <div id="ranking-list" class="space-y-1"></div>
+                </div>
+            </div>
+        </details>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-panel border-t border-th mt-auto">
+        <div class="max-w-3xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-3 text-sm text-th-text/40">
+            <span>Hecho por <span class="text-th-text font-semibold">Julián Osorio Mora</span></span>
+            <div class="flex gap-4">
+                <a href="https://ko-fi.com/julianosoriom" target="_blank" rel="noopener" class="hover:text-th-text transition-colors">Apoyar</a>
+                <a href="https://t.me/ampliando_marcos" target="_blank" rel="noopener" class="hover:text-th-text transition-colors">Telegram</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal de compartir -->
+    <div id="share-modal" class="fixed inset-0 bg-overlay backdrop-blur-md z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true">
+        <div class="glass-card p-6 w-full max-w-sm space-y-3">
+            <h3 class="text-base font-semibold text-center text-th-accent">Compartir resultado</h3>
+            <button id="share-whatsapp" class="glass-button-primary w-full flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp
+            </button>
+            <button id="share-copy" class="glass-button w-full flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                Copiar resultado
+            </button>
+            <button id="share-cancel" class="w-full text-center text-th-text/40 hover:text-th-text text-sm py-2 transition-colors">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Banner de cookies -->
+    <div id="cookie-banner" class="fixed bottom-0 inset-x-0 glass-panel border-t border-th p-4 z-40 hidden">
+        <div class="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-3 text-sm">
+            <p class="text-th-text/60">Usamos cookies para mejorar tu experiencia.
+                <a href="/privacy-policy" class="text-th-accent hover:underline">Política de privacidad</a>
+            </p>
+            <div class="flex gap-2">
+                <button id="cookie-accept" class="glass-button-primary text-xs px-4 py-1.5">Aceptar</button>
+                <button id="cookie-reject" class="glass-button text-xs px-4 py-1.5">Rechazar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
