@@ -22,23 +22,33 @@ def buscar():
     if potencial is None:
         return jsonify({"error": "parámetro potencial requerido"}), 400
 
-    excluir = request.args.get("excluir", "").strip().lower()
+    excluir_raw = request.args.get("excluir", "").strip().lower()
+    excluir_set = set(e.strip() for e in excluir_raw.split(",") if e.strip()) if excluir_raw else set()
 
     # Cargar todas las palabras de la BD
     todas = [p.palabra for p in Palabra.query.all()]
 
     # Palabras con mismo potencial
     encontradas = buscar_palabras_por_potencial(todas, potencial)
-    encontradas = sorted(set(normalizar(p) for p in encontradas))
-    if excluir:
-        encontradas = [p for p in encontradas if normalizar(p) != excluir]
+    encontradas = list(set(normalizar(p) for p in encontradas))
+    if excluir_set:
+        encontradas = [p for p in encontradas if p not in excluir_set]
 
     # Palabras con potencial invertido
     total_invertido = invertir_numero(potencial)
     invertidas = buscar_palabras_por_potencial(todas, total_invertido)
-    invertidas = sorted(set(normalizar(p) for p in invertidas))
-    if excluir:
-        invertidas = [p for p in invertidas if normalizar(p) != excluir]
+    invertidas = list(set(normalizar(p) for p in invertidas))
+    if excluir_set:
+        invertidas = [p for p in invertidas if p not in excluir_set]
+
+    # Ordenar por frecuencia de búsqueda (más buscadas primero)
+    all_words = set(encontradas + invertidas)
+    ranking_map = {
+        r.palabra: r.puntuacion
+        for r in Ranking.query.filter(Ranking.palabra.in_(all_words)).all()
+    } if all_words else {}
+    encontradas.sort(key=lambda p: (-ranking_map.get(p, 0), p))
+    invertidas.sort(key=lambda p: (-ranking_map.get(p, 0), p))
 
     # Territorios y elementos
     territorios = buscar_codigo_territorio(get_territorios(), potencial)

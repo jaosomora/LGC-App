@@ -438,6 +438,14 @@
       ]);
       if (resSuma) {
         $("#calc-suma-words").innerHTML = renderWordList(resSuma.palabras_relacionadas, "Palabras relacionadas con la suma");
+
+        const rc = $("#related-content");
+        rc.innerHTML = renderWordList(resSuma.palabras_relacionadas, "Palabras con el mismo potencial");
+        $("#related-count").textContent = resSuma.palabras_relacionadas.length ? `(${resSuma.palabras_relacionadas.length})` : "";
+
+        $("#inverted-value").textContent = `→ ${resSuma.total_invertido}`;
+        const ic = $("#inverted-content");
+        ic.innerHTML = renderWordList(resSuma.palabras_invertidas, `Palabras con potencial ${resSuma.total_invertido}`);
       }
       if (resResta) {
         $("#calc-resta-words").innerHTML = renderWordList(resResta.palabras_relacionadas, "Palabras relacionadas con la resta");
