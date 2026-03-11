@@ -185,6 +185,28 @@
     @apply animate-pulse-glow;
   }
 
+  /* ── Sidebar links ── */
+  .sidebar-link {
+    color: rgb(var(--c-text) / 0.5);
+    @apply flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200;
+  }
+  .sidebar-link:hover {
+    background: var(--glass-bg-hover);
+    color: rgb(var(--c-text));
+  }
+  .sidebar-link.active {
+    background: rgb(var(--c-accent) / 0.12);
+    color: rgb(var(--c-accent));
+  }
+  .sidebar-link.disabled {
+    color: rgb(var(--c-text) / 0.25);
+    @apply cursor-not-allowed;
+  }
+  .sidebar-link.disabled:hover {
+    background: transparent;
+    color: rgb(var(--c-text) / 0.25);
+  }
+
   /* ── Toggle icons (CSS-driven, no FOUC) ── */
   #icon-moon { display: none; }
   [data-theme="light"] #icon-sun { display: none; }

@@ -11,8 +11,9 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 
-from flask import Flask, render_template
+from flask import Flask
 from flask_cors import CORS
+from flask_migrate import Migrate
 from models import db
 
 
@@ -20,14 +21,17 @@ def create_app():
     app = Flask(__name__)
 
     # --- Base de datos ---
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    if os.getenv("RENDER") and os.getenv("ENV") == "PRODUCTION":
-        os.makedirs("/mnt/data", exist_ok=True)
-        db_path = os.path.join("/mnt/data", "palabras.db")
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        # Render usa postgres:// pero SQLAlchemy 2.x requiere postgresql://
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
     else:
+        base_dir = os.path.dirname(os.path.abspath(__file__))
         db_path = os.path.join(base_dir, "palabras.db")
+        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.secret_key = os.getenv("SECRET_KEY", "clave-secreta-por-defecto")
 
@@ -43,25 +47,23 @@ def create_app():
     # --- CORS ---
     CORS(app, origins=["https://www.julianosoriom.com"])
 
-    # --- Inicializar BD ---
+    # --- Inicializar BD y migraciones ---
     db.init_app(app)
+    Migrate(app, db)
 
     # --- Blueprints ---
     from routes.api import api_bp
+    from routes.public import public_bp
+    from routes.dashboard import dashboard_bp
+
     app.register_blueprint(api_bp)
+    app.register_blueprint(public_bp)
+    app.register_blueprint(dashboard_bp)
 
-    # --- Rutas HTML ---
-    @app.route("/")
-    def index():
-        return render_template("index.html")
-
-    @app.route("/privacy-policy")
-    def privacy_policy():
-        return render_template("privacy_policy.html")
-
-    # --- Crear tablas ---
-    with app.app_context():
-        db.create_all()
+    # --- Crear tablas (solo dev local con SQLite) ---
+    if not database_url:
+        with app.app_context():
+            db.create_all()
 
     return app
 
