@@ -75,10 +75,9 @@ def create_app():
     app.register_blueprint(dashboard_bp)
     app.register_blueprint(auth_bp)
 
-    # --- Crear tablas (solo dev local con SQLite) ---
-    if not database_url:
-        with app.app_context():
-            db.create_all()
+    # --- Crear tablas si no existen ---
+    with app.app_context():
+        db.create_all()
 
     return app
 
