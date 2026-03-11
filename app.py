@@ -13,8 +13,9 @@ logging.basicConfig(
 
 from flask import Flask
 from flask_cors import CORS
+from flask_login import LoginManager
 from flask_migrate import Migrate
-from models import db
+from models import db, User
 
 
 def create_app():
@@ -51,6 +52,19 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
+    # --- Flask-Login ---
+    login_manager = LoginManager()
+    login_manager.login_view = "auth.login"
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
+    # --- OAuth ---
+    from routes.auth import auth_bp, init_oauth
+    init_oauth(app)
+
     # --- Blueprints ---
     from routes.api import api_bp
     from routes.public import public_bp
@@ -59,6 +73,7 @@ def create_app():
     app.register_blueprint(api_bp)
     app.register_blueprint(public_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(auth_bp)
 
     # --- Crear tablas (solo dev local con SQLite) ---
     if not database_url:

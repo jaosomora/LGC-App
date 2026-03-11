@@ -45,9 +45,26 @@
     overlay.addEventListener("click", close);
   }
 
+  /* ── User Menu ──────────────────────────────────────────────────── */
+  function initUserMenu() {
+    var btn = document.getElementById("user-menu-btn");
+    var dropdown = document.getElementById("user-menu-dropdown");
+    if (!btn || !dropdown) return;
+
+    btn.addEventListener("click", function (e) {
+      e.stopPropagation();
+      dropdown.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", function () {
+      dropdown.classList.add("hidden");
+    });
+  }
+
   /* ── Init ───────────────────────────────────────────────────────── */
   document.addEventListener("DOMContentLoaded", function () {
     initTheme();
     initSidebar();
+    initUserMenu();
   });
 })();
