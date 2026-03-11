@@ -46,7 +46,10 @@ def create_app():
         app.config["SESSION_COOKIE_SECURE"] = False
 
     # --- CORS ---
-    CORS(app, origins=["https://www.julianosoriom.com"])
+    CORS(app, origins=[
+        "https://lgc.julianosoriom.com",
+        "https://lgc-app-1.onrender.com",
+    ])
 
     # --- Inicializar BD y migraciones ---
     db.init_app(app)
