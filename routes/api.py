@@ -1,7 +1,9 @@
 """
 routes/api.py — Endpoints JSON API para Interfaz LGC.
 """
+import os
 import logging
+import sqlite3
 from flask import Blueprint, request, jsonify
 from models import db, Palabra, Ranking
 from calculos import (
@@ -102,5 +104,69 @@ def ranking():
     return jsonify({
         "ranking": [{"palabra": e.palabra, "puntuacion": e.puntuacion} for e in entries],
     })
+
+
+@api_bp.route("/migrate-sqlite", methods=["POST"])
+def migrate_sqlite():
+    """Migración manual: copia datos de SQLite a PostgreSQL. Temporal."""
+    secret = request.args.get("key", "")
+    if secret != os.getenv("SECRET_KEY", ""):
+        return jsonify({"error": "unauthorized"}), 403
+
+    paths = ["/mnt/data/palabras.db", "/opt/render/project/src/palabras.db", "palabras.db"]
+    sqlite_path = None
+    for p in paths:
+        if os.path.exists(p):
+            sqlite_path = p
+            break
+
+    if not sqlite_path:
+        return jsonify({"error": "SQLite not found", "checked": paths}), 404
+
+    try:
+        conn = sqlite3.connect(sqlite_path)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+        # Contar antes
+        pg_palabras = Palabra.query.count()
+        pg_ranking = Ranking.query.count()
+
+        # Migrar Palabra
+        cur.execute("SELECT palabra FROM palabra")
+        rows_p = cur.fetchall()
+        added_p = 0
+        for row in rows_p:
+            if not Palabra.query.filter_by(palabra=row["palabra"]).first():
+                db.session.add(Palabra(palabra=row["palabra"]))
+                added_p += 1
+
+        # Migrar Ranking
+        cur.execute("SELECT palabra, puntuacion FROM ranking")
+        rows_r = cur.fetchall()
+        added_r = 0
+        for row in rows_r:
+            existing = Ranking.query.filter_by(palabra=row["palabra"]).first()
+            if not existing:
+                db.session.add(Ranking(palabra=row["palabra"], puntuacion=row["puntuacion"]))
+                added_r += 1
+            else:
+                existing.puntuacion = max(existing.puntuacion, row["puntuacion"])
+
+        db.session.commit()
+        conn.close()
+
+        return jsonify({
+            "success": True,
+            "sqlite_path": sqlite_path,
+            "sqlite_palabras": len(rows_p),
+            "sqlite_rankings": len(rows_r),
+            "added_palabras": added_p,
+            "added_rankings": added_r,
+            "pg_before": {"palabras": pg_palabras, "ranking": pg_ranking},
+        })
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 
