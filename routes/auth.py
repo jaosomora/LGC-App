@@ -58,9 +58,12 @@ def callback():
 
     login_user(user, remember=True)
 
-    # Registrar último login
+    # Registrar último login + auto-bootstrap owner
     from datetime import datetime, timezone as tz
     user.last_login = datetime.now(tz.utc)
+    owner_email = os.getenv("OWNER_EMAIL", "")
+    if owner_email and user.email == owner_email and not user.is_owner:
+        user.is_owner = True
     db.session.commit()
 
     return redirect(url_for("dashboard.index"))
