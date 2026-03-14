@@ -81,9 +81,39 @@ def create_app():
     # --- Crear tablas si no existen ---
     with app.app_context():
         db.create_all()
+        _ensure_owner_columns(app)
+        _bootstrap_owner(app)
         _migrate_sqlite_if_needed(app)
 
     return app
+
+
+def _ensure_owner_columns(app):
+    """Agrega columnas is_owner y last_login si no existen (para PG existente)."""
+    from sqlalchemy import inspect, text
+    inspector = inspect(db.engine)
+    columns = [c["name"] for c in inspector.get_columns("users")]
+    with db.engine.connect() as conn:
+        if "is_owner" not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN is_owner BOOLEAN DEFAULT FALSE NOT NULL"))
+            conn.commit()
+            app.logger.info("Added is_owner column to users table.")
+        if "last_login" not in columns:
+            conn.execute(text("ALTER TABLE users ADD COLUMN last_login TIMESTAMP"))
+            conn.commit()
+            app.logger.info("Added last_login column to users table.")
+
+
+def _bootstrap_owner(app):
+    """Setea is_owner=True para el email en OWNER_EMAIL."""
+    owner_email = os.getenv("OWNER_EMAIL")
+    if not owner_email:
+        return
+    owner = User.query.filter_by(email=owner_email).first()
+    if owner and not owner.is_owner:
+        owner.is_owner = True
+        db.session.commit()
+        app.logger.info("Owner bootstrapped: %s", owner_email)
 
 
 def _migrate_sqlite_if_needed(app):

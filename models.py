@@ -29,6 +29,8 @@ class User(UserMixin, db.Model):
     nombre = db.Column(db.String(200), nullable=False, default="")
     avatar_url = db.Column(db.Text, nullable=True)
     plan = db.Column(db.String(20), nullable=False, default="free")
+    is_owner = db.Column(db.Boolean, nullable=False, default=False)
+    last_login = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )

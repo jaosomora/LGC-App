@@ -107,9 +107,15 @@ def ranking():
 
 @api_bp.route("/stats")
 def stats():
-    """Estadísticas de la app. Protegido con SECRET_KEY."""
+    """Estadísticas de la app. Protegido con sesión (owner) o SECRET_KEY."""
+    from flask_login import current_user
     secret = request.args.get("key", "")
-    if secret != os.getenv("SECRET_KEY", ""):
+    expected_key = os.getenv("SECRET_KEY", "")
+    is_authorized = (
+        (current_user.is_authenticated and current_user.is_owner)
+        or (expected_key and secret == expected_key)
+    )
+    if not is_authorized:
         return jsonify({"error": "unauthorized"}), 403
 
     total_palabras = Palabra.query.count()

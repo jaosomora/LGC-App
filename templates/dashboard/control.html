@@ -1,0 +1,85 @@
+{% extends "base_dashboard.html" %}
+
+{% block page_title %}Centro de Control{% endblock %}
+
+{% block dashboard_content %}
+<div class="space-y-6">
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="glass-card p-5 space-y-1">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-th-text/40">Usuarios</p>
+            <p class="text-3xl font-bold text-th-accent" id="kpi-users">--</p>
+            <p class="text-[11px] text-th-text/40" id="kpi-users-detail">Cargando...</p>
+        </div>
+        <div class="glass-card p-5 space-y-1">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-th-text/40">Busquedas</p>
+            <p class="text-3xl font-bold text-th-accent" id="kpi-searches">--</p>
+            <p class="text-[11px] text-th-text/40">total</p>
+        </div>
+        <div class="glass-card p-5 space-y-1">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-th-text/40">Palabras</p>
+            <p class="text-3xl font-bold text-th-accent" id="kpi-palabras">--</p>
+            <p class="text-[11px] text-th-text/40">en BD</p>
+        </div>
+        <div class="glass-card p-5 space-y-1">
+            <p class="text-[11px] font-semibold uppercase tracking-wider text-th-text/40">Rankings</p>
+            <p class="text-3xl font-bold text-th-accent" id="kpi-rankings">--</p>
+            <p class="text-[11px] text-th-text/40">activos</p>
+        </div>
+    </div>
+
+    <!-- Two columns: Top 10 + Recent Users -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+        <!-- Top 10 Más Buscadas -->
+        <div class="glass-card p-5">
+            <h2 class="text-sm font-semibold mb-4 text-th-text/70">Top 10 Palabras Mas Buscadas</h2>
+            <div id="top-palabras-empty" class="text-sm text-th-text/30 text-center py-8 hidden">Sin datos</div>
+            <table class="w-full" id="top-palabras-table">
+                <tbody id="top-palabras-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Usuarios Recientes -->
+        <div class="glass-card p-5">
+            <h2 class="text-sm font-semibold mb-4 text-th-text/70">Usuarios Recientes</h2>
+            <div id="recent-users-empty" class="text-sm text-th-text/30 text-center py-8 hidden">Sin usuarios</div>
+            <div class="space-y-3" id="recent-users-list"></div>
+            <div class="mt-4 pt-3 border-t border-th-div">
+                <a href="/dashboard/usuarios" class="text-xs text-th-accent hover:underline">Ver todos &rarr;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estado del Sistema -->
+    <div class="glass-card p-5">
+        <h2 class="text-sm font-semibold mb-4 text-th-text/70">Estado del Sistema</h2>
+        <div class="flex flex-wrap gap-6 text-sm">
+            <div class="flex items-center gap-2">
+                <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-th-text/20"></span>
+                <span class="text-th-text/60">Base de Datos:</span>
+                <span id="status-db" class="font-medium">Verificando...</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-th-text/60">Entorno:</span>
+                <span class="font-medium">{{ config.get('ENV', 'LOCAL') if config.get('SESSION_COOKIE_SECURE') else 'Local' }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-th-text/60">Version:</span>
+                <span class="font-medium">v2.0.1</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ingresos Placeholder -->
+    <div class="glass-card p-5">
+        <div class="flex items-center gap-3 mb-2">
+            <svg class="w-5 h-5 text-th-accent/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+            <h2 class="text-sm font-semibold text-th-text/70">Ingresos y Rentabilidad</h2>
+        </div>
+        <p class="text-sm text-th-text/30">Pronto podras ver metricas de revenue, conversion free a paid, y mas.</p>
+    </div>
+
+</div>
+{% endblock %}

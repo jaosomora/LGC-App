@@ -57,6 +57,12 @@ def callback():
         db.session.commit()
 
     login_user(user, remember=True)
+
+    # Registrar último login
+    from datetime import datetime, timezone as tz
+    user.last_login = datetime.now(tz.utc)
+    db.session.commit()
+
     return redirect(url_for("dashboard.index"))
 
 
