@@ -14,6 +14,14 @@
   var MESES     = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   var ms        = 86400000;
 
+  // ── Grilla: estructura de cuadrantes ──
+  var QUADS = [
+    { name: "SO", start: 1,  mems: ["RAM","REM","ROM","RUM"] },
+    { name: "NE", start: 5,  mems: [null,null,null,null] },
+    { name: "NO", start: 9,  mems: [null,null,null,null] },
+    { name: "SE", start: 13, mems: [null,null,null,null] }
+  ];
+
   // ── JDN (Número de Día Juliano) ──
   function jdnG(y,m,d) {
     var a = Math.floor((14-m)/12), Y = y+4800-a, M = m+12*a-3;
@@ -36,8 +44,7 @@
   function isLeap(y) { return (y%4===0) && ((y%100)!==0 || y%400===0); }
   function dt(y,m,d) { var b = new Date(Date.UTC(2000, m-1, d)); b.setUTCFullYear(y); return b; }
   function dFrom(a,b) { return Math.floor((b-a)/ms); }
-  function fmt(n) { return n.toLocaleString("es"); }
-  function fmtSign(n) { return (n >= 0 ? "+" : "") + fmt(n); }
+  function fmtSign(n) { return (n >= 0 ? "+" : "") + n; }
   function fmtDate(d,m,y) { return d + " " + MESES[m-1] + " " + y; }
 
   // ── Motor de cálculo ──
@@ -52,15 +59,16 @@
     var aneg    = 1461 - apos;
     var fase    = Math.max(1, Math.min(4, year - apStart + 1));
 
-    // Día Solar y Días de Vida
-    var ds  = diaSolar(year, month, day);
-    var ddv = (nacY != null) ? Math.max(0, jdnCut(year,month,day) - jdnCut(nacY,nacM,nacD)) : null;
+    // Día Solar, Día Solar Nativo y Días de Vida
+    var ds       = diaSolar(year, month, day);
+    var dsNativo = (nacY != null) ? diaSolar(nacY, nacM, nacD) : null;
+    var ddv      = (nacY != null) ? Math.max(0, jdnCut(year,month,day) - jdnCut(nacY,nacM,nacD)) : null;
 
     // Cuarentena Global (inicio: 14/10/2012)
     var Q  = dt(2012, 10, 14);
     var qd = dFrom(Q, dt(year,month,day));
-    var qi      = qd > 0 ? Math.floor((qd-1)/39)+1 : 0;
-    var qDpos   = qd > 0 ? (qd-1)%39+1 : 0;
+    var qi       = qd > 0 ? Math.floor((qd-1)/39)+1 : 0;
+    var qDpos    = qd > 0 ? (qd-1)%39+1 : 0;
     var brickIdx = qDpos > 0 ? Math.floor((qDpos-1)/3)+1 : 0;
     var brickDay = qDpos > 0 ? (qDpos-1)%3+1 : 0;
 
@@ -84,7 +92,7 @@
     var cuarentena = { qd:qd, qi:qi, qDpos:qDpos, brickIdx:brickIdx, brickDay:brickDay };
 
     var base = {
-      doy:doy, total:total, ds:ds, ddv:ddv,
+      doy:doy, total:total, ds:ds, dsNativo:dsNativo, ddv:ddv,
       apNum:apNum, apStart:apStart, fase:fase, faseName:FASES[fase],
       apos:apos, aneg:aneg, anuAp:apos-aneg,
       frcPos:frcPos, frcNeg:frcNeg, anuAño:anuAño,
@@ -109,83 +117,134 @@
     base.mem  = cuad === "SO" ? MEMORIAS[step] : null;
     base.vAbs = Math.floor((doy-1)/16)+1;
     base.vRel = base.vAbs <= 11 ? base.vAbs : base.vAbs - 11;
-    base.vTipo = base.vAbs <= 11 ? "con uno mismo" : "con el otro";
     return base;
   }
 
-  // ── Renderizado ──
-  function render(data) {
-    var posEl = document.getElementById("cal-position");
-    var metricsEl = document.getElementById("cal-metrics");
-    if (!posEl || !metricsEl) return;
+  // ── Grilla visual 4×4 ──
+  function renderGrid(data) {
+    var html = '<div class="grid grid-cols-5 gap-1.5 mt-4">';
 
-    // ── Position Hero ──
-    if (data.esAnillo) {
-      posEl.innerHTML =
-        '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-2">Posición Calendaria</div>' +
-        '<div class="text-3xl sm:text-4xl font-bold text-th-accent">Anillo de Fuego</div>' +
-        '<div class="text-lg font-semibold text-th-text/70 mt-2">V23 · ' + data.diaAnillo + '/' + data.totalAnillo + '</div>' +
-        '<div class="text-sm text-th-text/40 mt-1">Días fuera del cuerpo calendárico</div>';
-    } else {
-      var memStr = data.mem ? " · " + data.mem : "";
-      posEl.innerHTML =
-        '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-2">Posición Calendaria</div>' +
-        '<div class="text-3xl sm:text-4xl font-bold text-th-accent">V' + data.vAbs + ' · ' + data.pos + '/16</div>' +
-        '<div class="text-lg font-semibold text-th-text/70 mt-2">' + data.cuad + ' · ' + data.paso + memStr + '</div>' +
-        '<div class="text-sm text-th-text/40 mt-1">Vuelta ' + data.vRel + ' (' + data.vTipo + ')</div>';
+    // Header
+    html += '<div></div>';
+    html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 text-center pb-1">Lógica</div>';
+    html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 text-center pb-1">Inhumano</div>';
+    html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 text-center pb-1">Humano</div>';
+    html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 text-center pb-1">Contexto</div>';
+
+    // Rows
+    for (var q = 0; q < 4; q++) {
+      var quad = QUADS[q];
+      var isActiveQuad = data.cuad === quad.name;
+      var labelCls = isActiveQuad ? "text-th-accent font-bold" : "text-th-text/40 font-semibold";
+      html += '<div class="flex items-center justify-center text-xs ' + labelCls + '">' + quad.name + '</div>';
+
+      for (var i = 0; i < 4; i++) {
+        var pos = quad.start + i;
+        var isActive = data.pos === pos;
+        var cellCls = isActive ? "cal-grid-active" : "cal-grid-cell";
+        html += '<div class="' + cellCls + ' flex flex-col items-center justify-center py-2 rounded-lg">';
+        html += '<span class="font-bold text-sm">' + pos + '</span>';
+        if (quad.mems[i]) {
+          html += '<span class="text-[9px] leading-tight mt-0.5 opacity-70">' + quad.mems[i] + '</span>';
+        }
+        html += '</div>';
+      }
     }
 
-    // ── Metrics Grid ──
+    html += '</div>';
+    return html;
+  }
+
+  // ── Renderizado principal ──
+  function render(data) {
+    var container = document.getElementById("calendaria-results");
+    if (!container) return;
+
     var html = "";
 
-    // Día Solar
-    html += '<div class="glass-card p-4">' +
-      '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día Solar</div>' +
-      '<div class="text-2xl font-bold text-th-accent">' + fmt(data.ds) + '</div>' +
-      '</div>';
+    // ── 1. Día Solar ──
+    html += '<div class="glass-card p-4">';
+    html += '<div class="flex items-center justify-between">';
+    html += '<div>';
+    html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día Solar</div>';
+    html += '<div class="text-2xl font-bold text-th-accent">' + data.ds + '</div>';
+    html += '</div>';
+    if (data.dsNativo !== null) {
+      html += '<div class="text-right">';
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día Solar Nativo</div>';
+      html += '<div class="text-2xl font-bold text-th-text/70">' + data.dsNativo + '</div>';
+      html += '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
 
-    // Frecuencias del Año
+    // ── 2. Posición Calendaria + Grilla ──
+    if (data.esAnillo) {
+      html += '<div class="glass-card p-6 text-center">';
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-2">Posición Calendaria</div>';
+      html += '<div class="text-3xl sm:text-4xl font-bold text-th-accent">Anillo de Fuego</div>';
+      html += '<div class="text-lg font-semibold text-th-text/70 mt-2">V23 · ' + data.diaAnillo + '/' + data.totalAnillo + '</div>';
+      html += '</div>';
+    } else {
+      html += '<div class="glass-card p-5">';
+      html += '<div class="text-center">';
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Posición Calendaria</div>';
+      var memStr = data.mem ? " · " + data.mem : "";
+      html += '<div class="text-2xl sm:text-3xl font-bold text-th-accent">V' + data.vAbs + ' · ' + data.pos + '/16</div>';
+      html += '<div class="text-sm text-th-text/50 mt-1">' + data.cuad + ' · ' + data.paso + memStr + '</div>';
+      html += '<div class="text-xs text-th-text/40 mt-0.5">Vuelta ' + data.vRel + '</div>';
+      html += '</div>';
+      html += renderGrid(data);
+      html += '</div>';
+    }
+
+    // ── 3. Métricas adicionales ──
+    html += '<div class="grid grid-cols-2 gap-3">';
+
+    // Día del Año / Frecuencias
     var encAnualStr = data.encajeAnual
       ? '<div class="text-xs text-th-text/30 mt-0.5">Encaje: ' + fmtDate(data.encajeAnual.d, data.encajeAnual.m, data.encajeAnual.y) + '</div>'
       : "";
-    html += '<div class="glass-card p-4">' +
-      '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día del Año</div>' +
-      '<div class="text-2xl font-bold">' + data.doy + '<span class="text-base text-th-text/40">/' + data.total + '</span></div>' +
-      '<div class="text-xs text-th-text/40 mt-1">+' + data.frcPos + ' −' + data.frcNeg + ' · Anu: ' + fmtSign(data.anuAño) + '</div>' +
-      encAnualStr +
-      '</div>';
+    html += '<div class="glass-card p-4">';
+    html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día del Año</div>';
+    html += '<div class="text-2xl font-bold">' + data.doy + '<span class="text-base text-th-text/40">/' + data.total + '</span></div>';
+    html += '<div class="text-xs text-th-text/40 mt-1">+' + data.frcPos + ' −' + data.frcNeg + ' · Anu: ' + fmtSign(data.anuAño) + '</div>';
+    html += encAnualStr;
+    html += '</div>';
 
     // Aparato
     var encApStr = data.encajeAp
       ? '<div class="text-xs text-th-text/30 mt-0.5">Encaje: ' + fmtDate(data.encajeAp.d, data.encajeAp.m, data.encajeAp.y) + '</div>'
       : "";
-    html += '<div class="glass-card p-4">' +
-      '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Aparato ' + data.apNum + '</div>' +
-      '<div class="text-lg font-bold">' + data.faseName + '</div>' +
-      '<div class="text-sm text-th-text/50">Día ' + fmt(data.apos) + '/1461</div>' +
-      '<div class="text-xs text-th-text/40 mt-1">+' + fmt(data.apos) + ' −' + fmt(data.aneg) + ' · Anu: ' + fmtSign(data.anuAp) + '</div>' +
-      encApStr +
-      '</div>';
+    html += '<div class="glass-card p-4">';
+    html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Aparato ' + data.apNum + '</div>';
+    html += '<div class="text-lg font-bold">' + data.faseName + '</div>';
+    html += '<div class="text-sm text-th-text/50">Día ' + data.apos + '/1461</div>';
+    html += '<div class="text-xs text-th-text/40 mt-1">+' + data.apos + ' −' + data.aneg + ' · Anu: ' + fmtSign(data.anuAp) + '</div>';
+    html += encApStr;
+    html += '</div>';
 
     // Cuarentena Global
     if (data.cuarentena.qd > 0) {
-      html += '<div class="glass-card p-4">' +
-        '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Cuarentena Global</div>' +
-        '<div class="text-lg font-bold">#' + fmt(data.cuarentena.qi) + '</div>' +
-        '<div class="text-sm text-th-text/50">Día ' + data.cuarentena.qDpos + '/39 · Ladrillo ' + data.cuarentena.brickIdx + '</div>' +
-        '<div class="text-xs text-th-text/40 mt-1">Día ' + data.cuarentena.brickDay + '/3 del ladrillo</div>' +
-        '</div>';
+      html += '<div class="glass-card p-4">';
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Cuarentena Global</div>';
+      html += '<div class="text-lg font-bold">#' + data.cuarentena.qi + '</div>';
+      html += '<div class="text-sm text-th-text/50">Día ' + data.cuarentena.qDpos + '/39 · Ladrillo ' + data.cuarentena.brickIdx + '</div>';
+      html += '<div class="text-xs text-th-text/40 mt-1">Día ' + data.cuarentena.brickDay + '/3 del ladrillo</div>';
+      html += '</div>';
     }
 
     // Días de Vida
     if (data.ddv !== null) {
-      html += '<div class="glass-card p-4 col-span-2">' +
-        '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Días de Vida</div>' +
-        '<div class="text-2xl font-bold text-th-accent">' + fmt(data.ddv) + '</div>' +
-        '</div>';
+      html += '<div class="glass-card p-4">';
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Días de Vida</div>';
+      html += '<div class="text-2xl font-bold text-th-accent">' + data.ddv + '</div>';
+      html += '</div>';
     }
 
-    metricsEl.innerHTML = html;
+    html += '</div>';
+
+    container.innerHTML = html;
   }
 
   // ── Inicialización ──
@@ -194,7 +253,7 @@
     var calBirth = document.getElementById("cal-birth");
     if (!calDate) return;
 
-    // Default: hoy
+    // Default: hoy (zona horaria local del usuario)
     var today = new Date();
     var yyyy = today.getFullYear();
     var mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -214,7 +273,7 @@
       });
     }
 
-    // Render inicial (oculto hasta que se active el modo)
+    // Render inicial
     refresh();
   }
 
