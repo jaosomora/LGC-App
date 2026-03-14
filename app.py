@@ -81,8 +81,76 @@ def create_app():
     # --- Crear tablas si no existen ---
     with app.app_context():
         db.create_all()
+        _migrate_sqlite_if_needed(app)
 
     return app
+
+
+def _migrate_sqlite_if_needed(app):
+    """
+    Auto-migración one-shot: si PostgreSQL está conectado, el archivo SQLite
+    existe en /mnt/data/palabras.db, y la tabla Palabra está vacía,
+    copia palabras y rankings desde SQLite a PostgreSQL.
+    Se ejecuta solo una vez (cuando PG está vacío).
+    """
+    from models import Palabra, Ranking
+    import sqlite3
+
+    database_url = os.getenv("DATABASE_URL", "")
+    if not database_url:
+        return  # Estamos en local con SQLite, no migrar
+
+    sqlite_path = "/mnt/data/palabras.db"
+    if not os.path.exists(sqlite_path):
+        app.logger.info("Auto-migrate: SQLite file not found at %s, skipping.", sqlite_path)
+        return
+
+    # Solo migrar si PostgreSQL está vacío
+    count = Palabra.query.count()
+    if count > 0:
+        app.logger.info("Auto-migrate: Palabra table has %d records, skipping.", count)
+        return
+
+    app.logger.info("Auto-migrate: PostgreSQL vacío, iniciando migración desde SQLite...")
+
+    try:
+        conn = sqlite3.connect(sqlite_path)
+        cursor = conn.cursor()
+
+        # Migrar palabras (batch — tabla ya está vacía)
+        cursor.execute("SELECT palabra FROM palabra")
+        palabras_rows = cursor.fetchall()
+        seen_p = set()
+        batch_p = []
+        for (p,) in palabras_rows:
+            if p and p.strip() and p.strip() not in seen_p:
+                seen_p.add(p.strip())
+                batch_p.append(Palabra(palabra=p.strip()))
+        if batch_p:
+            db.session.bulk_save_objects(batch_p)
+            db.session.commit()
+        app.logger.info("Auto-migrate: %d palabras agregadas.", len(batch_p))
+
+        # Migrar rankings (batch — tabla ya está vacía)
+        cursor.execute("SELECT palabra, puntuacion FROM ranking")
+        ranking_rows = cursor.fetchall()
+        seen_r = set()
+        batch_r = []
+        for palabra, puntuacion in ranking_rows:
+            if palabra and palabra.strip() and palabra.strip() not in seen_r:
+                seen_r.add(palabra.strip())
+                batch_r.append(Ranking(palabra=palabra.strip(), puntuacion=puntuacion or 1))
+        if batch_r:
+            db.session.bulk_save_objects(batch_r)
+            db.session.commit()
+        app.logger.info("Auto-migrate: %d rankings agregados.", len(batch_r))
+
+        conn.close()
+        app.logger.info("Auto-migrate: Migración completada exitosamente.")
+
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error("Auto-migrate: Error durante migración: %s", e)
 
 
 app = create_app()
