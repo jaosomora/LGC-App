@@ -9,6 +9,7 @@
   var JDN_EPOCH = 1721424;
   var CARD_MAP  = ["SO","SO","SO","SO","NE","NE","NE","NE","NO","NO","NO","NO","SE","SE","SE","SE"];
   var PASOS     = ["Lógica","Inhumano","Humano","Contexto"];
+  var PASOS_S   = ["Lóg","Inh","Hum","Ctx"];
   var MEMORIAS  = ["","RAM","REM","ROM","RUM"];
   var FASES     = ["","Asume","Asimila","Desafía","Decide"];
   var MESES     = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
@@ -185,9 +186,12 @@
       html += '</div>';
 
       // Etiquetas de paso debajo de las celdas
-      html += '<div class="grid grid-cols-4 gap-1 mt-0.5">';
+      html += '<div class="grid grid-cols-4 gap-0 mt-0.5">';
       for (var j = 0; j < 4; j++) {
-        html += '<div class="text-[7px] uppercase tracking-wider text-th-text/20 text-center">' + PASOS[j] + '</div>';
+        html += '<div class="text-[6px] sm:text-[7px] uppercase text-th-text/20 text-center leading-tight">' +
+          '<span class="hidden sm:inline">' + PASOS[j] + '</span>' +
+          '<span class="sm:hidden">' + PASOS_S[j] + '</span>' +
+          '</div>';
       }
       html += '</div>';
 

@@ -1716,6 +1716,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   justify-content: space-between;
 }
 
+.gap-0 {
+  gap: 0px;
+}
+
 .gap-1 {
   gap: 0.25rem;
 }
@@ -2059,8 +2063,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-size: 11px;
 }
 
-.text-\[7px\] {
-  font-size: 7px;
+.text-\[6px\] {
+  font-size: 6px;
 }
 
 .text-\[8px\] {
@@ -2366,6 +2370,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .sm\:text-4xl {
     font-size: 2.25rem;
     line-height: 2.5rem;
+  }
+
+  .sm\:text-\[7px\] {
+    font-size: 7px;
   }
 }
 
