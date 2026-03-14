@@ -141,35 +141,57 @@
     return base;
   }
 
-  // ── Grilla visual 4×4 ──
+  // ── Grilla visual 4×4 (plano cartesiano) ──
+  // Orden visual: NO(arriba-izq), NE(arriba-der), SO(abajo-izq), SE(abajo-der)
+  var GRID_DISPLAY = [
+    { name: "NO", start: 9,  mems: [null,null,null,null] },
+    { name: "NE", start: 5,  mems: [null,null,null,null] },
+    { name: "SO", start: 1,  mems: ["RAM","REM","ROM","RUM"] },
+    { name: "SE", start: 13, mems: [null,null,null,null] }
+  ];
+
   function renderGrid(data) {
-    var html = '<div class="grid grid-cols-5 gap-1.5 mt-4">';
+    var html = '<div class="grid grid-cols-2 mt-4 rounded-xl overflow-hidden" style="border:1px solid var(--glass-border)">';
 
-    // Header
-    html += '<div></div>';
-    html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 text-center pb-1">Lógica</div>';
-    html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 text-center pb-1">Inhumano</div>';
-    html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 text-center pb-1">Humano</div>';
-    html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 text-center pb-1">Contexto</div>';
-
-    // Rows
     for (var q = 0; q < 4; q++) {
-      var quad = QUADS[q];
+      var quad = GRID_DISPLAY[q];
       var isActiveQuad = data.cuad === quad.name;
-      var labelCls = isActiveQuad ? "text-th-accent font-bold" : "text-th-text/40 font-semibold";
-      html += '<div class="flex items-center justify-center text-xs ' + labelCls + '">' + quad.name + '</div>';
 
+      // Bordes internos: cruz cartesiana
+      var borders = [];
+      if (q === 0 || q === 2) borders.push("border-right:1px solid var(--glass-border)");
+      if (q === 0 || q === 1) borders.push("border-bottom:1px solid var(--glass-border)");
+      if (isActiveQuad) borders.push("background:rgb(var(--c-accent)/0.05)");
+
+      html += '<div class="p-2.5" style="' + borders.join(";") + '">';
+
+      // Label del cuadrante
+      var lblCls = isActiveQuad ? "text-th-accent font-bold" : "text-th-text/25";
+      html += '<div class="text-[10px] uppercase tracking-wider ' + lblCls + ' mb-1.5 text-center">' + quad.name + '</div>';
+
+      // 4 celdas de posición
+      html += '<div class="grid grid-cols-4 gap-1">';
       for (var i = 0; i < 4; i++) {
         var pos = quad.start + i;
         var isActive = data.pos === pos;
-        var cellCls = isActive ? "cal-grid-active" : "cal-grid-cell";
-        html += '<div class="' + cellCls + ' flex flex-col items-center justify-center py-2 rounded-lg">';
+        var cls = isActive ? "cal-grid-active" : "cal-grid-cell";
+        html += '<div class="' + cls + ' flex flex-col items-center justify-center py-2 rounded-lg">';
         html += '<span class="font-bold text-sm">' + pos + '</span>';
         if (quad.mems[i]) {
-          html += '<span class="text-[9px] leading-tight mt-0.5 opacity-70">' + quad.mems[i] + '</span>';
+          html += '<span class="text-[8px] leading-tight mt-0.5 opacity-60">' + quad.mems[i] + '</span>';
         }
         html += '</div>';
       }
+      html += '</div>';
+
+      // Etiquetas de paso debajo de las celdas
+      html += '<div class="grid grid-cols-4 gap-1 mt-0.5">';
+      for (var j = 0; j < 4; j++) {
+        html += '<div class="text-[7px] uppercase tracking-wider text-th-text/20 text-center">' + PASOS[j] + '</div>';
+      }
+      html += '</div>';
+
+      html += '</div>';
     }
 
     html += '</div>';
@@ -296,6 +318,7 @@
     var calBirth = document.getElementById("cal-birth");
     var btnPrev  = document.getElementById("cal-prev");
     var btnNext  = document.getElementById("cal-next");
+    var btnToday = document.getElementById("cal-today");
     if (!calDate) return;
 
     // Default: hoy (zona horaria local del usuario)
@@ -317,6 +340,10 @@
     }
     if (btnPrev) btnPrev.addEventListener("click", function () { shiftDate(-1); });
     if (btnNext) btnNext.addEventListener("click", function () { shiftDate(1); });
+    if (btnToday) btnToday.addEventListener("click", function () {
+      calDate.value = toDateStr(new Date());
+      refresh();
+    });
 
     // Render inicial
     refresh();
