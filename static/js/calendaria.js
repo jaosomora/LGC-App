@@ -47,6 +47,27 @@
   function fmtSign(n) { return (n >= 0 ? "+" : "") + n; }
   function fmtDate(d,m,y) { return d + " " + MESES[m-1] + " " + y; }
 
+  function toDateStr(date) {
+    var y = date.getFullYear();
+    var m = String(date.getMonth() + 1).padStart(2, "0");
+    var d = String(date.getDate()).padStart(2, "0");
+    return y + "-" + m + "-" + d;
+  }
+
+  // ── Barra de progreso ──
+  function progressBar(value, max, label) {
+    var pct = Math.round((value / max) * 100);
+    return '<div class="mt-2">' +
+      '<div class="flex items-center justify-between text-[10px] text-th-text/30 mb-0.5">' +
+        '<span>' + label + '</span>' +
+        '<span>' + value + '/' + max + '</span>' +
+      '</div>' +
+      '<div class="h-1.5 rounded-full overflow-hidden" style="background:var(--glass-border)">' +
+        '<div class="h-full rounded-full transition-all duration-500" style="width:' + pct + '%;background:rgb(var(--c-accent))"></div>' +
+      '</div>' +
+    '</div>';
+  }
+
   // ── Motor de cálculo ──
   function calcular(year, month, day, nacY, nacM, nacD) {
     var leap = isLeap(year), total = leap ? 366 : 365;
@@ -162,28 +183,38 @@
 
     var html = "";
 
-    // ── 1. Día Solar ──
+    // ── 1. Día Solar + Nativo + Días de Vida ──
     html += '<div class="glass-card p-4">';
-    html += '<div class="flex items-center justify-between">';
-    html += '<div>';
-    html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día Solar</div>';
-    html += '<div class="text-2xl font-bold text-th-accent">' + data.ds + '</div>';
-    html += '</div>';
     if (data.dsNativo !== null) {
-      html += '<div class="text-right">';
-      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día Solar Nativo</div>';
-      html += '<div class="text-2xl font-bold text-th-text/70">' + data.dsNativo + '</div>';
+      // Con fecha de nacimiento: 3 filas
+      html += '<div class="grid grid-cols-3 gap-4 text-center">';
+      html += '<div>';
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día Solar</div>';
+      html += '<div class="text-xl font-bold text-th-accent">' + data.ds + '</div>';
       html += '</div>';
+      html += '<div>';
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Solar Nativo</div>';
+      html += '<div class="text-xl font-bold text-th-text/70">' + data.dsNativo + '</div>';
+      html += '</div>';
+      html += '<div>';
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Días de Vida</div>';
+      html += '<div class="text-xl font-bold text-th-accent">' + data.ddv + '</div>';
+      html += '</div>';
+      html += '</div>';
+    } else {
+      // Sin fecha de nacimiento: solo Día Solar
+      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Día Solar</div>';
+      html += '<div class="text-2xl font-bold text-th-accent">' + data.ds + '</div>';
     }
     html += '</div>';
-    html += '</div>';
 
-    // ── 2. Posición Calendaria + Grilla ──
+    // ── 2. Posición Calendaria + Grilla + Barra ──
     if (data.esAnillo) {
       html += '<div class="glass-card p-6 text-center">';
       html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-2">Posición Calendaria</div>';
       html += '<div class="text-3xl sm:text-4xl font-bold text-th-accent">Anillo de Fuego</div>';
       html += '<div class="text-lg font-semibold text-th-text/70 mt-2">V23 · ' + data.diaAnillo + '/' + data.totalAnillo + '</div>';
+      html += progressBar(data.diaAnillo, data.totalAnillo, "Anillo de Fuego");
       html += '</div>';
     } else {
       html += '<div class="glass-card p-5">';
@@ -194,6 +225,7 @@
       html += '<div class="text-sm text-th-text/50 mt-1">' + data.cuad + ' · ' + data.paso + memStr + '</div>';
       html += '<div class="text-xs text-th-text/40 mt-0.5">Vuelta ' + data.vRel + '</div>';
       html += '</div>';
+      html += progressBar(data.pos, 16, "Posición en la vuelta");
       html += renderGrid(data);
       html += '</div>';
     }
@@ -210,6 +242,7 @@
     html += '<div class="text-2xl font-bold">' + data.doy + '<span class="text-base text-th-text/40">/' + data.total + '</span></div>';
     html += '<div class="text-xs text-th-text/40 mt-1">+' + data.frcPos + ' −' + data.frcNeg + ' · Anu: ' + fmtSign(data.anuAño) + '</div>';
     html += encAnualStr;
+    html += progressBar(data.doy, data.total, "Progreso anual");
     html += '</div>';
 
     // Aparato
@@ -222,23 +255,23 @@
     html += '<div class="text-sm text-th-text/50">Día ' + data.apos + '/1461</div>';
     html += '<div class="text-xs text-th-text/40 mt-1">+' + data.apos + ' −' + data.aneg + ' · Anu: ' + fmtSign(data.anuAp) + '</div>';
     html += encApStr;
+    html += progressBar(data.apos, 1461, "Progreso del Aparato");
     html += '</div>';
 
     // Cuarentena Global
     if (data.cuarentena.qd > 0) {
-      html += '<div class="glass-card p-4">';
+      html += '<div class="glass-card p-4 col-span-2">';
       html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Cuarentena Global</div>';
+      html += '<div class="flex items-center justify-between">';
+      html += '<div>';
       html += '<div class="text-lg font-bold">#' + data.cuarentena.qi + '</div>';
       html += '<div class="text-sm text-th-text/50">Día ' + data.cuarentena.qDpos + '/39 · Ladrillo ' + data.cuarentena.brickIdx + '</div>';
-      html += '<div class="text-xs text-th-text/40 mt-1">Día ' + data.cuarentena.brickDay + '/3 del ladrillo</div>';
       html += '</div>';
-    }
-
-    // Días de Vida
-    if (data.ddv !== null) {
-      html += '<div class="glass-card p-4">';
-      html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Días de Vida</div>';
-      html += '<div class="text-2xl font-bold text-th-accent">' + data.ddv + '</div>';
+      html += '<div class="text-right">';
+      html += '<div class="text-xs text-th-text/40">Día ' + data.cuarentena.brickDay + '/3 del ladrillo</div>';
+      html += '</div>';
+      html += '</div>';
+      html += progressBar(data.cuarentena.qDpos, 39, "Progreso de la cuarentena");
       html += '</div>';
     }
 
@@ -247,23 +280,33 @@
     container.innerHTML = html;
   }
 
+  // ── Navegación de fecha ──
+  function shiftDate(days) {
+    var calDate = document.getElementById("cal-date");
+    if (!calDate || !calDate.value) return;
+    var current = new Date(calDate.value + "T12:00:00");
+    current.setDate(current.getDate() + days);
+    calDate.value = toDateStr(current);
+    refresh();
+  }
+
   // ── Inicialización ──
   function init() {
     var calDate  = document.getElementById("cal-date");
     var calBirth = document.getElementById("cal-birth");
+    var btnPrev  = document.getElementById("cal-prev");
+    var btnNext  = document.getElementById("cal-next");
     if (!calDate) return;
 
     // Default: hoy (zona horaria local del usuario)
     var today = new Date();
-    var yyyy = today.getFullYear();
-    var mm = String(today.getMonth() + 1).padStart(2, "0");
-    var dd = String(today.getDate()).padStart(2, "0");
-    calDate.value = yyyy + "-" + mm + "-" + dd;
+    calDate.value = toDateStr(today);
 
     // Cargar fecha de nacimiento guardada
     var savedBirth = localStorage.getItem("lgc_birth_date");
     if (savedBirth && calBirth) calBirth.value = savedBirth;
 
+    // Event listeners
     calDate.addEventListener("input", refresh);
     if (calBirth) {
       calBirth.addEventListener("input", function () {
@@ -272,6 +315,8 @@
         refresh();
       });
     }
+    if (btnPrev) btnPrev.addEventListener("click", function () { shiftDate(-1); });
+    if (btnNext) btnNext.addEventListener("click", function () { shiftDate(1); });
 
     // Render inicial
     refresh();
