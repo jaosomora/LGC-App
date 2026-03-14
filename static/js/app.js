@@ -105,7 +105,17 @@
         });
         $$(".mode-input").forEach(el => el.classList.add("hidden"));
         $(`#input-${currentMode}`).classList.remove("hidden");
-        clearResults();
+
+        if (currentMode === "calendaria") {
+          $("#results-area").classList.add("hidden");
+          $("#quick-metrics").classList.add("hidden");
+          $("#history-panel").classList.add("hidden");
+          $("#calendaria-results").classList.remove("hidden");
+          if (window.LGCCalendaria) window.LGCCalendaria.refresh();
+        } else {
+          $("#calendaria-results").classList.add("hidden");
+          clearResults();
+        }
         focusCurrentInput();
       });
     });
@@ -113,7 +123,8 @@
 
   function focusCurrentInput() {
     if (currentMode === "conversor") $("#word-input").focus();
-    else $("#word1-input").focus();
+    else if (currentMode === "comparar") $("#word1-input").focus();
+    else if (currentMode === "calendaria") $("#cal-date").focus();
   }
 
   // ── Listeners de input ──

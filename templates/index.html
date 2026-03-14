@@ -32,6 +32,7 @@
         <div id="mode-selector" class="flex justify-center gap-2">
             <button data-mode="conversor" class="glass-pill active" aria-pressed="true">Conversor</button>
             <button data-mode="comparar" class="glass-pill" aria-pressed="false">Comparar</button>
+            <button data-mode="calendaria" class="glass-pill" aria-pressed="false">Calendaria</button>
         </div>
 
         <!-- Área de input -->
@@ -48,6 +49,17 @@
                 <label for="word2-input" class="block text-sm text-th-text/50 mb-2">Segunda palabra o frase</label>
                 <input type="text" id="word2-input" class="glass-input w-full text-lg"
                     placeholder="Escribe aquí..." autocomplete="off" spellcheck="false">
+            </div>
+
+            <div id="input-calendaria" class="mode-input hidden">
+                <label for="cal-date" class="block text-sm text-th-text/50 mb-2">Fecha de consulta</label>
+                <input type="date" id="cal-date" class="glass-input w-full text-lg">
+                <div class="mt-3">
+                    <label for="cal-birth" class="block text-sm text-th-text/50 mb-2">
+                        Fecha de nacimiento <span class="text-th-text/30">(opcional)</span>
+                    </label>
+                    <input type="date" id="cal-birth" class="glass-input w-full text-lg">
+                </div>
             </div>
 
             <div id="quick-metrics" class="hidden mt-4 flex flex-wrap gap-3 text-sm">
@@ -147,6 +159,11 @@
                 </div>
             </div>
         </details>
+        <!-- Calendaria Results -->
+        <section id="calendaria-results" class="space-y-4 hidden">
+            <div id="cal-position" class="glass-card p-6 text-center"></div>
+            <div id="cal-metrics" class="grid grid-cols-2 gap-3"></div>
+        </section>
 {% endblock %}
 
 {% block modals %}
@@ -168,5 +185,6 @@
 {% endblock %}
 
 {% block scripts %}
+    <script src="/static/js/calendaria.js"></script>
     <script src="/static/js/app.js"></script>
 {% endblock %}

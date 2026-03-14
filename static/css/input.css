@@ -207,6 +207,14 @@
     color: rgb(var(--c-text) / 0.25);
   }
 
+  /* ── Date input dark mode fix ── */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.8);
+  }
+  [data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: none;
+  }
+
   /* ── Toggle icons (CSS-driven, no FOUC) ── */
   #icon-moon { display: none; }
   [data-theme="light"] #icon-sun { display: none; }
