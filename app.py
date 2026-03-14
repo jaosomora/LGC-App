@@ -3,7 +3,6 @@ app.py — Interfaz LGC: App factory mínima.
 """
 import os
 import logging
-import sqlite3
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -82,65 +81,8 @@ def create_app():
     # --- Crear tablas si no existen ---
     with app.app_context():
         db.create_all()
-        _migrate_sqlite_to_pg(app)
 
     return app
-
-
-def _migrate_sqlite_to_pg(app):
-    """Migración one-shot: copia datos de SQLite viejo a PostgreSQL.
-
-    Se ejecuta solo si:
-    - Estamos en modo PostgreSQL (DATABASE_URL existe)
-    - El archivo SQLite de Render existe (/mnt/data/palabras.db)
-    - Las tablas PostgreSQL están vacías (primera vez)
-
-    Después de copiar, NO borra el SQLite — solo deja de copiar porque
-    PostgreSQL ya tiene datos.
-    """
-    if not os.getenv("DATABASE_URL"):
-        return  # Estamos en dev local con SQLite, nada que migrar
-
-    sqlite_path = "/mnt/data/palabras.db"
-    if not os.path.exists(sqlite_path):
-        app.logger.info("migrate: No SQLite file found at %s, skipping.", sqlite_path)
-        return
-
-    # Solo migrar si PostgreSQL está vacío
-    from models import Palabra, Ranking
-    pg_count = Palabra.query.count() + Ranking.query.count()
-    if pg_count > 0:
-        app.logger.info("migrate: PostgreSQL already has %d rows, skipping.", pg_count)
-        return
-
-    app.logger.info("migrate: Starting SQLite → PostgreSQL migration...")
-
-    try:
-        conn = sqlite3.connect(sqlite_path)
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-
-        # Migrar Palabra
-        cur.execute("SELECT palabra FROM palabra")
-        palabras = cur.fetchall()
-        for row in palabras:
-            db.session.add(Palabra(palabra=row["palabra"]))
-        app.logger.info("migrate: %d palabras copied.", len(palabras))
-
-        # Migrar Ranking
-        cur.execute("SELECT palabra, puntuacion FROM ranking")
-        rankings = cur.fetchall()
-        for row in rankings:
-            db.session.add(Ranking(palabra=row["palabra"], puntuacion=row["puntuacion"]))
-        app.logger.info("migrate: %d rankings copied.", len(rankings))
-
-        db.session.commit()
-        conn.close()
-        app.logger.info("migrate: SQLite → PostgreSQL migration completed successfully.")
-
-    except Exception as e:
-        db.session.rollback()
-        app.logger.error("migrate: Migration failed: %s", e)
 
 
 app = create_app()
