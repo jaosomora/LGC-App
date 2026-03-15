@@ -37,7 +37,9 @@ class User(UserMixin, db.Model):
 
     # Perfil
     birth_date = db.Column(db.Date, nullable=True)
-    lugar_nacimiento = db.Column(db.String(200), nullable=True)
-    lugar_residencia = db.Column(db.String(200), nullable=True)
+    pais_nacimiento = db.Column(db.String(5), nullable=True)    # ISO code: "CO"
+    ciudad_nacimiento = db.Column(db.String(200), nullable=True)
+    pais_residencia = db.Column(db.String(5), nullable=True)    # ISO code: "CO"
+    ciudad_residencia = db.Column(db.String(200), nullable=True)
     user_timezone = db.Column(db.String(100), nullable=True)
     nombre_custom = db.Column(db.Boolean, nullable=False, default=False)

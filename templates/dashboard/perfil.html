@@ -54,20 +54,52 @@
         </div>
 
         <!-- Lugar de nacimiento -->
-        <div>
-            <label for="perfil-lugar-nac" class="block text-xs text-th-text/40 mb-1.5">Lugar de nacimiento</label>
-            <input type="text" id="perfil-lugar-nac" name="lugar_nacimiento"
-                value="{{ current_user.lugar_nacimiento or '' }}" maxlength="200"
-                class="glass-input w-full" placeholder="Ciudad, Pa&iacute;s">
-        </div>
+        <fieldset class="space-y-2">
+            <legend class="text-xs text-th-text/40 mb-0.5">Lugar de nacimiento</legend>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                    <select name="pais_nacimiento" id="perfil-pais-nac" class="glass-input w-full">
+                        <option value="">Pa&iacute;s</option>
+                        {% for c in countries %}
+                        <option value="{{ c.code }}" data-phone="{{ c.phone }}"
+                            {% if current_user.pais_nacimiento == c.code %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <input type="text" name="ciudad_nacimiento" id="perfil-ciudad-nac"
+                        value="{{ current_user.ciudad_nacimiento or '' }}" maxlength="200"
+                        class="glass-input w-full" placeholder="Ciudad">
+                </div>
+            </div>
+            <p id="perfil-phone-nac" class="text-[11px] text-th-text/30"></p>
+        </fieldset>
 
         <!-- Lugar de residencia -->
-        <div>
-            <label for="perfil-lugar-res" class="block text-xs text-th-text/40 mb-1.5">Lugar de residencia</label>
-            <input type="text" id="perfil-lugar-res" name="lugar_residencia"
-                value="{{ current_user.lugar_residencia or '' }}" maxlength="200"
-                class="glass-input w-full" placeholder="Ciudad, Pa&iacute;s">
-        </div>
+        <fieldset class="space-y-2">
+            <legend class="text-xs text-th-text/40 mb-0.5">Lugar de residencia</legend>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                    <select name="pais_residencia" id="perfil-pais-res" class="glass-input w-full">
+                        <option value="">Pa&iacute;s</option>
+                        {% for c in countries %}
+                        <option value="{{ c.code }}" data-phone="{{ c.phone }}"
+                            {% if current_user.pais_residencia == c.code %}selected{% endif %}>
+                            {{ c.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <input type="text" name="ciudad_residencia" id="perfil-ciudad-res"
+                        value="{{ current_user.ciudad_residencia or '' }}" maxlength="200"
+                        class="glass-input w-full" placeholder="Ciudad">
+                </div>
+            </div>
+            <p id="perfil-phone-res" class="text-[11px] text-th-text/30"></p>
+        </fieldset>
 
         <!-- Zona horaria -->
         <div>
@@ -150,6 +182,28 @@
     });
   }
 
+  // ── Phone code display para país ──
+  function showPhoneCode(selectId, labelId) {
+    var sel = document.getElementById(selectId);
+    var lbl = document.getElementById(labelId);
+    if (!sel || !lbl) return;
+
+    function update() {
+      var opt = sel.options[sel.selectedIndex];
+      if (opt && opt.value) {
+        lbl.textContent = opt.getAttribute("data-phone") + " " + opt.textContent.trim();
+      } else {
+        lbl.textContent = "";
+      }
+    }
+
+    sel.addEventListener("change", update);
+    update(); // mostrar al cargar si ya hay valor
+  }
+
+  showPhoneCode("perfil-pais-nac", "perfil-phone-nac");
+  showPhoneCode("perfil-pais-res", "perfil-phone-res");
+
   // ── Timezone detection ──
   var tzInput = document.getElementById("perfil-tz");
   var tzDetect = document.getElementById("perfil-tz-detect");
@@ -172,11 +226,7 @@
   }
 
   if (tzDetect) tzDetect.addEventListener("click", detectTz);
-
-  // Auto-detect si está vacío
   if (tzInput && !tzInput.value) detectTz();
-
-  // Mostrar label para valor existente
   if (tzInput && tzInput.value) detectTz();
 })();
 </script>

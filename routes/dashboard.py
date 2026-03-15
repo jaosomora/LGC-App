@@ -1,12 +1,21 @@
 """
 routes/dashboard.py — Rutas del dashboard (requieren autenticación).
 """
+import json
+import os
 from functools import wraps
 from datetime import date
 from flask import Blueprint, render_template, abort, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
+
+# Cargar países una sola vez al importar el módulo
+_countries_path = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), "static", "data", "countries.json"
+)
+with open(_countries_path, encoding="utf-8") as _f:
+    COUNTRIES = json.load(_f)
 
 
 def owner_required(f):
@@ -36,8 +45,10 @@ def perfil():
     if request.method == "POST":
         nuevo_nombre = request.form.get("nombre", "").strip()
         birth_str = request.form.get("birth_date", "").strip()
-        lugar_nac = request.form.get("lugar_nacimiento", "").strip()
-        lugar_res = request.form.get("lugar_residencia", "").strip()
+        pais_nac = request.form.get("pais_nacimiento", "").strip()
+        ciudad_nac = request.form.get("ciudad_nacimiento", "").strip()
+        pais_res = request.form.get("pais_residencia", "").strip()
+        ciudad_res = request.form.get("ciudad_residencia", "").strip()
         tz = request.form.get("timezone", "").strip()
 
         if nuevo_nombre:
@@ -54,8 +65,10 @@ def perfil():
         else:
             current_user.birth_date = None
 
-        current_user.lugar_nacimiento = lugar_nac or None
-        current_user.lugar_residencia = lugar_res or None
+        current_user.pais_nacimiento = pais_nac or None
+        current_user.ciudad_nacimiento = ciudad_nac or None
+        current_user.pais_residencia = pais_res or None
+        current_user.ciudad_residencia = ciudad_res or None
         current_user.user_timezone = tz or None
 
         db.session.commit()
@@ -63,7 +76,7 @@ def perfil():
         return redirect(url_for("dashboard.perfil"))
 
     espacio = User.query.filter(User.created_at <= current_user.created_at).count() - 1
-    return render_template("dashboard/perfil.html", espacio=espacio)
+    return render_template("dashboard/perfil.html", espacio=espacio, countries=COUNTRIES)
 
 
 @dashboard_bp.route("/usuarios")
