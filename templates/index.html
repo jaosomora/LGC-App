@@ -68,8 +68,6 @@
             <div id="input-calendaria" class="mode-input hidden">
                 <!-- Hidden native date inputs -->
                 <input type="date" id="cal-date" class="sr-only" tabindex="-1">
-                <input type="date" id="cal-birth" class="sr-only" tabindex="-1">
-
                 <!-- Navegador temporal -->
                 <div class="flex items-center justify-center gap-3 sm:gap-4">
                     <button id="cal-prev" class="p-1.5 text-th-text/25 hover:text-th-accent transition-colors rounded-lg" aria-label="Día anterior">
@@ -89,14 +87,20 @@
                     <button id="cal-today" class="text-[11px] text-th-accent hover:text-th-accent/80 transition-colors font-medium hidden">○ Hoy</button>
                 </div>
 
+                <!-- Timezone indicator -->
+                <div id="cal-timezone" class="text-[9px] text-th-text/20 text-center mt-0.5"></div>
+
                 <!-- Nacimiento (compacto, colapsable) -->
                 <div class="flex justify-center items-center mt-3 pt-3" style="border-top:1px solid var(--glass-divider)">
-                    <button id="cal-birth-add" class="text-[11px] text-th-text/25 hover:text-th-text/50 transition-colors">+ Fecha de nacimiento</button>
+                    <div id="cal-birth-add" class="relative text-xs text-th-text/40 hover:text-th-accent transition-colors cursor-pointer py-1.5 px-3 rounded-lg" style="border:1px dashed var(--glass-border)">
+                        + Fecha de nacimiento
+                        <input type="date" id="cal-birth" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" tabindex="-1">
+                    </div>
                     <div id="cal-birth-badge" class="hidden flex items-center gap-1.5">
                         <span class="text-[11px] text-th-text/30">Nac:</span>
-                        <button id="cal-birth-edit" class="text-[11px] text-th-text/50 hover:text-th-accent transition-colors font-medium cursor-pointer" aria-label="Cambiar fecha de nacimiento">
+                        <div id="cal-birth-edit" class="relative text-[11px] text-th-text/50 hover:text-th-accent transition-colors font-medium cursor-pointer" aria-label="Cambiar fecha de nacimiento">
                             <span id="cal-birth-text"></span>
-                        </button>
+                        </div>
                         <button id="cal-birth-clear" class="text-th-text/20 hover:text-th-text/50 transition-colors text-xs leading-none ml-0.5" aria-label="Quitar fecha de nacimiento">✕</button>
                     </div>
                 </div>

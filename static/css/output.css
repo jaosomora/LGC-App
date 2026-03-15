@@ -1244,6 +1244,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   pointer-events: none;
 }
 
+.visible {
+  visibility: visible;
+}
+
 .fixed {
   position: fixed;
 }

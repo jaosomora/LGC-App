@@ -94,12 +94,36 @@
     var birthAdd = document.getElementById("cal-birth-add");
     var birthBadge = document.getElementById("cal-birth-badge");
     var birthText = document.getElementById("cal-birth-text");
+    var birthEdit = document.getElementById("cal-birth-edit");
     if (!calBirth) return;
 
     var hasBirth = !!calBirth.value;
     if (birthAdd) birthAdd.classList.toggle("hidden", hasBirth);
     if (birthBadge) birthBadge.classList.toggle("hidden", !hasBirth);
     if (birthText && hasBirth) birthText.textContent = fmtBirthDisplay(calBirth.value);
+
+    // Move input overlay to the visible container for mobile compatibility
+    if (hasBirth && birthEdit && calBirth.parentNode !== birthEdit) {
+      birthEdit.appendChild(calBirth);
+    } else if (!hasBirth && birthAdd && calBirth.parentNode !== birthAdd) {
+      birthAdd.appendChild(calBirth);
+    }
+  }
+
+  function getTimezoneLabel() {
+    try {
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      var offset = new Date().getTimezoneOffset();
+      var sign = offset <= 0 ? "+" : "-";
+      var absOff = Math.abs(offset);
+      var h = Math.floor(absOff / 60);
+      var m = absOff % 60;
+      var utc = "UTC" + sign + h + (m ? ":" + String(m).padStart(2, "0") : "");
+      var short = tz.split("/").pop().replace(/_/g, " ");
+      return short + " · " + utc;
+    } catch (e) {
+      return "";
+    }
   }
 
   // ── Toast de navegación ──
@@ -636,17 +660,7 @@
       });
     }
 
-    // Nacimiento: agregar / editar / quitar
-    if (birthAdd) {
-      birthAdd.addEventListener("click", function () {
-        try { calBirth.showPicker(); } catch (e) { calBirth.focus(); }
-      });
-    }
-    if (birthEdit) {
-      birthEdit.addEventListener("click", function () {
-        try { calBirth.showPicker(); } catch (e) { calBirth.focus(); }
-      });
-    }
+    // Nacimiento: quitar (agregar/editar se manejan por input overlay nativo)
     if (birthClear) {
       birthClear.addEventListener("click", function () {
         calBirth.value = "";
@@ -654,6 +668,10 @@
         refresh();
       });
     }
+
+    // Timezone indicator
+    var tzEl = document.getElementById("cal-timezone");
+    if (tzEl) tzEl.textContent = getTimezoneLabel();
 
     // Toggle Cuadrantes/Cardinalidad (event delegation)
     document.addEventListener("click", function (e) {
