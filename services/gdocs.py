@@ -247,15 +247,20 @@ def create_doc_with_header(docs_service, drive_service, folder_id,
     return doc_id
 
 
-def append_reactivo(docs_service, doc_id, hora, texto):
+def append_reactivo(docs_service, doc_id, hora, texto, tags=None):
     """
-    Agrega un reactivo al final del documento con timestamp.
+    Agrega un reactivo al final del documento con timestamp y tags.
     """
     # Obtener longitud actual del documento
     doc = docs_service.documents().get(documentId=doc_id).execute()
     end_index = doc["body"]["content"][-1]["endIndex"] - 1
 
-    entry_text = "\n[{}]\n{}\n".format(hora, texto)
+    # Formatear tags como hashtags
+    tags_line = ""
+    if tags and len(tags) > 0:
+        tags_line = " ".join("#{}".format(t) for t in tags) + "\n"
+
+    entry_text = "\n[{}]\n{}{}\n".format(hora, tags_line, texto)
 
     requests = [
         {
@@ -272,7 +277,7 @@ def append_reactivo(docs_service, doc_id, hora, texto):
     logger.info("Appended reactivo to doc %s at %s", doc_id, hora)
 
 
-def save_reactivo(user, fecha, hora, cabecera_data, texto):
+def save_reactivo(user, fecha, hora, cabecera_data, texto, tags=None):
     """
     Función principal: crea o encuentra el doc del día, agrega el reactivo.
 
@@ -282,9 +287,10 @@ def save_reactivo(user, fecha, hora, cabecera_data, texto):
         hora: "HH:MM"
         cabecera_data: dict con datos Calendaria calculados en JS
         texto: texto del reactivo
+        tags: list de strings (palabras clave extraídas del texto)
 
     Returns:
-        dict con doc_url
+        dict con doc_url, folder_url
     """
     creds = get_credentials(user)
     if not creds:
@@ -306,7 +312,8 @@ def save_reactivo(user, fecha, hora, cabecera_data, texto):
         )
 
     # Agregar el reactivo
-    append_reactivo(docs_service, doc_id, hora, texto)
+    append_reactivo(docs_service, doc_id, hora, texto, tags=tags)
 
     doc_url = "https://docs.google.com/document/d/{}/edit".format(doc_id)
-    return {"doc_id": doc_id, "doc_url": doc_url}
+    folder_url = "https://drive.google.com/drive/folders/{}".format(folder_id)
+    return {"doc_id": doc_id, "doc_url": doc_url, "folder_url": folder_url}

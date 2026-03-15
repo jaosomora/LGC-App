@@ -18,29 +18,100 @@
 
     {% if not gdocs_connected %}
     <!-- Estado: Google Docs no conectado -->
-    <div class="glass-card p-8 text-center space-y-4">
+    <div class="glass-card p-8 text-center space-y-5">
         <div class="w-16 h-16 mx-auto rounded-full bg-th-accent/10 flex items-center justify-center">
             <svg class="w-8 h-8 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
             </svg>
         </div>
-        <h2 class="text-lg font-semibold">Conecta Google Docs</h2>
-        <p class="text-sm text-th-text/50 max-w-sm mx-auto">
-            Reactivos guarda tus registros directamente en Google Docs.
-            Necesitas autorizar el acceso una sola vez.
-        </p>
-        <a href="/auth/connect-gdocs"
-           class="inline-flex items-center gap-2 glass-button !bg-th-accent/20 !text-th-accent hover:!bg-th-accent/30 font-semibold px-6 py-3">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14.727 6.727H14V0H4.91c-.905 0-1.637.732-1.637 1.636v20.728c0 .904.732 1.636 1.636 1.636h14.182c.904 0 1.636-.732 1.636-1.636V6.727h-6.001z" opacity=".3"/>
-                <path d="M14.727 6.727H20.727V6.727L14.727 0.727V6.727z" opacity=".5"/>
-            </svg>
-            Conectar Google Docs
-        </a>
+        <div>
+            <h2 class="text-lg font-semibold mb-1">Reactivos</h2>
+            <p class="text-sm text-th-text/50 max-w-md mx-auto">
+                Un espacio para registrar tus procesos reactivos &mdash; emociones, desregulaciones, observaciones &mdash; mediante voz o texto.
+            </p>
+        </div>
+
+        <!-- C&oacute;mo funciona -->
+        <div class="text-left max-w-md mx-auto space-y-3 py-4 border-t border-b border-th">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-th-text/30 text-center mb-3">C&oacute;mo funciona</p>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium">Se crea una carpeta &ldquo;Reactivos LGC&rdquo;</p>
+                    <p class="text-xs text-th-text/40">En tu Google Drive, autom&aacute;ticamente. Ah&iacute; vivir&aacute;n todos tus documentos.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium">Un documento por d&iacute;a</p>
+                    <p class="text-xs text-th-text/40">Cada d&iacute;a se crea un Google Doc con la cabecera de datos Calendaria. Todos los reactivos del d&iacute;a van al mismo documento.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium">Graba o escribe</p>
+                    <p class="text-xs text-th-text/40">Usa el micr&oacute;fono para dictar o escribe directamente. Cada entrada queda con su hora y los temas detectados autom&aacute;ticamente.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium">Temas autom&aacute;ticos</p>
+                    <p class="text-xs text-th-text/40">Se extraen las palabras clave de lo que dices o escribes, para que puedas ver r&aacute;pidamente de qu&eacute; tratan tus reactivos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bot&oacute;n conectar -->
+        <div>
+            <a href="/auth/connect-gdocs"
+               class="inline-flex items-center gap-2 glass-button !bg-th-accent/20 !text-th-accent hover:!bg-th-accent/30 font-semibold px-6 py-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>
+                Conectar con Google Docs
+            </a>
+            <p class="text-[10px] text-th-text/25 mt-2">Solo necesitas autorizar una vez. Tus datos son tuyos, en tu Google Drive.</p>
+        </div>
     </div>
 
     {% else %}
     <!-- Estado: Google Docs conectado -->
+
+    <!-- Link permanente a Google Drive -->
+    <div id="react-drive-link" class="glass-card p-4 hidden">
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-medium truncate">Reactivos LGC</p>
+                    <p class="text-[10px] text-th-text/30">Tu carpeta en Google Drive</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <a id="react-doc-today-link" href="#" target="_blank" rel="noopener"
+                   class="hidden glass-button text-xs !px-3 !py-1.5">Doc de hoy</a>
+                <a id="react-folder-link" href="#" target="_blank" rel="noopener"
+                   class="glass-button text-xs !px-3 !py-1.5 !bg-th-accent/10 !text-th-accent">Abrir carpeta</a>
+            </div>
+        </div>
+    </div>
 
     <!-- Cabecera del d&iacute;a (datos Calendaria) -->
     <div class="glass-card p-5">
@@ -89,6 +160,12 @@
             </div>
         </div>
 
+        <!-- Tags autom&aacute;ticos -->
+        <div id="react-tags-container" class="hidden">
+            <p class="text-[10px] text-th-text/30 mb-1.5">Temas detectados</p>
+            <div id="react-tags" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
         <!-- Bot&oacute;n guardar -->
         <div class="flex items-center gap-3">
             <button id="react-save-btn" type="button" disabled
@@ -133,12 +210,19 @@
     var saveBtn = document.getElementById("react-save-btn");
     var saveStatus = document.getElementById("react-save-status");
     var historialEl = document.getElementById("react-historial");
+    var tagsContainer = document.getElementById("react-tags-container");
+    var tagsEl = document.getElementById("react-tags");
+    var driveLinkCard = document.getElementById("react-drive-link");
+    var folderLink = document.getElementById("react-folder-link");
+    var docTodayLink = document.getElementById("react-doc-today-link");
 
     // ── Estado ──
     var recognition = null;
     var isRecording = false;
     var cabeceraData = null;
     var historialItems = [];
+    var currentTags = [];
+    var tagsDebounceTimer = null;
 
     // ── Helpers de fecha/hora ──
     function padZero(n) { return n < 10 ? "0" + n : "" + n; }
@@ -164,6 +248,178 @@
         return months[m];
     }
 
+    // ── Tags: extracci\u00f3n de palabras clave ──
+    var STOP_WORDS_STR = "el la los las un una unos unas de del al a ante con en entre para por sin sobre tras que es son fue ser era esta esto este esta eso ese esa como mas pero muy ya solo hay no si me te se le lo nos les su sus mi mis tu tus yo el ella ellos ellas nos todo toda todos todas otro otra otros otras siendo sido tiene tienen tener hacer hecho puede pueden cuando donde quien porque como tambien bien mal mucho poco algo nada cada vez desde hasta durante despues antes ahora aqui alla mientras aunque sino pues luego entonces cuanto cual fue fui era estaba estoy soy eso esa esos esas ese ahi creo siento sentia voy dia dias cosa cosas tipo parte manera forma hoy momento tiempo";
+    var STOP_WORDS = {};
+    (function () {
+        var words = STOP_WORDS_STR.split(" ");
+        for (var i = 0; i < words.length; i++) {
+            STOP_WORDS[words[i]] = true;
+        }
+    })();
+
+    function normalizeForTags(str) {
+        // Minusculas, eliminar acentos (excepto \u00f1), eliminar puntuacion
+        return str.toLowerCase()
+            .replace(/[^\w\s\u00f1]/g, " ")
+            .replace(/\d+/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            // NFD para quitar acentos
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function extractTags(text) {
+        if (!text || text.trim().length < 10) return [];
+
+        var normalized = normalizeForTags(text);
+        var words = normalized.split(" ");
+        var freq = {};
+
+        for (var i = 0; i < words.length; i++) {
+            var w = words[i];
+            if (w.length < 4) continue;
+            if (STOP_WORDS[w]) continue;
+            freq[w] = (freq[w] || 0) + 1;
+        }
+
+        // Convertir a array y ordenar por frecuencia desc
+        var entries = [];
+        for (var key in freq) {
+            if (freq.hasOwnProperty(key)) {
+                entries.push({ word: key, count: freq[key] });
+            }
+        }
+        entries.sort(function (a, b) { return b.count - a.count; });
+
+        // Tomar top 8 tags
+        var tags = [];
+        for (var j = 0; j < Math.min(entries.length, 8); j++) {
+            tags.push(entries[j].word);
+        }
+        return tags;
+    }
+
+    function renderTags(tags) {
+        if (!tagsContainer || !tagsEl) return;
+
+        if (tags.length === 0) {
+            tagsContainer.classList.add("hidden");
+            return;
+        }
+
+        tagsContainer.classList.remove("hidden");
+        var html = "";
+        for (var i = 0; i < tags.length; i++) {
+            html += '<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-th-accent/10 text-th-accent">' +
+                escapeHtml(tags[i]) + '</span>';
+        }
+        tagsEl.innerHTML = html;
+    }
+
+    function updateTags() {
+        if (!textareaEl) return;
+        currentTags = extractTags(textareaEl.value);
+        renderTags(currentTags);
+    }
+
+    function debounceTags() {
+        if (tagsDebounceTimer) clearTimeout(tagsDebounceTimer);
+        tagsDebounceTimer = setTimeout(updateTags, 500);
+    }
+
+    // ── Google Drive links (localStorage) ──
+    function restoreDriveLinks() {
+        var folderUrl = localStorage.getItem("lgc_reactivos_folder_url");
+        var docUrl = localStorage.getItem("lgc_reactivos_doc_url_" + getTodayDmy());
+
+        if (folderUrl) {
+            if (driveLinkCard) driveLinkCard.classList.remove("hidden");
+            if (folderLink) folderLink.href = folderUrl;
+            if (docUrl && docTodayLink) {
+                docTodayLink.href = docUrl;
+                docTodayLink.classList.remove("hidden");
+            }
+        }
+    }
+
+    function saveDriveLinks(folderUrl, docUrl) {
+        if (folderUrl) {
+            localStorage.setItem("lgc_reactivos_folder_url", folderUrl);
+        }
+        if (docUrl) {
+            localStorage.setItem("lgc_reactivos_doc_url_" + getTodayDmy(), docUrl);
+        }
+        restoreDriveLinks();
+    }
+
+    // ── Historial persistente (localStorage) ──
+    function loadHistorial() {
+        var key = "lgc_reactivos_" + getTodayDmy();
+        var saved = localStorage.getItem(key);
+        if (saved) {
+            try { historialItems = JSON.parse(saved); } catch (e) { historialItems = []; }
+        }
+        renderHistorial();
+    }
+
+    function saveHistorial() {
+        var key = "lgc_reactivos_" + getTodayDmy();
+        localStorage.setItem(key, JSON.stringify(historialItems));
+    }
+
+    function addToHistorial(hora, texto, tags, docUrl) {
+        historialItems.unshift({ hora: hora, texto: texto, tags: tags || [], docUrl: docUrl });
+        saveHistorial();
+        renderHistorial();
+    }
+
+    function renderHistorial() {
+        if (!historialEl) return;
+
+        if (historialItems.length === 0) {
+            historialEl.innerHTML = '<p class="text-xs text-th-text/20">A\u00fan no hay reactivos hoy.</p>';
+            return;
+        }
+
+        var html = "";
+        for (var i = 0; i < historialItems.length; i++) {
+            var item = historialItems[i];
+            var preview = item.texto.length > 120 ? item.texto.substring(0, 120) + "\u2026" : item.texto;
+            html += '<div class="py-2' + (i > 0 ? ' border-t border-th' : '') + '">';
+
+            // Linea 1: hora + preview + link
+            html += '<div class="flex items-start gap-3">';
+            html += '<span class="text-xs text-th-accent font-mono font-semibold mt-0.5 shrink-0">' + escapeHtml(item.hora) + '</span>';
+            html += '<p class="text-sm text-th-text/60 flex-1">' + escapeHtml(preview) + '</p>';
+            if (item.docUrl) {
+                html += '<a href="' + item.docUrl + '" target="_blank" rel="noopener" class="text-th-text/20 hover:text-th-accent transition-colors shrink-0 mt-0.5" title="Abrir en Google Docs">';
+                html += '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>';
+                html += '</a>';
+            }
+            html += '</div>';
+
+            // Linea 2: tags
+            if (item.tags && item.tags.length > 0) {
+                html += '<div class="flex flex-wrap gap-1 mt-1.5 ml-12">';
+                for (var j = 0; j < item.tags.length; j++) {
+                    html += '<span class="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-th-accent/5 text-th-accent/60">' +
+                        escapeHtml(item.tags[j]) + '</span>';
+                }
+                html += '</div>';
+            }
+
+            html += '</div>';
+        }
+        historialEl.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        var div = document.createElement("div");
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
     // ── Calcular cabecera del d\u00eda ──
     function calcularCabecera() {
         var now = new Date();
@@ -171,11 +427,9 @@
         var month = now.getMonth() + 1;
         var day = now.getDate();
 
-        // Fecha display
         var fechaStr = getDayName(now) + " " + day + " " + getMonthName(now.getMonth()) + " " + year;
         if (fechaEl) fechaEl.textContent = fechaStr;
 
-        // Birth date desde localStorage (igual que calendaria.js)
         var nacY = null, nacM = null, nacD = null;
         var savedBirth = localStorage.getItem("lgc_birth_date");
         if (savedBirth) {
@@ -185,13 +439,8 @@
             nacD = parseInt(bp[2], 10);
         }
 
-        // Calcular usando el motor Calendaria
-        // LGCCalendaria expone { refresh }, pero necesitamos la funci\u00f3n calcular directamente.
-        // El motor es IIFE cerrado. Vamos a replicar los c\u00e1lculos esenciales aqu\u00ed.
         var data = calcularLocal(year, month, day, nacY, nacM, nacD);
         cabeceraData = data;
-
-        // Render cabecera
         renderCabecera(data);
     }
 
@@ -234,7 +483,6 @@
         var dsNativo = (nacY != null) ? diaSolar(nacY, nacM, nacD) : null;
         var ddv = (nacY != null) ? Math.max(0, jdnCut(year, month, day) - jdnCut(nacY, nacM, nacD)) : null;
 
-        // Cuarentena Global (inicio: 14/10/2012)
         var Q = dtUTC(2012, 10, 14);
         var qd = dFrom(Q, dtUTC(year, month, day));
         var qi = qd > 0 ? Math.floor((qd - 1) / 39) + 1 : 0;
@@ -278,8 +526,6 @@
         if (!cabeceraEl) return;
 
         var html = "";
-
-        // D\u00eda Solar
         html += '<div class="flex items-center gap-4 flex-wrap">';
         html += '<span class="text-th-accent font-bold text-lg">DS ' + data.ds + '</span>';
         if (data.dsNativo !== null) {
@@ -292,7 +538,6 @@
         }
         html += '</div>';
 
-        // Posici\u00f3n
         if (data.esAnillo) {
             html += '<p class="text-th-accent">Anillo de Fuego ' + data.diaAnillo + '/' + data.totalAnillo + '</p>';
         } else {
@@ -304,20 +549,17 @@
             html += '</p>';
         }
 
-        // Aparato
         html += '<p class="text-th-text/40">';
         html += 'Aparato #' + data.apNum + ' \u00b7 ' + data.faseName;
         html += ' \u00b7 D\u00eda ' + data.apos + '/1461';
         html += '</p>';
 
-        // D\u00eda del A\u00f1o
         html += '<p class="text-th-text/30 text-xs">';
         html += 'D\u00eda ' + data.doy + '/' + data.total;
         html += ' \u00b7 +' + data.frcPos + ' \u2212' + data.frcNeg;
         html += ' \u00b7 Anu: ' + (data.anuAno >= 0 ? '+' : '') + data.anuAno;
         html += '</p>';
 
-        // Cuarentena
         if (data.cuarentena.qi > 0) {
             html += '<p class="text-th-text/30 text-xs">';
             html += 'Cuarentena #' + data.cuarentena.qi;
@@ -360,6 +602,7 @@
                 textareaEl.value = finalTranscript + interim;
                 updateCharCount();
                 updateSaveBtn();
+                debounceTags();
             }
         };
 
@@ -370,7 +613,6 @@
 
         recognition.onend = function () {
             if (isRecording) {
-                // Reiniciar si se detuvo por timeout del navegador
                 try { recognition.start(); } catch (e) { stopRecording(); }
             }
         };
@@ -396,9 +638,7 @@
             isRecording = false;
             return;
         }
-        if (recordBtn) {
-            recordBtn.classList.add("!bg-red-500/20", "!text-red-400");
-        }
+        if (recordBtn) recordBtn.classList.add("!bg-red-500/20", "!text-red-400");
         if (recordLabel) recordLabel.textContent = "Detener";
         if (micIcon) micIcon.classList.add("hidden");
         if (recordingIndicator) recordingIndicator.classList.remove("hidden");
@@ -409,9 +649,7 @@
         if (recognition) {
             try { recognition.stop(); } catch (e) {}
         }
-        if (recordBtn) {
-            recordBtn.classList.remove("!bg-red-500/20", "!text-red-400");
-        }
+        if (recordBtn) recordBtn.classList.remove("!bg-red-500/20", "!text-red-400");
         if (recordLabel) recordLabel.textContent = "Grabar";
         if (micIcon) micIcon.classList.remove("hidden");
         if (recordingIndicator) recordingIndicator.classList.add("hidden");
@@ -437,6 +675,7 @@
         textareaEl.addEventListener("input", function () {
             updateCharCount();
             updateSaveBtn();
+            debounceTags();
         });
     }
 
@@ -445,6 +684,8 @@
             if (textareaEl) textareaEl.value = "";
             updateCharCount();
             updateSaveBtn();
+            currentTags = [];
+            renderTags([]);
         });
     }
 
@@ -456,7 +697,9 @@
         var fecha = getTodayDmy();
         var hora = getNowTime();
 
-        // Deshabilitar bot\u00f3n
+        // Actualizar tags finales antes de guardar
+        currentTags = extractTags(texto);
+
         if (saveBtn) {
             saveBtn.disabled = true;
             saveBtn.textContent = "Guardando...";
@@ -471,7 +714,8 @@
             texto: texto,
             fecha: fecha,
             hora: hora,
-            cabecera: cabeceraData || {}
+            cabecera: cabeceraData || {},
+            tags: currentTags
         };
 
         var xhr = new XMLHttpRequest();
@@ -482,16 +726,19 @@
                 try {
                     var resp = JSON.parse(xhr.responseText);
                     if (resp.ok) {
-                        // \u00c9xito
                         if (saveStatus) {
                             saveStatus.className = "text-sm text-green-400";
                             saveStatus.innerHTML = 'Guardado <a href="' + resp.doc_url + '" target="_blank" rel="noopener" class="underline hover:text-green-300">\u2192 Abrir doc</a>';
                         }
-                        // Agregar al historial local
-                        addToHistorial(hora, texto, resp.doc_url);
-                        // Limpiar textarea
+                        // Guardar links de Drive
+                        saveDriveLinks(resp.folder_url, resp.doc_url);
+                        // Agregar al historial (con tags)
+                        addToHistorial(hora, texto, currentTags, resp.doc_url);
+                        // Limpiar
                         if (textareaEl) textareaEl.value = "";
                         updateCharCount();
+                        currentTags = [];
+                        renderTags([]);
                     } else {
                         showSaveError(resp.error || "Error desconocido");
                     }
@@ -508,10 +755,7 @@
                     showSaveError("Error del servidor (" + xhr.status + ")");
                 }
             }
-            // Restaurar bot\u00f3n
-            if (saveBtn) {
-                saveBtn.textContent = "Guardar en Google Docs";
-            }
+            if (saveBtn) saveBtn.textContent = "Guardar en Google Docs";
             updateSaveBtn();
         };
         xhr.onerror = function () {
@@ -534,48 +778,13 @@
         saveBtn.addEventListener("click", guardarReactivo);
     }
 
-    // ── Historial local (solo sesi\u00f3n) ──
-    function addToHistorial(hora, texto, docUrl) {
-        historialItems.unshift({ hora: hora, texto: texto, docUrl: docUrl });
-        renderHistorial();
-    }
-
-    function renderHistorial() {
-        if (!historialEl) return;
-
-        if (historialItems.length === 0) {
-            historialEl.innerHTML = '<p class="text-xs text-th-text/20">A\u00fan no hay reactivos hoy.</p>';
-            return;
-        }
-
-        var html = "";
-        for (var i = 0; i < historialItems.length; i++) {
-            var item = historialItems[i];
-            var preview = item.texto.length > 120 ? item.texto.substring(0, 120) + "\u2026" : item.texto;
-            html += '<div class="flex items-start gap-3 py-2' + (i > 0 ? ' border-t border-th' : '') + '">';
-            html += '<span class="text-xs text-th-accent font-mono font-semibold mt-0.5 shrink-0">' + item.hora + '</span>';
-            html += '<p class="text-sm text-th-text/60 flex-1">' + escapeHtml(preview) + '</p>';
-            if (item.docUrl) {
-                html += '<a href="' + item.docUrl + '" target="_blank" rel="noopener" class="text-th-text/20 hover:text-th-accent transition-colors shrink-0 mt-0.5" title="Abrir en Google Docs">';
-                html += '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>';
-                html += '</a>';
-            }
-            html += '</div>';
-        }
-        historialEl.innerHTML = html;
-    }
-
-    function escapeHtml(str) {
-        var div = document.createElement("div");
-        div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
-    }
-
     // ── Inicializaci\u00f3n ──
     calcularCabecera();
     initSpeech();
     updateCharCount();
     updateSaveBtn();
+    restoreDriveLinks();
+    loadHistorial();
 })();
 </script>
 {% endif %}

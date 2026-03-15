@@ -177,12 +177,19 @@ def guardar_reactivo():
     cabecera = data.get("cabecera", {})
     fecha = data.get("fecha", "").strip()
     hora = data.get("hora", "").strip()
+    tags = data.get("tags", [])
 
     if not texto:
         return jsonify({"error": "Texto vacío"}), 400
 
     if not current_user.google_refresh_token:
         return jsonify({"error": "Google Docs no conectado"}), 403
+
+    # Sanitizar tags: solo strings, max 10
+    if isinstance(tags, list):
+        tags = [str(t).strip() for t in tags[:10] if str(t).strip()]
+    else:
+        tags = []
 
     try:
         from services.gdocs import save_reactivo
@@ -192,8 +199,13 @@ def guardar_reactivo():
             hora=hora,
             cabecera_data=cabecera,
             texto=texto,
+            tags=tags,
         )
-        return jsonify({"ok": True, "doc_url": result["doc_url"]})
+        return jsonify({
+            "ok": True,
+            "doc_url": result["doc_url"],
+            "folder_url": result["folder_url"],
+        })
     except Exception as e:
         logger.error("Error guardando reactivo: %s", e)
         return jsonify({"error": str(e)}), 500
