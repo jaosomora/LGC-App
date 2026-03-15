@@ -70,7 +70,10 @@
                         class="glass-input w-full" placeholder="Escribe una ciudad...">
                 </div>
             </div>
-            <p id="perfil-phone-nac" class="text-[11px] text-th-text/30"></p>
+            <div class="flex gap-4 flex-wrap">
+                <p id="perfil-phone-nac" class="text-[11px] text-th-text/30"></p>
+                <p id="perfil-area-nac" class="text-[11px] text-th-text/30"></p>
+            </div>
         </fieldset>
 
         <!-- Lugar de residencia -->
@@ -90,7 +93,10 @@
                         class="glass-input w-full" placeholder="Escribe una ciudad...">
                 </div>
             </div>
-            <p id="perfil-phone-res" class="text-[11px] text-th-text/30"></p>
+            <div class="flex gap-4 flex-wrap">
+                <p id="perfil-phone-res" class="text-[11px] text-th-text/30"></p>
+                <p id="perfil-area-res" class="text-[11px] text-th-text/30"></p>
+            </div>
         </fieldset>
 
         <!-- Zona horaria -->
@@ -182,6 +188,9 @@
     {% endfor %}
   ];
 
+  // ── Cache de area codes por país ──
+  var areaCodesCache = {};  // {CC: {region: code, ...} | null}
+
   // ── Helper: cargar ciudades de un país vía XHR ──
   function loadCities(countryCode, cityAc) {
     var xhr = new XMLHttpRequest();
@@ -198,6 +207,54 @@
     };
     xhr.onerror = function () { cityAc.setData([]); };
     xhr.send();
+  }
+
+  // ── Helper: cargar area codes de un país ──
+  function loadAreaCodes(countryCode, callback) {
+    if (areaCodesCache[countryCode] !== undefined) {
+      callback(areaCodesCache[countryCode]);
+      return;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/static/data/area_codes/" + countryCode + ".json");
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        try {
+          areaCodesCache[countryCode] = JSON.parse(xhr.responseText);
+        } catch (e) {
+          areaCodesCache[countryCode] = null;
+        }
+      } else {
+        areaCodesCache[countryCode] = null;
+      }
+      callback(areaCodesCache[countryCode]);
+    };
+    xhr.onerror = function () {
+      areaCodesCache[countryCode] = null;
+      callback(null);
+    };
+    xhr.send();
+  }
+
+  // ── Helper: extraer región de "Ciudad, Región" y mostrar area code ──
+  function showAreaCode(cityName, countryCode, labelId) {
+    var lbl = document.getElementById(labelId);
+    if (!lbl) return;
+    if (!cityName || !countryCode) { lbl.textContent = ""; return; }
+
+    var region = "";
+    var commaIdx = cityName.indexOf(", ");
+    if (commaIdx >= 0) {
+      region = cityName.substring(commaIdx + 2);
+    }
+
+    loadAreaCodes(countryCode, function (codes) {
+      if (codes && region && codes[region]) {
+        lbl.textContent = codes[region] + " " + region;
+      } else {
+        lbl.textContent = "";
+      }
+    });
   }
 
   // ── Helper: mostrar phone code en un label ──
@@ -224,7 +281,14 @@
     data: [],
     maxResults: 8,
     strict: false,
-    minChars: 2
+    minChars: 2,
+    onSelect: function (item) {
+      var cc = document.getElementById("perfil-pais-nac").value;
+      showAreaCode(item.label, cc, "perfil-area-nac");
+    },
+    onClear: function () {
+      clearPhone("perfil-area-nac");
+    }
   });
 
   // ── Autocomplete: País nacimiento ──
@@ -234,11 +298,15 @@
     onSelect: function (item) {
       document.getElementById("perfil-pais-nac").value = item.value;
       showPhone(item, "perfil-phone-nac");
+      clearPhone("perfil-area-nac");
       loadCities(item.value, acCiudadNac);
+      // Pre-cargar area codes
+      loadAreaCodes(item.value, function () {});
     },
     onClear: function () {
       document.getElementById("perfil-pais-nac").value = "";
       clearPhone("perfil-phone-nac");
+      clearPhone("perfil-area-nac");
       acCiudadNac.setData([]);
     },
     maxResults: 8,
@@ -257,6 +325,11 @@
         break;
       }
     }
+    // Mostrar area code inicial si hay ciudad guardada
+    var initCiudadNac = document.getElementById("perfil-ciudad-nac").value;
+    if (initCiudadNac) {
+      showAreaCode(initCiudadNac, initPaisNac, "perfil-area-nac");
+    }
   }
 
   // ── Autocomplete: Ciudad residencia ──
@@ -265,7 +338,14 @@
     data: [],
     maxResults: 8,
     strict: false,
-    minChars: 2
+    minChars: 2,
+    onSelect: function (item) {
+      var cc = document.getElementById("perfil-pais-res").value;
+      showAreaCode(item.label, cc, "perfil-area-res");
+    },
+    onClear: function () {
+      clearPhone("perfil-area-res");
+    }
   });
 
   // ── Autocomplete: País residencia ──
@@ -275,11 +355,14 @@
     onSelect: function (item) {
       document.getElementById("perfil-pais-res").value = item.value;
       showPhone(item, "perfil-phone-res");
+      clearPhone("perfil-area-res");
       loadCities(item.value, acCiudadRes);
+      loadAreaCodes(item.value, function () {});
     },
     onClear: function () {
       document.getElementById("perfil-pais-res").value = "";
       clearPhone("perfil-phone-res");
+      clearPhone("perfil-area-res");
       acCiudadRes.setData([]);
     },
     maxResults: 8,
@@ -296,6 +379,10 @@
         showPhone(countriesData[i], "perfil-phone-res");
         break;
       }
+    }
+    var initCiudadRes = document.getElementById("perfil-ciudad-res").value;
+    if (initCiudadRes) {
+      showAreaCode(initCiudadRes, initPaisRes, "perfil-area-res");
     }
   }
 
