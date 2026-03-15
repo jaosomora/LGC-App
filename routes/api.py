@@ -118,29 +118,50 @@ def stats():
     if not is_authorized:
         return jsonify({"error": "unauthorized"}), 403
 
+    from sqlalchemy import func
+    from datetime import datetime, timezone as tz, timedelta
+
     total_palabras = Palabra.query.count()
     total_rankings = Ranking.query.count()
     total_users = User.query.count()
+    users_free = User.query.filter_by(plan="free").count()
+    users_paid = total_users - users_free
+
+    # Usuarios nuevos hoy
+    today_start = datetime.now(tz.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    users_today = User.query.filter(User.created_at >= today_start).count()
 
     # Top 10 más buscadas
     top = Ranking.query.order_by(Ranking.puntuacion.desc()).limit(10).all()
 
-    # Usuarios registrados (últimos 10)
+    # Usuarios registrados (últimos 10) con número de orden
     recent_users = User.query.order_by(User.created_at.desc()).limit(10).all()
+    all_ids_ordered = [u.id for u in User.query.order_by(User.created_at.asc()).all()]
+    id_to_num = {uid: i + 1 for i, uid in enumerate(all_ids_ordered)}
 
     # Total de búsquedas (suma de todas las puntuaciones)
-    from sqlalchemy import func
     total_searches = db.session.query(func.sum(Ranking.puntuacion)).scalar() or 0
 
     return jsonify({
         "palabras": total_palabras,
         "rankings": total_rankings,
         "users": total_users,
+        "users_free": users_free,
+        "users_paid": users_paid,
+        "users_today": users_today,
         "total_searches": total_searches,
         "top_10": [{"palabra": r.palabra, "puntuacion": r.puntuacion} for r in top],
         "recent_users": [
-            {"email": u.email, "nombre": u.nombre, "plan": u.plan,
-             "created_at": u.created_at.isoformat() if u.created_at else None}
+            {
+                "email": u.email,
+                "nombre": u.nombre,
+                "plan": u.plan,
+                "is_owner": u.is_owner,
+                "pais_residencia": u.pais_residencia or "",
+                "created_at": u.created_at.isoformat() if u.created_at else None,
+                "last_login": u.last_login.isoformat() if u.last_login else None,
+                "num": id_to_num.get(u.id, 0),
+            }
             for u in recent_users
         ],
     })

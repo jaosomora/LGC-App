@@ -56,8 +56,10 @@
       dropdown.classList.toggle("hidden");
     });
 
-    document.addEventListener("click", function () {
-      dropdown.classList.add("hidden");
+    document.addEventListener("click", function (e) {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
     });
   }
 
@@ -102,8 +104,9 @@
 
     el = document.getElementById("kpi-users-detail");
     if (el) {
-      var free = data.users || 0;
-      el.textContent = free + " free";
+      var free = data.users_free || 0;
+      var paid = data.users_paid || 0;
+      el.textContent = free + " free · " + paid + " paid";
     }
 
     el = document.getElementById("kpi-searches");
@@ -112,8 +115,8 @@
     el = document.getElementById("kpi-palabras");
     if (el) el.textContent = formatNumber(data.palabras || 0);
 
-    el = document.getElementById("kpi-rankings");
-    if (el) el.textContent = formatNumber(data.rankings || 0);
+    el = document.getElementById("kpi-today");
+    if (el) el.textContent = formatNumber(data.users_today || 0);
   }
 
   function renderTopPalabras(items) {
@@ -147,6 +150,12 @@
       .join("");
   }
 
+  function isoToFlag(code) {
+    if (!code || code.length !== 2) return "";
+    var a = 0x1F1E6;
+    return String.fromCodePoint(a + code.charCodeAt(0) - 65, a + code.charCodeAt(1) - 65);
+  }
+
   function renderRecentUsers(users) {
     var list = document.getElementById("recent-users-list");
     var empty = document.getElementById("recent-users-empty");
@@ -161,14 +170,20 @@
       .map(function (u) {
         var initials = (u.nombre || u.email || "?").charAt(0).toUpperCase();
         var date = u.created_at ? new Date(u.created_at).toLocaleDateString("es-CO", { day: "2-digit", month: "short" }) : "-";
+        var flag = u.pais_residencia ? isoToFlag(u.pais_residencia.toUpperCase()) : "";
+        var numTag = '<span class="text-[10px] text-th-text/25 font-mono">#' + (u.num || 0) + '</span>';
+        var ownerBadge = u.is_owner ? '<span class="inline-block px-1.5 py-0.5 text-[9px] font-bold uppercase rounded-full bg-th-accent/20 text-th-accent">owner</span> ' : "";
+        var planCls = u.plan === "free" ? "bg-th-text/5 text-th-text/40" : "bg-th-accent/20 text-th-accent";
         return (
           '<div class="flex items-center gap-3">' +
           '<div class="w-8 h-8 rounded-full bg-th-accent/20 flex items-center justify-center flex-shrink-0">' +
           '<span class="text-th-accent text-xs font-semibold">' + escapeHtml(initials) + "</span></div>" +
           '<div class="flex-1 min-w-0">' +
-          '<p class="text-sm font-medium truncate">' + escapeHtml(u.nombre || u.email) + "</p>" +
+          '<p class="text-sm font-medium truncate">' + numTag + " " + escapeHtml(u.nombre || u.email) +
+          (flag ? ' <span class="text-xs">' + flag + "</span>" : "") + "</p>" +
           '<p class="text-[11px] text-th-text/40 truncate">' + escapeHtml(u.email) + "</p></div>" +
-          '<span class="inline-block px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-th-text/5 text-th-text/40">' +
+          ownerBadge +
+          '<span class="inline-block px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full ' + planCls + '">' +
           escapeHtml(u.plan || "free") + "</span>" +
           '<span class="text-[11px] text-th-text/30 whitespace-nowrap">' + date + "</span>" +
           "</div>"

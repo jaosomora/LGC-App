@@ -98,4 +98,4 @@ def perfil():
 def usuarios():
     from models import User
     users = User.query.order_by(User.created_at.asc()).all()
-    return render_template("dashboard/usuarios.html", users=users)
+    return render_template("dashboard/usuarios.html", users=users, country_map=_COUNTRY_MAP)
