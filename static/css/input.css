@@ -81,6 +81,14 @@
     border: 1px solid var(--glass-border);
     border-radius: 1rem;
     box-shadow: var(--glass-shadow);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.25s ease;
+  }
+  .glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glass-shadow), 0 4px 20px rgb(var(--c-accent) / 0.08);
+    border-color: rgb(var(--c-accent) / 0.18);
   }
 
   /* ── Inputs ── */
@@ -213,6 +221,12 @@
     border: 1px solid var(--glass-border);
     color: rgb(var(--c-text) / 0.4);
     @apply transition-all duration-300;
+  }
+  .cal-grid-cell:hover {
+    background: var(--glass-bg-hover);
+    border-color: rgb(var(--c-accent) / 0.25);
+    color: rgb(var(--c-text) / 0.7);
+    transform: translateY(-1px);
   }
   .cal-grid-active {
     background: rgb(var(--c-accent) / 0.15);
