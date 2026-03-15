@@ -79,8 +79,29 @@
   }
 
   // ── Birth date: 3 estados (empty / editing / set) ──
-  function fmtBirthDisplay(dateStr) {
-    var p = dateStr.split("-").map(Number);
+
+  // ISO "1990-03-15" → display "15/03/1990"
+  function isoToDmy(iso) {
+    var p = iso.split("-");
+    return p[2] + "/" + p[1] + "/" + p[0];
+  }
+  // "15/03/1990" → ISO "1990-03-15"
+  function dmyToIso(dmy) {
+    var p = dmy.split("/");
+    return p[2] + "-" + p[1] + "-" + p[0];
+  }
+  // Valida "DD/MM/AAAA" como fecha real con año >= 1900
+  function isValidDmy(dmy) {
+    var p = dmy.split("/");
+    if (p.length !== 3 || p[2].length !== 4) return false;
+    var d = parseInt(p[0], 10), m = parseInt(p[1], 10), y = parseInt(p[2], 10);
+    if (y < 1900 || m < 1 || m > 12 || d < 1 || d > 31) return false;
+    var date = new Date(y, m - 1, d);
+    return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d;
+  }
+
+  function fmtBirthDisplay(iso) {
+    var p = iso.split("-").map(Number);
     return p[2] + " " + MESES[p[1] - 1] + " " + p[0];
   }
 
@@ -94,11 +115,10 @@
   }
 
   function updateBirthDisplay() {
-    var calBirth  = document.getElementById("cal-birth");
     var birthText = document.getElementById("cal-birth-text");
-    if (!calBirth) return;
-    if (calBirth.value) {
-      if (birthText) birthText.textContent = fmtBirthDisplay(calBirth.value);
+    var saved = localStorage.getItem("lgc_birth_date");
+    if (saved) {
+      if (birthText) birthText.textContent = fmtBirthDisplay(saved);
       showBirthState("set");
     } else {
       showBirthState("empty");
@@ -607,28 +627,24 @@
     var today = new Date();
     calDate.value = toDateStr(today);
 
-    // Cargar fecha de nacimiento guardada
-    var savedBirth = localStorage.getItem("lgc_birth_date");
-    if (savedBirth && calBirth) calBirth.value = savedBirth;
-
-    // Timestamp: ignora change prematuro de pickers mobile (~<800ms)
-    var birthEditTs = 0;
-
     // Event listeners
     calDate.addEventListener("input", refresh);
+
+    // Birth date: input de texto con auto-formato DD/MM/AAAA
     if (calBirth) {
-      calBirth.addEventListener("change", function () {
-        if (calBirth.value) {
-          var year = parseInt(calBirth.value.split("-")[0], 10);
-          if (year >= 1900) {
-            localStorage.setItem("lgc_birth_date", calBirth.value);
-            refresh();
-            // Si change llega <800ms después de abrir editing,
-            // es el picker mobile auto-seleccionando hoy → no transicionar
-            if (Date.now() - birthEditTs > 800) {
-              updateBirthDisplay();
-            }
-          }
+      calBirth.addEventListener("input", function () {
+        // Solo dígitos, formatear con /
+        var raw = calBirth.value.replace(/\D/g, "");
+        var fmt = "";
+        if (raw.length > 0) fmt += raw.substring(0, 2);
+        if (raw.length > 2) fmt += "/" + raw.substring(2, 4);
+        if (raw.length > 4) fmt += "/" + raw.substring(4, 8);
+        calBirth.value = fmt;
+        // Cuando tiene 10 chars (DD/MM/AAAA) y es válida → guardar y mostrar badge
+        if (fmt.length === 10 && isValidDmy(fmt)) {
+          localStorage.setItem("lgc_birth_date", dmyToIso(fmt));
+          updateBirthDisplay();
+          refresh();
         }
       });
     }
@@ -646,16 +662,18 @@
     var birthClear  = document.getElementById("cal-birth-clear");
 
     if (birthAdd) birthAdd.addEventListener("click", function () {
-      birthEditTs = Date.now();
+      if (calBirth) calBirth.value = "";
       showBirthState("editing");
+      if (calBirth) calBirth.focus();
     });
     if (birthEdit) birthEdit.addEventListener("click", function () {
-      birthEditTs = Date.now();
+      var saved = localStorage.getItem("lgc_birth_date");
+      if (calBirth) calBirth.value = saved ? isoToDmy(saved) : "";
       showBirthState("editing");
+      if (calBirth) calBirth.focus();
     });
     if (birthCancel) birthCancel.addEventListener("click", function () {
       var prev = localStorage.getItem("lgc_birth_date");
-      if (calBirth) calBirth.value = prev || "";
       if (prev) updateBirthDisplay();
       else showBirthState("empty");
     });
@@ -752,9 +770,9 @@
     if (!year || !month || !day) return;
 
     var nacY = null, nacM = null, nacD = null;
-    var calBirth = document.getElementById("cal-birth");
-    if (calBirth && calBirth.value) {
-      var bp = calBirth.value.split("-").map(Number);
+    var savedBirth = localStorage.getItem("lgc_birth_date");
+    if (savedBirth) {
+      var bp = savedBirth.split("-").map(Number);
       nacY = bp[0]; nacM = bp[1]; nacD = bp[2];
     }
 
