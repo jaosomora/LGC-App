@@ -137,7 +137,7 @@ def stats():
     # Usuarios registrados (últimos 10) con número de orden
     recent_users = User.query.order_by(User.created_at.desc()).limit(10).all()
     all_ids_ordered = [u.id for u in User.query.order_by(User.created_at.asc()).all()]
-    id_to_num = {uid: i + 1 for i, uid in enumerate(all_ids_ordered)}
+    id_to_num = {uid: i for i, uid in enumerate(all_ids_ordered)}
 
     # Total de búsquedas (suma de todas las puntuaciones)
     total_searches = db.session.query(func.sum(Ranking.puntuacion)).scalar() or 0
