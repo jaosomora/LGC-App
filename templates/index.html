@@ -66,15 +66,18 @@
             </div>
 
             <div id="input-calendaria" class="mode-input hidden">
+                <!-- Hidden date inputs (off-screen, fully rendered for showPicker compatibility) -->
+                <input type="date" id="cal-date" class="fixed -top-24 left-0 opacity-0 pointer-events-none" tabindex="-1" aria-hidden="true">
+                <input type="date" id="cal-birth" class="fixed -top-24 left-0 opacity-0 pointer-events-none" tabindex="-1" aria-hidden="true">
+
                 <!-- Navegador temporal -->
                 <div class="flex items-center justify-center gap-3 sm:gap-4">
                     <button id="cal-prev" class="p-1.5 text-th-text/25 hover:text-th-accent transition-colors rounded-lg" aria-label="Día anterior">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <div id="cal-date-display" class="text-center cursor-pointer group relative" aria-label="Elegir fecha">
+                    <button id="cal-date-display" class="text-center cursor-pointer group" aria-label="Elegir fecha">
                         <div id="cal-date-text" class="text-base sm:text-lg font-semibold group-hover:text-th-accent transition-colors"></div>
-                        <input type="date" id="cal-date" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" tabindex="-1">
-                    </div>
+                    </button>
                     <button id="cal-next" class="p-1.5 text-th-text/25 hover:text-th-accent transition-colors rounded-lg" aria-label="Día siguiente">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                     </button>
@@ -91,15 +94,12 @@
 
                 <!-- Nacimiento (compacto, colapsable) -->
                 <div class="flex justify-center items-center mt-3 pt-3" style="border-top:1px solid var(--glass-divider)">
-                    <div id="cal-birth-add" class="relative text-xs text-th-text/40 hover:text-th-accent transition-colors cursor-pointer py-1.5 px-3 rounded-lg" style="border:1px dashed var(--glass-border)">
-                        + Fecha de nacimiento
-                        <input type="date" id="cal-birth" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" tabindex="-1">
-                    </div>
+                    <button id="cal-birth-add" class="text-xs text-th-text/40 hover:text-th-accent transition-colors cursor-pointer py-1.5 px-3 rounded-lg" style="border:1px dashed var(--glass-border)">+ Fecha de nacimiento</button>
                     <div id="cal-birth-badge" class="hidden flex items-center gap-1.5">
                         <span class="text-[11px] text-th-text/30">Nac:</span>
-                        <div id="cal-birth-edit" class="relative text-[11px] text-th-text/50 hover:text-th-accent transition-colors font-medium cursor-pointer" aria-label="Cambiar fecha de nacimiento">
+                        <button id="cal-birth-edit" class="text-[11px] text-th-text/50 hover:text-th-accent transition-colors font-medium cursor-pointer" aria-label="Cambiar fecha de nacimiento">
                             <span id="cal-birth-text"></span>
-                        </div>
+                        </button>
                         <button id="cal-birth-clear" class="text-th-text/20 hover:text-th-text/50 transition-colors text-xs leading-none ml-0.5" aria-label="Quitar fecha de nacimiento">✕</button>
                     </div>
                 </div>

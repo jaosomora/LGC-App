@@ -101,13 +101,6 @@
     if (birthAdd) birthAdd.classList.toggle("hidden", hasBirth);
     if (birthBadge) birthBadge.classList.toggle("hidden", !hasBirth);
     if (birthText && hasBirth) birthText.textContent = fmtBirthDisplay(calBirth.value);
-
-    // Move input overlay to the visible container for mobile compatibility
-    if (hasBirth && birthEdit && calBirth.parentNode !== birthEdit) {
-      birthEdit.appendChild(calBirth);
-    } else if (!hasBirth && birthAdd && calBirth.parentNode !== birthAdd) {
-      birthAdd.appendChild(calBirth);
-    }
   }
 
   function getTimezoneLabel() {
@@ -653,7 +646,24 @@
       refresh();
     });
 
-    // Nacimiento: quitar (agregar/editar se manejan por input overlay nativo)
+    // Click en fecha display → abrir date picker nativo
+    if (dateDisplay) {
+      dateDisplay.addEventListener("click", function () {
+        try { calDate.showPicker(); } catch (e) { calDate.focus(); }
+      });
+    }
+
+    // Nacimiento: agregar / editar / quitar
+    if (birthAdd) {
+      birthAdd.addEventListener("click", function () {
+        try { calBirth.showPicker(); } catch (e) { calBirth.focus(); }
+      });
+    }
+    if (birthEdit) {
+      birthEdit.addEventListener("click", function () {
+        try { calBirth.showPicker(); } catch (e) { calBirth.focus(); }
+      });
+    }
     if (birthClear) {
       birthClear.addEventListener("click", function () {
         calBirth.value = "";
