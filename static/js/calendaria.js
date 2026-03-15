@@ -635,10 +635,10 @@
     var savedBirth = localStorage.getItem("lgc_birth_date");
     if (savedBirth && calBirth) calBirth.value = savedBirth;
 
-    // Event listeners — native inputs
-    calDate.addEventListener("input", refresh);
+    // Event listeners — native inputs (overlay handles picker open)
+    calDate.addEventListener("change", refresh);
     if (calBirth) {
-      calBirth.addEventListener("input", function () {
+      calBirth.addEventListener("change", function () {
         if (calBirth.value) localStorage.setItem("lgc_birth_date", calBirth.value);
         else localStorage.removeItem("lgc_birth_date");
         refresh();
@@ -652,13 +652,6 @@
       calDate.value = toDateStr(new Date());
       refresh();
     });
-
-    // Click en fecha display → abrir date picker nativo
-    if (dateDisplay) {
-      dateDisplay.addEventListener("click", function () {
-        try { calDate.showPicker(); } catch (e) { calDate.focus(); }
-      });
-    }
 
     // Nacimiento: quitar (agregar/editar se manejan por input overlay nativo)
     if (birthClear) {

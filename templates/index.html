@@ -66,16 +66,15 @@
             </div>
 
             <div id="input-calendaria" class="mode-input hidden">
-                <!-- Hidden native date inputs -->
-                <input type="date" id="cal-date" class="sr-only" tabindex="-1">
                 <!-- Navegador temporal -->
                 <div class="flex items-center justify-center gap-3 sm:gap-4">
                     <button id="cal-prev" class="p-1.5 text-th-text/25 hover:text-th-accent transition-colors rounded-lg" aria-label="Día anterior">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <button id="cal-date-display" class="text-center cursor-pointer group" aria-label="Elegir fecha">
+                    <div id="cal-date-display" class="text-center cursor-pointer group relative" aria-label="Elegir fecha">
                         <div id="cal-date-text" class="text-base sm:text-lg font-semibold group-hover:text-th-accent transition-colors"></div>
-                    </button>
+                        <input type="date" id="cal-date" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" tabindex="-1">
+                    </div>
                     <button id="cal-next" class="p-1.5 text-th-text/25 hover:text-th-accent transition-colors rounded-lg" aria-label="Día siguiente">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                     </button>
