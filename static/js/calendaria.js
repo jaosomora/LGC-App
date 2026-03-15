@@ -13,6 +13,7 @@
   var MEMORIAS  = ["","RAM","REM","ROM","RUM"];
   var FASES     = ["","Asume","Asimila","Desafía","Decide"];
   var MESES     = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  var DIAS      = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var ms        = 86400000;
 
   // ── Grilla: estructura de cuadrantes ──
@@ -119,7 +120,7 @@
       apos:apos, aneg:aneg, anuAp:apos-aneg,
       frcPos:frcPos, frcNeg:frcNeg, anuAño:anuAño,
       encajeAnual:encajeAnual, encajeAp:encajeAp,
-      cuarentena:cuarentena, year:year
+      cuarentena:cuarentena, year:year, month:month, day:day
     };
 
     if (doy > 352) {
@@ -202,6 +203,71 @@
     return html;
   }
 
+  // ── Vista Foco: solo el cuadrante activo con fechas ──
+  function renderFocusView(data) {
+    // Encontrar el cuadrante activo
+    var activeQuad = null;
+    for (var q = 0; q < GRID_DISPLAY.length; q++) {
+      if (GRID_DISPLAY[q].name === data.cuad) { activeQuad = GRID_DISPLAY[q]; break; }
+    }
+    if (!activeQuad) return "";
+
+    // Fecha de consulta como referencia
+    var refDate = new Date(data.year, data.month - 1, data.day, 12, 0, 0);
+
+    var html = '<div class="mt-4 rounded-xl overflow-hidden" style="border:1px solid var(--glass-border)">';
+
+    // Header del cuadrante
+    html += '<div class="text-center py-2.5" style="background:rgb(var(--c-accent)/0.05);border-bottom:1px solid var(--glass-border)">';
+    html += '<span class="text-xs uppercase tracking-wider text-th-accent font-bold">' + activeQuad.name + '</span>';
+    html += '</div>';
+
+    // 4 filas de posición con fecha
+    for (var i = 0; i < 4; i++) {
+      var pos = activeQuad.start + i;
+      var isActive = data.pos === pos;
+      var offset = pos - data.pos;
+      var posDate = new Date(refDate.getTime() + offset * ms);
+      var dayName = DIAS[posDate.getDay()];
+      var dateStr = dayName + " " + posDate.getDate() + " " + MESES[posDate.getMonth()];
+
+      var rowBg = isActive ? "background:rgb(var(--c-accent)/0.08)" : "";
+      var borderB = i < 3 ? "border-bottom:1px solid var(--glass-border);" : "";
+
+      html += '<div class="flex items-center gap-3 px-3 py-2.5" style="' + borderB + rowBg + '">';
+
+      // Indicador activo
+      if (isActive) {
+        html += '<div class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:rgb(var(--c-accent))"></div>';
+      } else {
+        html += '<div class="w-1.5 flex-shrink-0"></div>';
+      }
+
+      // Número de posición
+      var numCls = isActive ? "text-th-accent font-bold" : "text-th-text/50 font-semibold";
+      html += '<span class="text-sm ' + numCls + ' w-5 text-right">' + pos + '</span>';
+
+      // Paso
+      var pasoCls = isActive ? "font-semibold" : "text-th-text/60";
+      html += '<span class="text-sm ' + pasoCls + ' flex-1">' + PASOS[i] + '</span>';
+
+      // Memoria (solo SO)
+      if (activeQuad.mems[i]) {
+        var memCls = isActive ? "text-th-accent/70" : "text-th-text/30";
+        html += '<span class="text-[10px] uppercase font-semibold ' + memCls + '">' + activeQuad.mems[i] + '</span>';
+      }
+
+      // Fecha
+      var dateCls = isActive ? "text-th-accent/80" : "text-th-text/30";
+      html += '<span class="text-xs tabular-nums ' + dateCls + ' whitespace-nowrap">' + dateStr + '</span>';
+
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
   // ── Renderizado principal ──
   function render(data) {
     var container = document.getElementById("calendaria-results");
@@ -243,6 +309,8 @@
       html += progressBar(data.diaAnillo, data.totalAnillo, "Anillo de Fuego");
       html += '</div>';
     } else {
+      var calView = localStorage.getItem("lgc_cal_view") || "plano";
+
       html += '<div class="glass-card p-5">';
       html += '<div class="text-center">';
       html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Posición Calendaria</div>';
@@ -252,12 +320,46 @@
       html += '<div class="text-xs text-th-text/40 mt-0.5">Vuelta ' + data.vRel + '</div>';
       html += '</div>';
       html += progressBar(data.pos, 16, "Posición en la vuelta");
-      html += renderGrid(data);
+
+      // Toggle Plano / Foco
+      var planoActive = calView === "plano";
+      var focoActive  = calView === "foco";
+      html += '<div class="flex justify-center gap-1.5 mt-3 mb-1">';
+      html += '<button data-calview="plano" class="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all ' +
+        (planoActive ? 'text-th-accent' : 'text-th-text/30 hover:text-th-text/50') + '"' +
+        (planoActive ? ' style="background:rgb(var(--c-accent)/0.12)"' : '') +
+        '>Plano</button>';
+      html += '<button data-calview="foco" class="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all ' +
+        (focoActive ? 'text-th-accent' : 'text-th-text/30 hover:text-th-text/50') + '"' +
+        (focoActive ? ' style="background:rgb(var(--c-accent)/0.12)"' : '') +
+        '>Foco</button>';
+      html += '</div>';
+
+      // Renderizar según vista seleccionada
+      if (calView === "foco") {
+        html += renderFocusView(data);
+      } else {
+        html += renderGrid(data);
+      }
+
       html += '</div>';
     }
 
     // ── 3. Métricas adicionales ──
     html += '<div class="grid grid-cols-2 gap-3">';
+
+    // Aparato (contenedor mayor: 1461 días / 4 años)
+    var encApStr = data.encajeAp
+      ? '<div class="text-xs text-th-text/30 mt-0.5">Encaje: ' + fmtDate(data.encajeAp.d, data.encajeAp.m, data.encajeAp.y) + '</div>'
+      : "";
+    html += '<div class="glass-card p-4">';
+    html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Aparato ' + data.apNum + '</div>';
+    html += '<div class="text-lg font-bold">' + data.faseName + '</div>';
+    html += '<div class="text-sm text-th-text/50">Día ' + data.apos + '/1461</div>';
+    html += '<div class="text-xs text-th-text/40 mt-1">+' + data.apos + ' −' + data.aneg + ' · Anu: ' + fmtSign(data.anuAp) + '</div>';
+    html += encApStr;
+    html += progressBar(data.apos, 1461, "Progreso del Aparato");
+    html += '</div>';
 
     // Día del Año / Frecuencias
     var encAnualStr = data.encajeAnual
@@ -269,19 +371,6 @@
     html += '<div class="text-xs text-th-text/40 mt-1">+' + data.frcPos + ' −' + data.frcNeg + ' · Anu: ' + fmtSign(data.anuAño) + '</div>';
     html += encAnualStr;
     html += progressBar(data.doy, data.total, "Progreso anual");
-    html += '</div>';
-
-    // Aparato
-    var encApStr = data.encajeAp
-      ? '<div class="text-xs text-th-text/30 mt-0.5">Encaje: ' + fmtDate(data.encajeAp.d, data.encajeAp.m, data.encajeAp.y) + '</div>'
-      : "";
-    html += '<div class="glass-card p-4">';
-    html += '<div class="text-xs uppercase tracking-wider text-th-text/40 mb-1">Aparato ' + data.apNum + '</div>';
-    html += '<div class="text-lg font-bold">' + data.faseName + '</div>';
-    html += '<div class="text-sm text-th-text/50">Día ' + data.apos + '/1461</div>';
-    html += '<div class="text-xs text-th-text/40 mt-1">+' + data.apos + ' −' + data.aneg + ' · Anu: ' + fmtSign(data.anuAp) + '</div>';
-    html += encApStr;
-    html += progressBar(data.apos, 1461, "Progreso del Aparato");
     html += '</div>';
 
     // Cuarentena Global
@@ -346,6 +435,15 @@
     if (btnNext) btnNext.addEventListener("click", function () { shiftDate(1); });
     if (btnToday) btnToday.addEventListener("click", function () {
       calDate.value = toDateStr(new Date());
+      refresh();
+    });
+
+    // Toggle Plano/Foco (event delegation)
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-calview]");
+      if (!btn) return;
+      var view = btn.getAttribute("data-calview");
+      localStorage.setItem("lgc_cal_view", view);
       refresh();
     });
 
