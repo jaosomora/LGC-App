@@ -278,18 +278,20 @@
 
     // Header: nombre completo + concepto
     html += '<div class="text-center py-2.5" style="background:rgb(var(--c-accent)/0.05);border-bottom:1px solid var(--glass-border)">';
-    html += '<span class="text-xs uppercase tracking-wider text-th-accent font-bold">' + qi.full + '</span>';
-    html += '<span class="text-xs text-th-text/30 ml-1.5">· ' + qi.concepto + '</span>';
+    html += '<span class="text-sm font-bold text-th-accent">' + activeQuad.name + '</span>';
+    html += '<span class="text-[10px] text-th-text/20 mx-2">·</span>';
+    html += '<span class="text-xs text-th-text/50">' + qi.full + '</span>';
+    html += '<span class="text-[10px] text-th-text/20 mx-2">·</span>';
+    html += '<span class="text-xs text-th-text/30 italic">' + qi.concepto + '</span>';
     html += '</div>';
 
     // ── Desktop: tabla con columnas (hidden en mobile) ──
     html += '<div class="hidden sm:block">';
 
     // Header de columnas
-    html += '<div class="grid gap-x-3 px-3 py-1.5 text-[10px] uppercase tracking-wider text-th-text/25" style="border-bottom:1px solid var(--glass-border);' +
-      'grid-template-columns:auto 1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
+    html += '<div class="grid gap-x-4 px-3 py-1.5 text-[10px] uppercase tracking-wider text-th-text/25" style="border-bottom:1px solid var(--glass-border);' +
+      'grid-template-columns:1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
     html += '<span>Posición</span>';
-    html += '<span></span>';
     if (hasMems) html += '<span class="text-center">Mem</span>';
     html += '<span class="text-right">Día Solar</span>';
     html += '<span class="text-right">Día Año</span>';
@@ -302,22 +304,22 @@
       var rowBg = r.isActive ? "background:rgb(var(--c-accent)/0.08)" : "";
       var borderB = d < 3 ? "border-bottom:1px solid var(--glass-border);" : "";
 
-      html += '<div class="grid gap-x-3 items-center px-3 py-2 cursor-pointer" data-calpos="' + r.pos + '" style="' + borderB + rowBg +
-        ';grid-template-columns:auto 1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
+      html += '<div class="grid gap-x-4 items-center px-3 py-2 cursor-pointer" data-calpos="' + r.pos + '" style="' + borderB + rowBg +
+        ';grid-template-columns:1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
 
-      // Posición (indicador + número)
+      // Posición + nombre combinados
       var numCls = r.isActive ? "text-th-accent font-bold" : "text-th-text/50 font-semibold";
-      html += '<span class="text-sm ' + numCls + ' flex items-center gap-1.5">';
-      if (r.isActive) {
-        html += '<span class="inline-block w-1.5 h-1.5 rounded-full" style="background:rgb(var(--c-accent))"></span>';
-      } else {
-        html += '<span class="inline-block w-1.5"></span>';
-      }
-      html += r.pos + '</span>';
-
-      // Nombre de posición
       var pasoCls = r.isActive ? "font-semibold" : "text-th-text/60";
-      html += '<span class="text-sm ' + pasoCls + '">' + r.paso + '</span>';
+      html += '<span class="text-sm flex items-center gap-1.5">';
+      if (r.isActive) {
+        html += '<span class="inline-block w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:rgb(var(--c-accent))"></span>';
+      } else {
+        html += '<span class="inline-block w-1.5 flex-shrink-0"></span>';
+      }
+      html += '<span class="' + numCls + '">' + r.pos + '</span>';
+      html += '<span class="text-th-text/15 text-xs">·</span>';
+      html += '<span class="' + pasoCls + '">' + r.paso + '</span>';
+      html += '</span>';
 
       // Memoria (solo SO)
       if (hasMems) {
