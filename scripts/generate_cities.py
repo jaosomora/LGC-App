@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-generate_cities.py — Descarga el dataset GeoNames cities15000
+generate_cities.py — Descarga el dataset GeoNames cities5000
 y genera un JSON por país en static/data/cities/{CC}.json.
 
 Uso:
@@ -19,8 +19,8 @@ import zipfile
 from collections import defaultdict
 from urllib.request import urlretrieve
 
-URL = "https://download.geonames.org/export/dump/cities15000.zip"
-INNER_FILE = "cities15000.txt"
+URL = "https://download.geonames.org/export/dump/cities5000.zip"
+INNER_FILE = "cities5000.txt"
 
 # Columnas del TSV de GeoNames (0-indexed)
 COL_NAME = 1          # nombre UTF-8
@@ -36,7 +36,7 @@ def main():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     # ── Descargar ──
-    zip_path = os.path.join(SCRIPT_DIR, "cities15000.zip")
+    zip_path = os.path.join(SCRIPT_DIR, "cities5000.zip")
     if not os.path.exists(zip_path):
         print(f"Descargando {URL} ...")
         urlretrieve(URL, zip_path)
