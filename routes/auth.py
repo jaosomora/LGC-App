@@ -2,8 +2,9 @@
 routes/auth.py — Autenticación con Google OAuth 2.0.
 """
 import os
+from datetime import datetime, timezone as tz
 from flask import Blueprint, redirect, url_for, session, flash
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_required, login_user, logout_user, current_user
 from authlib.integrations.flask_client import OAuth
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -60,7 +61,6 @@ def callback():
     login_user(user, remember=True)
 
     # Registrar último login + auto-bootstrap owner
-    from datetime import datetime, timezone as tz
     user.last_login = datetime.now(tz.utc)
     owner_email = os.getenv("OWNER_EMAIL", "")
     if owner_email and user.email == owner_email and not user.is_owner:
@@ -68,6 +68,46 @@ def callback():
     db.session.commit()
 
     return redirect(url_for("dashboard.index"))
+
+
+# ── Google Docs OAuth (flujo separado) ──
+
+GDOCS_SCOPES = (
+    "openid email profile "
+    "https://www.googleapis.com/auth/documents "
+    "https://www.googleapis.com/auth/drive.file"
+)
+
+
+@auth_bp.route("/connect-gdocs")
+@login_required
+def connect_gdocs():
+    """Inicia OAuth para permisos de Google Docs/Drive."""
+    redirect_uri = url_for("auth.gdocs_callback", _external=True)
+    return oauth.google.authorize_redirect(
+        redirect_uri,
+        access_type="offline",
+        prompt="consent",
+        scope=GDOCS_SCOPES,
+    )
+
+
+@auth_bp.route("/gdocs-callback")
+@login_required
+def gdocs_callback():
+    """Callback: guarda tokens de Google Docs."""
+    from models import db
+
+    token = oauth.google.authorize_access_token()
+    current_user.google_access_token = token.get("access_token")
+    current_user.google_refresh_token = token.get("refresh_token")
+    if token.get("expires_at"):
+        current_user.google_token_expires_at = datetime.fromtimestamp(
+            token["expires_at"], tz=tz.utc
+        )
+    db.session.commit()
+    flash("Google Docs conectado exitosamente.", "success")
+    return redirect(url_for("dashboard.reactivos"))
 
 
 @auth_bp.route("/logout")

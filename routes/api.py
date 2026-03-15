@@ -4,6 +4,7 @@ routes/api.py — Endpoints JSON API para Interfaz LGC.
 import os
 import logging
 from flask import Blueprint, request, jsonify
+from flask_login import login_required, current_user
 from models import db, Palabra, Ranking, User
 from calculos import (
     normalizar, es_valida, calcular_potencial, calcular_lupa,
@@ -165,5 +166,36 @@ def stats():
             for u in recent_users
         ],
     })
+
+
+@api_bp.route("/reactivo", methods=["POST"])
+@login_required
+def guardar_reactivo():
+    """Guarda un reactivo en Google Docs."""
+    data = request.get_json(silent=True) or {}
+    texto = data.get("texto", "").strip()
+    cabecera = data.get("cabecera", {})
+    fecha = data.get("fecha", "").strip()
+    hora = data.get("hora", "").strip()
+
+    if not texto:
+        return jsonify({"error": "Texto vacío"}), 400
+
+    if not current_user.google_refresh_token:
+        return jsonify({"error": "Google Docs no conectado"}), 403
+
+    try:
+        from services.gdocs import save_reactivo
+        result = save_reactivo(
+            user=current_user,
+            fecha=fecha,
+            hora=hora,
+            cabecera_data=cabecera,
+            texto=texto,
+        )
+        return jsonify({"ok": True, "doc_url": result["doc_url"]})
+    except Exception as e:
+        logger.error("Error guardando reactivo: %s", e)
+        return jsonify({"error": str(e)}), 500
 
 

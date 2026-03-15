@@ -103,6 +103,16 @@ def perfil():
     )
 
 
+@dashboard_bp.route("/reactivos")
+@login_required
+def reactivos():
+    gdocs_connected = bool(current_user.google_refresh_token)
+    return render_template(
+        "dashboard/reactivos.html",
+        gdocs_connected=gdocs_connected,
+    )
+
+
 @dashboard_bp.route("/usuarios")
 @owner_required
 def usuarios():
