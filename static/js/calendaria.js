@@ -280,9 +280,9 @@
     html += '<div class="text-center py-2.5" style="background:rgb(var(--c-accent)/0.05);border-bottom:1px solid var(--glass-border)">';
     html += '<span class="text-sm font-bold text-th-accent">' + activeQuad.name + '</span>';
     html += '<span class="text-[10px] text-th-text/20 mx-2">·</span>';
-    html += '<span class="text-xs text-th-text/50">' + qi.full + '</span>';
+    html += '<span class="text-xs text-th-text/50">' + qi.concepto + '</span>';
     html += '<span class="text-[10px] text-th-text/20 mx-2">·</span>';
-    html += '<span class="text-xs text-th-text/30 italic">' + qi.concepto + '</span>';
+    html += '<span class="text-xs text-th-text/30 italic">' + qi.full + '</span>';
     html += '</div>';
 
     // ── Desktop: tabla con columnas (hidden en mobile) ──
