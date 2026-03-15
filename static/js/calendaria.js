@@ -64,6 +64,33 @@
     return y + "-" + m + "-" + d;
   }
 
+  // Date → "DD/MM/AAAA"
+  function toDateDmy(date) {
+    var d = String(date.getDate()).padStart(2, "0");
+    var m = String(date.getMonth() + 1).padStart(2, "0");
+    return d + "/" + m + "/" + date.getFullYear();
+  }
+
+  // "DD/MM/AAAA" → [year, month, day] or null
+  function parseDmy(dmy) {
+    if (!dmy || dmy.length !== 10) return null;
+    var p = dmy.split("/");
+    if (p.length !== 3) return null;
+    var d = parseInt(p[0], 10), m = parseInt(p[1], 10), y = parseInt(p[2], 10);
+    if (isNaN(d) || isNaN(m) || isNaN(y)) return null;
+    return [y, m, d];
+  }
+
+  // Auto-formato: solo dígitos → DD/MM/AAAA
+  function formatDmyInput(value) {
+    var raw = value.replace(/\D/g, "");
+    var fmt = "";
+    if (raw.length > 0) fmt += raw.substring(0, 2);
+    if (raw.length > 2) fmt += "/" + raw.substring(2, 4);
+    if (raw.length > 4) fmt += "/" + raw.substring(4, 8);
+    return fmt;
+  }
+
   // ── Timezone label ──
   function getTimezoneLabel() {
     try {
@@ -608,9 +635,11 @@
   function shiftDate(days) {
     var calDate = document.getElementById("cal-date");
     if (!calDate || !calDate.value) return;
-    var current = new Date(calDate.value + "T12:00:00");
+    var p = parseDmy(calDate.value);
+    if (!p) return;
+    var current = new Date(p[0], p[1] - 1, p[2], 12, 0, 0);
     current.setDate(current.getDate() + days);
-    calDate.value = toDateStr(current);
+    calDate.value = toDateDmy(current);
     refresh();
   }
 
@@ -625,22 +654,22 @@
 
     // Default: hoy (zona horaria local del usuario)
     var today = new Date();
-    calDate.value = toDateStr(today);
+    calDate.value = toDateDmy(today);
 
-    // Event listeners
-    calDate.addEventListener("input", refresh);
+    // Event listeners — auto-formato DD/MM/AAAA
+    calDate.addEventListener("input", function () {
+      var fmt = formatDmyInput(calDate.value);
+      calDate.value = fmt;
+      if (fmt.length === 10 && isValidDmy(fmt)) {
+        refresh();
+      }
+    });
 
     // Birth date: input de texto con auto-formato DD/MM/AAAA
     if (calBirth) {
       calBirth.addEventListener("input", function () {
-        // Solo dígitos, formatear con /
-        var raw = calBirth.value.replace(/\D/g, "");
-        var fmt = "";
-        if (raw.length > 0) fmt += raw.substring(0, 2);
-        if (raw.length > 2) fmt += "/" + raw.substring(2, 4);
-        if (raw.length > 4) fmt += "/" + raw.substring(4, 8);
+        var fmt = formatDmyInput(calBirth.value);
         calBirth.value = fmt;
-        // Cuando tiene 10 chars (DD/MM/AAAA) y es válida → guardar y mostrar badge
         if (fmt.length === 10 && isValidDmy(fmt)) {
           localStorage.setItem("lgc_birth_date", dmyToIso(fmt));
           updateBirthDisplay();
@@ -651,7 +680,7 @@
     if (btnPrev) btnPrev.addEventListener("click", function () { shiftDate(-1); });
     if (btnNext) btnNext.addEventListener("click", function () { shiftDate(1); });
     if (btnToday) btnToday.addEventListener("click", function () {
-      calDate.value = toDateStr(new Date());
+      calDate.value = toDateDmy(new Date());
       refresh();
     });
 
@@ -711,7 +740,8 @@
       var dir = nav.getAttribute("data-calquad-nav");
       var calDate = document.getElementById("cal-date");
       if (!calDate || !calDate.value) return;
-      var p = calDate.value.split("-").map(Number);
+      var p = parseDmy(calDate.value);
+      if (!p) return;
       var currentDoy = dFrom(dt(p[0],1,1), dt(p[0],p[1],p[2])) + 1;
       if (currentDoy > 352) return;
       var currentPos = (currentDoy - 1) % 16 + 1;
@@ -739,7 +769,8 @@
       if (isNaN(targetPos)) return;
       var calDate = document.getElementById("cal-date");
       if (!calDate || !calDate.value) return;
-      var p = calDate.value.split("-").map(Number);
+      var p = parseDmy(calDate.value);
+      if (!p) return;
       var currentDoy = dFrom(dt(p[0],1,1), dt(p[0],p[1],p[2])) + 1;
       if (currentDoy > 352) return;
       var currentPos = (currentDoy - 1) % 16 + 1;
@@ -765,7 +796,8 @@
     var calDate = document.getElementById("cal-date");
     if (!calDate || !calDate.value) return;
 
-    var parts = calDate.value.split("-").map(Number);
+    var parts = parseDmy(calDate.value);
+    if (!parts) return;
     var year = parts[0], month = parts[1], day = parts[2];
     if (!year || !month || !day) return;
 
