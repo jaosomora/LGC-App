@@ -51,8 +51,9 @@ def callback():
         db.session.add(user)
         db.session.commit()
     else:
-        # Actualizar avatar y nombre por si cambiaron en Google
-        user.nombre = user_info.get("name", user.nombre)
+        # Actualizar avatar siempre; nombre solo si no fue editado en perfil
+        if not user.nombre_custom:
+            user.nombre = user_info.get("name", user.nombre)
         user.avatar_url = user_info.get("picture", user.avatar_url)
         db.session.commit()
 

@@ -34,3 +34,10 @@ class User(UserMixin, db.Model):
     created_at = db.Column(
         db.DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
+
+    # Perfil
+    birth_date = db.Column(db.Date, nullable=True)
+    lugar_nacimiento = db.Column(db.String(200), nullable=True)
+    lugar_residencia = db.Column(db.String(200), nullable=True)
+    user_timezone = db.Column(db.String(100), nullable=True)
+    nombre_custom = db.Column(db.Boolean, nullable=False, default=False)

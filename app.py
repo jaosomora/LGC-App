@@ -82,6 +82,7 @@ def create_app():
     with app.app_context():
         db.create_all()
         _ensure_owner_columns(app)
+        _ensure_profile_columns(app)
         _bootstrap_owner(app)
         _migrate_sqlite_if_needed(app)
 
@@ -102,6 +103,26 @@ def _ensure_owner_columns(app):
             conn.execute(text("ALTER TABLE users ADD COLUMN last_login TIMESTAMP"))
             conn.commit()
             app.logger.info("Added last_login column to users table.")
+
+
+def _ensure_profile_columns(app):
+    """Agrega columnas de perfil si no existen (para PG existente)."""
+    from sqlalchemy import inspect, text
+    inspector = inspect(db.engine)
+    columns = [c["name"] for c in inspector.get_columns("users")]
+    new_cols = [
+        ("birth_date", "DATE"),
+        ("lugar_nacimiento", "VARCHAR(200)"),
+        ("lugar_residencia", "VARCHAR(200)"),
+        ("user_timezone", "VARCHAR(100)"),
+        ("nombre_custom", "BOOLEAN DEFAULT FALSE NOT NULL"),
+    ]
+    with db.engine.connect() as conn:
+        for col_name, col_type in new_cols:
+            if col_name not in columns:
+                conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}"))
+                conn.commit()
+                app.logger.info(f"Added {col_name} column to users table.")
 
 
 def _bootstrap_owner(app):

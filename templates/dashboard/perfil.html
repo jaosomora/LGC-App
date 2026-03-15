@@ -1,0 +1,183 @@
+{% extends "base_dashboard.html" %}
+
+{% block page_title %}Mi Perfil{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+    <!-- Avatar + Header -->
+    <div class="glass-card p-6 flex items-center gap-5">
+        {% if current_user.avatar_url %}
+        <img src="{{ current_user.avatar_url }}" alt="" class="w-20 h-20 rounded-full object-cover ring-2 ring-th-accent/20" referrerpolicy="no-referrer">
+        {% else %}
+        <div class="w-20 h-20 rounded-full bg-th-accent/20 flex items-center justify-center ring-2 ring-th-accent/20">
+            <span class="text-th-accent text-2xl font-bold">{{ current_user.nombre[:1] | upper }}</span>
+        </div>
+        {% endif %}
+        <div>
+            <h2 class="text-xl font-bold">{{ current_user.nombre }}</h2>
+            <p class="text-sm text-th-text/40">{{ current_user.email }}</p>
+            <p class="text-xs text-th-text/30 mt-1">Espacio #{{ espacio }}</p>
+        </div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="glass-card p-4 text-sm border {% if category == 'success' %}text-green-400 border-green-500/20{% else %}text-red-400 border-red-500/20{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Datos personales (editable) -->
+    <form method="POST" action="{{ url_for('dashboard.perfil') }}" class="glass-card p-6 space-y-5">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-th-text/40 mb-1">Datos personales</h3>
+
+        <!-- Nombre -->
+        <div>
+            <label for="perfil-nombre" class="block text-xs text-th-text/40 mb-1.5">Nombre</label>
+            <input type="text" id="perfil-nombre" name="nombre" value="{{ current_user.nombre }}" maxlength="200"
+                class="glass-input w-full" placeholder="Tu nombre">
+        </div>
+
+        <!-- Fecha de nacimiento -->
+        <div>
+            <label for="perfil-birth-display" class="block text-xs text-th-text/40 mb-1.5">Fecha de nacimiento</label>
+            <input type="text" id="perfil-birth-display" inputmode="numeric" placeholder="DD/MM/AAAA" maxlength="10"
+                class="glass-input w-full text-center tracking-wider"
+                value="{{ current_user.birth_date.strftime('%d/%m/%Y') if current_user.birth_date else '' }}">
+            <input type="hidden" id="perfil-birth-iso" name="birth_date"
+                value="{{ current_user.birth_date.isoformat() if current_user.birth_date else '' }}">
+        </div>
+
+        <!-- Lugar de nacimiento -->
+        <div>
+            <label for="perfil-lugar-nac" class="block text-xs text-th-text/40 mb-1.5">Lugar de nacimiento</label>
+            <input type="text" id="perfil-lugar-nac" name="lugar_nacimiento"
+                value="{{ current_user.lugar_nacimiento or '' }}" maxlength="200"
+                class="glass-input w-full" placeholder="Ciudad, Pa&iacute;s">
+        </div>
+
+        <!-- Lugar de residencia -->
+        <div>
+            <label for="perfil-lugar-res" class="block text-xs text-th-text/40 mb-1.5">Lugar de residencia</label>
+            <input type="text" id="perfil-lugar-res" name="lugar_residencia"
+                value="{{ current_user.lugar_residencia or '' }}" maxlength="200"
+                class="glass-input w-full" placeholder="Ciudad, Pa&iacute;s">
+        </div>
+
+        <!-- Zona horaria -->
+        <div>
+            <label for="perfil-tz" class="block text-xs text-th-text/40 mb-1.5">Zona horaria</label>
+            <div class="flex items-center gap-2">
+                <input type="text" id="perfil-tz" name="timezone"
+                    value="{{ current_user.user_timezone or '' }}"
+                    class="glass-input w-full" placeholder="Auto-detectada" readonly>
+                <button type="button" id="perfil-tz-detect"
+                    class="glass-button text-xs whitespace-nowrap !px-3 !py-2.5 shrink-0">Detectar</button>
+            </div>
+            <p id="perfil-tz-label" class="text-[11px] text-th-text/30 mt-1"></p>
+        </div>
+
+        <!-- Submit -->
+        <div class="pt-2">
+            <button type="submit" class="glass-button w-full sm:w-auto !bg-th-accent/20 !text-th-accent hover:!bg-th-accent/30 font-semibold px-6">
+                Guardar cambios
+            </button>
+        </div>
+    </form>
+
+    <!-- Info de cuenta (readonly) -->
+    <div class="glass-card p-6">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-th-text/40 mb-4">Informaci&oacute;n de la cuenta</h3>
+        <div class="space-y-3 text-sm">
+            <div class="flex justify-between items-center">
+                <span class="text-th-text/50">Email</span>
+                <span class="font-medium">{{ current_user.email }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-th-text/50">Espacio #</span>
+                <span class="font-medium">{{ espacio }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-th-text/50">Plan</span>
+                <span class="inline-block px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full
+                    {% if current_user.plan == 'free' %}bg-th-text/5 text-th-text/40{% else %}bg-th-accent/20 text-th-accent{% endif %}">
+                    {{ current_user.plan }}
+                </span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-th-text/50">Miembro desde</span>
+                <span class="font-medium">{{ current_user.created_at.strftime('%d/%m/%Y') if current_user.created_at else '-' }}</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block dashboard_scripts %}
+<script>
+(function () {
+  // ── DD/MM/AAAA auto-format para birth date ──
+  var display = document.getElementById("perfil-birth-display");
+  var hidden = document.getElementById("perfil-birth-iso");
+
+  if (display && hidden) {
+    display.addEventListener("input", function () {
+      var raw = display.value.replace(/\D/g, "");
+      var fmt = "";
+      if (raw.length > 0) fmt += raw.substring(0, 2);
+      if (raw.length > 2) fmt += "/" + raw.substring(2, 4);
+      if (raw.length > 4) fmt += "/" + raw.substring(4, 8);
+      display.value = fmt;
+
+      if (fmt.length === 10) {
+        var p = fmt.split("/");
+        var d = parseInt(p[0], 10), m = parseInt(p[1], 10), y = parseInt(p[2], 10);
+        if (y >= 1900 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+          var date = new Date(y, m - 1, d);
+          if (date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d) {
+            hidden.value = y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+            return;
+          }
+        }
+      }
+      if (fmt.length === 0) hidden.value = "";
+    });
+  }
+
+  // ── Timezone detection ──
+  var tzInput = document.getElementById("perfil-tz");
+  var tzDetect = document.getElementById("perfil-tz-detect");
+  var tzLabel = document.getElementById("perfil-tz-label");
+
+  function detectTz() {
+    try {
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tzInput) tzInput.value = tz;
+      if (tzLabel) {
+        var offset = new Date().getTimezoneOffset();
+        var sign = offset <= 0 ? "+" : "\u2212";
+        var h = Math.floor(Math.abs(offset) / 60);
+        var m = Math.abs(offset) % 60;
+        var utc = "UTC" + sign + h + (m ? ":" + String(m).padStart(2, "0") : "");
+        var city = tz.split("/").pop().replace(/_/g, " ");
+        tzLabel.textContent = city + " \u00b7 " + utc;
+      }
+    } catch (e) {}
+  }
+
+  if (tzDetect) tzDetect.addEventListener("click", detectTz);
+
+  // Auto-detect si está vacío
+  if (tzInput && !tzInput.value) detectTz();
+
+  // Mostrar label para valor existente
+  if (tzInput && tzInput.value) detectTz();
+})();
+</script>
+{% endblock %}
