@@ -64,6 +64,29 @@
     return y + "-" + m + "-" + d;
   }
 
+  // ── Abrir date picker (con fallback para mobile) ──
+  function openPicker(input, anchor) {
+    // 1. Intentar showPicker (Chrome 99+, Safari 16+, Firefox 101+)
+    try { input.showPicker(); return; } catch (e) { /* fallback */ }
+
+    // 2. Fallback: posicionar input sobre el botón para que el tap nativo funcione
+    var rect = anchor.getBoundingClientRect();
+    input.style.cssText =
+      "position:fixed;top:" + rect.top + "px;left:" + rect.left + "px;" +
+      "width:" + rect.width + "px;height:" + rect.height + "px;" +
+      "opacity:0.01;z-index:9999;";
+    input.focus();
+
+    var restore = function () {
+      input.style.cssText = "position:absolute;left:-9999px;top:0";
+      input.removeEventListener("change", restore);
+      input.removeEventListener("blur", onBlur);
+    };
+    var onBlur = function () { setTimeout(restore, 500); };
+    input.addEventListener("change", restore, { once: true });
+    input.addEventListener("blur", onBlur, { once: true });
+  }
+
   // ── Display de fecha humanizado ──
   function fmtDisplayDate(dateStr) {
     var d = new Date(dateStr + "T12:00:00");
@@ -649,19 +672,19 @@
     // Click en fecha display → abrir date picker nativo
     if (dateDisplay) {
       dateDisplay.addEventListener("click", function () {
-        try { calDate.showPicker(); } catch (e) { calDate.focus(); }
+        openPicker(calDate, dateDisplay);
       });
     }
 
     // Nacimiento: agregar / editar / quitar
     if (birthAdd) {
       birthAdd.addEventListener("click", function () {
-        try { calBirth.showPicker(); } catch (e) { calBirth.focus(); }
+        openPicker(calBirth, birthAdd);
       });
     }
     if (birthEdit) {
       birthEdit.addEventListener("click", function () {
-        try { calBirth.showPicker(); } catch (e) { calBirth.focus(); }
+        openPicker(calBirth, birthEdit);
       });
     }
     if (birthClear) {

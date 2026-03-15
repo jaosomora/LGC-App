@@ -66,27 +66,30 @@
             </div>
 
             <div id="input-calendaria" class="mode-input hidden">
-                <!-- Hidden date inputs (off-screen, fully rendered for showPicker compatibility) -->
-                <input type="date" id="cal-date" class="fixed -top-24 left-0 opacity-0 pointer-events-none" tabindex="-1" aria-hidden="true">
-                <input type="date" id="cal-birth" class="fixed -top-24 left-0 opacity-0 pointer-events-none" tabindex="-1" aria-hidden="true">
+                <!-- Date inputs: off-screen but fully rendered for showPicker compatibility.
+                     Uses absolute+left:-9999px (not fixed) because glass-card's transition:transform
+                     creates a containing block that breaks fixed positioning. -->
+                <input type="date" id="cal-date" style="position:absolute;left:-9999px;top:0" tabindex="-1" aria-hidden="true">
+                <input type="date" id="cal-birth" style="position:absolute;left:-9999px;top:0" tabindex="-1" aria-hidden="true">
 
                 <!-- Navegador temporal -->
                 <div class="flex items-center justify-center gap-3 sm:gap-4">
                     <button id="cal-prev" class="p-1.5 text-th-text/25 hover:text-th-accent transition-colors rounded-lg" aria-label="Día anterior">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
                     </button>
-                    <button id="cal-date-display" class="text-center cursor-pointer group" aria-label="Elegir fecha">
-                        <div id="cal-date-text" class="text-base sm:text-lg font-semibold group-hover:text-th-accent transition-colors"></div>
+                    <button id="cal-date-display" class="text-center cursor-pointer group flex items-center gap-2" aria-label="Elegir fecha">
+                        <span id="cal-date-text" class="text-base sm:text-lg font-semibold group-hover:text-th-accent transition-colors"></span>
+                        <svg class="w-4 h-4 text-th-text/20 group-hover:text-th-accent transition-colors flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>
                     </button>
                     <button id="cal-next" class="p-1.5 text-th-text/25 hover:text-th-accent transition-colors rounded-lg" aria-label="Día siguiente">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                     </button>
                 </div>
 
-                <!-- Hoy: indicador o botón -->
+                <!-- Hoy: indicador o botón para volver -->
                 <div class="text-center mt-1">
                     <span id="cal-today-label" class="text-[10px] text-th-accent/40 uppercase tracking-wider">hoy</span>
-                    <button id="cal-today" class="text-[11px] text-th-accent hover:text-th-accent/80 transition-colors font-medium hidden">○ Hoy</button>
+                    <button id="cal-today" class="text-[11px] text-th-accent hover:text-th-accent/80 transition-colors font-medium hidden">↩ Volver a hoy</button>
                 </div>
 
                 <!-- Timezone indicator -->
