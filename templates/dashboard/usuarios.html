@@ -27,7 +27,7 @@
             <tbody>
                 {% for u in users %}
                 <tr class="border-b border-th-div last:border-0 hover:bg-[var(--glass-bg-hover)] transition-colors">
-                    <td class="px-5 py-3 text-th-text/30">{{ loop.index }}</td>
+                    <td class="px-5 py-3 text-th-text/30">{{ loop.index0 }}</td>
                     <td class="px-5 py-3">
                         <div class="flex items-center gap-3">
                             {% if u.avatar_url %}
@@ -68,7 +68,7 @@
                 </div>
                 {% endif %}
                 <div>
-                    <p class="font-medium text-sm">{{ u.nombre }}</p>
+                    <p class="font-medium text-sm"><span class="text-th-text/30">#{{ loop.index0 }}</span> {{ u.nombre }}</p>
                     <p class="text-xs text-th-text/40">{{ u.email }}</p>
                 </div>
                 <span class="ml-auto inline-block px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full
