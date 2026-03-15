@@ -112,6 +112,7 @@ def _ensure_profile_columns(app):
     columns = [c["name"] for c in inspector.get_columns("users")]
     new_cols = [
         ("birth_date", "DATE"),
+        ("fecha_derivacion", "DATE"),
         ("pais_nacimiento", "VARCHAR(5)"),
         ("ciudad_nacimiento", "VARCHAR(200)"),
         ("pais_residencia", "VARCHAR(5)"),

@@ -76,6 +76,7 @@ class User(UserMixin, db.Model):
     last_login      # Último login
     created_at      # Fecha de registro
     birth_date      # Fecha de nacimiento (Date)
+    fecha_derivacion # Fecha derivación fundante (Date) — para cálculo de cuarentenas
     pais_nacimiento # ISO code 2 letras ("CO", "MX", ...)
     ciudad_nacimiento  # "Ciudad, Región" (texto libre)
     pais_residencia # ISO code 2 letras

@@ -37,6 +37,7 @@ class User(UserMixin, db.Model):
 
     # Perfil
     birth_date = db.Column(db.Date, nullable=True)
+    fecha_derivacion = db.Column(db.Date, nullable=True)  # Fecha derivación fundante
     pais_nacimiento = db.Column(db.String(5), nullable=True)    # ISO code: "CO"
     ciudad_nacimiento = db.Column(db.String(200), nullable=True)
     pais_residencia = db.Column(db.String(5), nullable=True)    # ISO code: "CO"

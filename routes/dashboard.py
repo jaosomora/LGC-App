@@ -53,6 +53,7 @@ def perfil():
     if request.method == "POST":
         nuevo_nombre = request.form.get("nombre", "").strip()
         birth_str = request.form.get("birth_date", "").strip()
+        deriv_str = request.form.get("fecha_derivacion", "").strip()
         pais_nac = request.form.get("pais_nacimiento", "").strip()
         ciudad_nac = request.form.get("ciudad_nacimiento", "").strip()
         pais_res = request.form.get("pais_residencia", "").strip()
@@ -72,6 +73,15 @@ def perfil():
                 pass
         else:
             current_user.birth_date = None
+
+        if deriv_str:
+            try:
+                p = deriv_str.split("-")
+                current_user.fecha_derivacion = date(int(p[0]), int(p[1]), int(p[2]))
+            except (ValueError, IndexError):
+                pass
+        else:
+            current_user.fecha_derivacion = None
 
         current_user.pais_nacimiento = pais_nac or None
         current_user.ciudad_nacimiento = ciudad_nac or None

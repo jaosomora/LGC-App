@@ -53,6 +53,16 @@
                 value="{{ current_user.birth_date.isoformat() if current_user.birth_date else '' }}">
         </div>
 
+        <!-- Fecha derivación fundante -->
+        <div>
+            <label for="perfil-deriv-display" class="block text-xs text-th-text/40 mb-1.5">Fecha derivaci&oacute;n fundante</label>
+            <input type="text" id="perfil-deriv-display" inputmode="numeric" placeholder="DD/MM/AAAA" maxlength="10"
+                class="glass-input w-full text-center tracking-wider"
+                value="{{ current_user.fecha_derivacion.strftime('%d/%m/%Y') if current_user.fecha_derivacion else '' }}">
+            <input type="hidden" id="perfil-deriv-iso" name="fecha_derivacion"
+                value="{{ current_user.fecha_derivacion.isoformat() if current_user.fecha_derivacion else '' }}">
+        </div>
+
         <!-- Lugar de nacimiento -->
         <fieldset class="space-y-2">
             <legend class="text-xs text-th-text/40 mb-0.5">Lugar de nacimiento</legend>
@@ -178,6 +188,34 @@
         }
       }
       if (fmt.length === 0) hidden.value = "";
+    });
+  }
+
+  // ── DD/MM/AAAA auto-format para fecha derivación fundante ──
+  var derivDisplay = document.getElementById("perfil-deriv-display");
+  var derivHidden = document.getElementById("perfil-deriv-iso");
+
+  if (derivDisplay && derivHidden) {
+    derivDisplay.addEventListener("input", function () {
+      var raw = derivDisplay.value.replace(/\D/g, "");
+      var fmt = "";
+      if (raw.length > 0) fmt += raw.substring(0, 2);
+      if (raw.length > 2) fmt += "/" + raw.substring(2, 4);
+      if (raw.length > 4) fmt += "/" + raw.substring(4, 8);
+      derivDisplay.value = fmt;
+
+      if (fmt.length === 10) {
+        var p = fmt.split("/");
+        var d = parseInt(p[0], 10), m = parseInt(p[1], 10), y = parseInt(p[2], 10);
+        if (y >= 1900 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+          var date = new Date(y, m - 1, d);
+          if (date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d) {
+            derivHidden.value = y + "-" + String(m).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+            return;
+          }
+        }
+      }
+      if (fmt.length === 0) derivHidden.value = "";
     });
   }
 
