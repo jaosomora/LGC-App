@@ -13,6 +13,7 @@
   var MEMORIAS  = ["","RAM","REM","ROM","RUM"];
   var FASES     = ["","Asume","Asimila","Desafía","Decide"];
   var MESES     = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  var MESES_FULL = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
   var DIAS      = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var DIAS_FULL = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   var QUAD_INFO = {
@@ -309,6 +310,8 @@
         dayFull: DIAS_FULL[posDate.getDay()],
         dateDay: posDate.getDate(),
         dateMes: MESES[posDate.getMonth()],
+        dateMesFull: MESES_FULL[posDate.getMonth()],
+        dateYear: posDate.getFullYear(),
         ds: posDs,
         doy: posDoy,
         total: data.total
@@ -349,17 +352,18 @@
     html += '</button>';
     html += '</div>';
 
-    // ── Desktop: tabla con columnas (hidden en mobile) ──
+    // ── Desktop: tabla con columnas y separadores (hidden en mobile) ──
+    var colBorder = "border-left:1px solid var(--glass-divider)";
+    var gridCols = "grid-template-columns:1fr" + (hasMems ? " auto" : "") + " 100px 50px 1fr";
     html += '<div class="hidden sm:block">';
 
     // Header de columnas
-    html += '<div class="grid gap-x-4 px-3 py-1.5 text-[10px] uppercase tracking-wider text-th-text/25" style="border-bottom:1px solid var(--glass-border);' +
-      'grid-template-columns:1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
-    html += '<span>Posición</span>';
-    if (hasMems) html += '<span class="text-center">Mem</span>';
-    html += '<span class="text-right">Día Solar</span>';
-    html += '<span class="text-right">Día Año</span>';
-    html += '<span class="text-right">Fecha</span>';
+    html += '<div class="grid text-[10px] uppercase tracking-wider text-th-text/25" style="border-bottom:1px solid var(--glass-border);background:rgb(255 255 255/0.02);' + gridCols + '">';
+    html += '<span class="px-3 py-1.5">Posición</span>';
+    if (hasMems) html += '<span class="px-3 py-1.5 text-center" style="' + colBorder + '">Mem</span>';
+    html += '<span class="px-3 py-1.5 text-right" style="' + colBorder + '">Día Solar</span>';
+    html += '<span class="px-3 py-1.5 text-right" style="' + colBorder + '">Día</span>';
+    html += '<span class="px-3 py-1.5 text-right" style="' + colBorder + '">Fecha</span>';
     html += '</div>';
 
     // Filas desktop
@@ -368,41 +372,39 @@
       var rowBg = r.isActive ? "background:rgb(var(--c-accent)/0.08)" : "";
       var borderB = d < 3 ? "border-bottom:1px solid var(--glass-border);" : "";
 
-      html += '<div class="grid gap-x-4 items-center px-3 py-2 cursor-pointer" data-calpos="' + r.pos + '" style="' + borderB + rowBg +
-        ';grid-template-columns:1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
+      html += '<div class="grid items-stretch cursor-pointer" data-calpos="' + r.pos + '" style="' + borderB + rowBg + ';' + gridCols + '">';
 
-      // Posición + nombre combinados
+      // Posición + nombre
       var numCls = r.isActive ? "text-th-accent font-bold" : "text-th-text/50 font-semibold";
       var pasoCls = r.isActive ? "font-semibold" : "text-th-text/60";
-      html += '<span class="text-sm flex items-center gap-1.5">';
+      html += '<span class="text-sm flex items-center gap-1.5 px-3 py-2.5">';
       if (r.isActive) {
         html += '<span class="inline-block w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:rgb(var(--c-accent))"></span>';
       } else {
         html += '<span class="inline-block w-1.5 flex-shrink-0"></span>';
       }
-      html += '<span class="' + numCls + '">' + r.pos + '</span>';
-      html += '<span class="text-th-text/15 text-xs">·</span>';
+      html += '<span class="text-base ' + numCls + '">' + r.pos + '</span>';
       html += '<span class="' + pasoCls + '">' + r.paso + '</span>';
       html += '</span>';
 
       // Memoria (solo SO)
       if (hasMems) {
         var memCls = r.isActive ? "text-th-accent/70" : "text-th-text/30";
-        html += '<span class="text-[10px] uppercase font-semibold text-center ' + memCls + ' px-2">' + (r.mem || '') + '</span>';
+        html += '<span class="text-[10px] uppercase font-semibold flex items-center justify-center px-2" style="' + colBorder + '">' + (r.mem || '') + '</span>';
       }
 
       // Día Solar
       var dsCls = r.isActive ? "text-th-accent/80 font-semibold" : "text-th-text/35";
-      html += '<span class="text-xs tabular-nums text-right ' + dsCls + '">' + r.ds + '</span>';
+      html += '<span class="text-xs tabular-nums flex items-center justify-end px-3 ' + dsCls + '" style="' + colBorder + '">' + r.ds + '</span>';
 
-      // Día del Año
+      // Día del Año (solo número)
       var doyCls = r.isActive ? "text-th-accent/80 font-semibold" : "text-th-text/35";
-      html += '<span class="text-xs tabular-nums text-right ' + doyCls + '">' + r.doy + '/' + r.total + '</span>';
+      html += '<span class="text-xs tabular-nums flex items-center justify-end px-3 ' + doyCls + '" style="' + colBorder + '">' + r.doy + '</span>';
 
-      // Fecha (día completo en desktop)
+      // Fecha completa (Domingo 15 marzo 2026)
       var dateCls = r.isActive ? "text-th-accent/80" : "text-th-text/30";
-      html += '<span class="text-xs tabular-nums text-right ' + dateCls + ' whitespace-nowrap">' +
-        r.dayFull + ' ' + r.dateDay + ' ' + r.dateMes + '</span>';
+      html += '<span class="text-xs tabular-nums flex items-center justify-end px-3 ' + dateCls + ' whitespace-nowrap" style="' + colBorder + '">' +
+        r.dayFull + ' ' + r.dateDay + ' ' + r.dateMesFull + ' ' + r.dateYear + '</span>';
 
       html += '</div>';
     }
@@ -612,7 +614,8 @@
     // Event listeners
     calDate.addEventListener("input", refresh);
     if (calBirth) {
-      // change: confirma automáticamente si el año tiene 4 dígitos (>= 1900)
+      // change: confirma cuando el año tiene 4 dígitos (>= 1900)
+      // NO usar blur — en mobile, blur cierra el picker inmediatamente
       calBirth.addEventListener("change", function () {
         if (calBirth.value) {
           var year = parseInt(calBirth.value.split("-")[0], 10);
@@ -621,19 +624,6 @@
             updateBirthDisplay();
             refresh();
           }
-        }
-      });
-      // blur: fallback para confirmar al salir del input
-      calBirth.addEventListener("blur", function () {
-        if (calBirth.value) {
-          var year = parseInt(calBirth.value.split("-")[0], 10);
-          if (year >= 1900) {
-            localStorage.setItem("lgc_birth_date", calBirth.value);
-            updateBirthDisplay();
-            refresh();
-          }
-        } else {
-          showBirthState("empty");
         }
       });
     }
