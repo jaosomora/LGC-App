@@ -17,6 +17,14 @@ _countries_path = os.path.join(
 with open(_countries_path, encoding="utf-8") as _f:
     COUNTRIES = json.load(_f)
 
+# Lookup rápido: ISO code → nombre del país
+_COUNTRY_MAP = {c["code"]: c["name"] for c in COUNTRIES}
+
+
+def _country_name(code):
+    """Devuelve nombre del país dado su ISO code, o cadena vacía."""
+    return _COUNTRY_MAP.get(code, "") if code else ""
+
 
 def owner_required(f):
     """Decorator: login + is_owner check."""
@@ -76,7 +84,13 @@ def perfil():
         return redirect(url_for("dashboard.perfil"))
 
     espacio = User.query.filter(User.created_at <= current_user.created_at).count() - 1
-    return render_template("dashboard/perfil.html", espacio=espacio, countries=COUNTRIES)
+    return render_template(
+        "dashboard/perfil.html",
+        espacio=espacio,
+        countries=COUNTRIES,
+        country_name_nac=_country_name(current_user.pais_nacimiento),
+        country_name_res=_country_name(current_user.pais_residencia),
+    )
 
 
 @dashboard_bp.route("/usuarios")

@@ -58,20 +58,16 @@
             <legend class="text-xs text-th-text/40 mb-0.5">Lugar de nacimiento</legend>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
-                    <select name="pais_nacimiento" id="perfil-pais-nac" class="glass-input w-full">
-                        <option value="">Pa&iacute;s</option>
-                        {% for c in countries %}
-                        <option value="{{ c.code }}" data-phone="{{ c.phone }}"
-                            {% if current_user.pais_nacimiento == c.code %}selected{% endif %}>
-                            {{ c.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
+                    <input type="text" id="perfil-pais-nac-display" autocomplete="off"
+                        class="glass-input w-full" placeholder="Escribe un pa&iacute;s..."
+                        value="{{ country_name_nac }}">
+                    <input type="hidden" id="perfil-pais-nac" name="pais_nacimiento"
+                        value="{{ current_user.pais_nacimiento or '' }}">
                 </div>
                 <div>
-                    <input type="text" name="ciudad_nacimiento" id="perfil-ciudad-nac"
+                    <input type="text" id="perfil-ciudad-nac" name="ciudad_nacimiento" autocomplete="off"
                         value="{{ current_user.ciudad_nacimiento or '' }}" maxlength="200"
-                        class="glass-input w-full" placeholder="Ciudad">
+                        class="glass-input w-full" placeholder="Escribe una ciudad...">
                 </div>
             </div>
             <p id="perfil-phone-nac" class="text-[11px] text-th-text/30"></p>
@@ -82,20 +78,16 @@
             <legend class="text-xs text-th-text/40 mb-0.5">Lugar de residencia</legend>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
-                    <select name="pais_residencia" id="perfil-pais-res" class="glass-input w-full">
-                        <option value="">Pa&iacute;s</option>
-                        {% for c in countries %}
-                        <option value="{{ c.code }}" data-phone="{{ c.phone }}"
-                            {% if current_user.pais_residencia == c.code %}selected{% endif %}>
-                            {{ c.name }}
-                        </option>
-                        {% endfor %}
-                    </select>
+                    <input type="text" id="perfil-pais-res-display" autocomplete="off"
+                        class="glass-input w-full" placeholder="Escribe un pa&iacute;s..."
+                        value="{{ country_name_res }}">
+                    <input type="hidden" id="perfil-pais-res" name="pais_residencia"
+                        value="{{ current_user.pais_residencia or '' }}">
                 </div>
                 <div>
-                    <input type="text" name="ciudad_residencia" id="perfil-ciudad-res"
+                    <input type="text" id="perfil-ciudad-res" name="ciudad_residencia" autocomplete="off"
                         value="{{ current_user.ciudad_residencia or '' }}" maxlength="200"
-                        class="glass-input w-full" placeholder="Ciudad">
+                        class="glass-input w-full" placeholder="Escribe una ciudad...">
                 </div>
             </div>
             <p id="perfil-phone-res" class="text-[11px] text-th-text/30"></p>
@@ -152,6 +144,7 @@
 {% endblock %}
 
 {% block dashboard_scripts %}
+<script src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
 <script>
 (function () {
   // ── DD/MM/AAAA auto-format para birth date ──
@@ -182,27 +175,129 @@
     });
   }
 
-  // ── Phone code display para país ──
-  function showPhoneCode(selectId, labelId) {
-    var sel = document.getElementById(selectId);
-    var lbl = document.getElementById(labelId);
-    if (!sel || !lbl) return;
+  // ── Datos de países para autocomplete ──
+  var countriesData = [
+    {% for c in countries %}
+    {label:"{{ c.name }}", value:"{{ c.code }}", extra:{phone:"{{ c.phone }}"}}{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ];
 
-    function update() {
-      var opt = sel.options[sel.selectedIndex];
-      if (opt && opt.value) {
-        lbl.textContent = opt.getAttribute("data-phone") + " " + opt.textContent.trim();
-      } else {
-        lbl.textContent = "";
+  // ── Helper: cargar ciudades de un país vía XHR ──
+  function loadCities(countryCode, cityAc) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/static/data/cities/" + countryCode + ".json");
+    xhr.onload = function () {
+      if (xhr.status === 200) {
+        try {
+          var cities = JSON.parse(xhr.responseText);
+          cityAc.setData(cities);
+        } catch (e) {
+          cityAc.setData([]);
+        }
       }
-    }
-
-    sel.addEventListener("change", update);
-    update(); // mostrar al cargar si ya hay valor
+    };
+    xhr.onerror = function () { cityAc.setData([]); };
+    xhr.send();
   }
 
-  showPhoneCode("perfil-pais-nac", "perfil-phone-nac");
-  showPhoneCode("perfil-pais-res", "perfil-phone-res");
+  // ── Helper: mostrar phone code en un label ──
+  function showPhone(item, labelId) {
+    var lbl = document.getElementById(labelId);
+    if (lbl && item && item.extra) {
+      lbl.textContent = item.extra.phone + " " + item.label;
+    }
+  }
+
+  function clearPhone(labelId) {
+    var lbl = document.getElementById(labelId);
+    if (lbl) lbl.textContent = "";
+  }
+
+  // ── Display function para países: muestra nombre + indicativo ──
+  function countryDisplay(item) {
+    return item.label + "  " + item.extra.phone;
+  }
+
+  // ── Autocomplete: Ciudad nacimiento ──
+  var acCiudadNac = LgcAutocomplete(
+    document.getElementById("perfil-ciudad-nac"), {
+    data: [],
+    maxResults: 8,
+    strict: false,
+    minChars: 2
+  });
+
+  // ── Autocomplete: País nacimiento ──
+  var acPaisNac = LgcAutocomplete(
+    document.getElementById("perfil-pais-nac-display"), {
+    data: countriesData,
+    onSelect: function (item) {
+      document.getElementById("perfil-pais-nac").value = item.value;
+      showPhone(item, "perfil-phone-nac");
+      loadCities(item.value, acCiudadNac);
+    },
+    onClear: function () {
+      document.getElementById("perfil-pais-nac").value = "";
+      clearPhone("perfil-phone-nac");
+      acCiudadNac.setData([]);
+    },
+    maxResults: 8,
+    strict: true,
+    displayFn: countryDisplay
+  });
+
+  // Cargar ciudades iniciales si ya hay país guardado
+  var initPaisNac = document.getElementById("perfil-pais-nac").value;
+  if (initPaisNac) {
+    loadCities(initPaisNac, acCiudadNac);
+    // Mostrar phone code inicial
+    for (var i = 0; i < countriesData.length; i++) {
+      if (countriesData[i].value === initPaisNac) {
+        showPhone(countriesData[i], "perfil-phone-nac");
+        break;
+      }
+    }
+  }
+
+  // ── Autocomplete: Ciudad residencia ──
+  var acCiudadRes = LgcAutocomplete(
+    document.getElementById("perfil-ciudad-res"), {
+    data: [],
+    maxResults: 8,
+    strict: false,
+    minChars: 2
+  });
+
+  // ── Autocomplete: País residencia ──
+  var acPaisRes = LgcAutocomplete(
+    document.getElementById("perfil-pais-res-display"), {
+    data: countriesData,
+    onSelect: function (item) {
+      document.getElementById("perfil-pais-res").value = item.value;
+      showPhone(item, "perfil-phone-res");
+      loadCities(item.value, acCiudadRes);
+    },
+    onClear: function () {
+      document.getElementById("perfil-pais-res").value = "";
+      clearPhone("perfil-phone-res");
+      acCiudadRes.setData([]);
+    },
+    maxResults: 8,
+    strict: true,
+    displayFn: countryDisplay
+  });
+
+  // Cargar ciudades iniciales si ya hay país guardado
+  var initPaisRes = document.getElementById("perfil-pais-res").value;
+  if (initPaisRes) {
+    loadCities(initPaisRes, acCiudadRes);
+    for (var i = 0; i < countriesData.length; i++) {
+      if (countriesData[i].value === initPaisRes) {
+        showPhone(countriesData[i], "perfil-phone-res");
+        break;
+      }
+    }
+  }
 
   // ── Timezone detection ──
   var tzInput = document.getElementById("perfil-tz");
