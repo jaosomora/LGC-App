@@ -611,8 +611,8 @@
     var savedBirth = localStorage.getItem("lgc_birth_date");
     if (savedBirth && calBirth) calBirth.value = savedBirth;
 
-    // Touch detection — mobile pickers fire change prematurely
-    var isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+    // Timestamp: ignora change prematuro de pickers mobile (~<800ms)
+    var birthEditTs = 0;
 
     // Event listeners
     calDate.addEventListener("input", refresh);
@@ -623,8 +623,9 @@
           if (year >= 1900) {
             localStorage.setItem("lgc_birth_date", calBirth.value);
             refresh();
-            if (!isTouch) {
-              // Desktop: auto-transition al badge
+            // Si change llega <800ms después de abrir editing,
+            // es el picker mobile auto-seleccionando hoy → no transicionar
+            if (Date.now() - birthEditTs > 800) {
               updateBirthDisplay();
             }
           }
@@ -645,37 +646,18 @@
     var birthClear  = document.getElementById("cal-birth-clear");
 
     if (birthAdd) birthAdd.addEventListener("click", function () {
+      birthEditTs = Date.now();
       showBirthState("editing");
     });
     if (birthEdit) birthEdit.addEventListener("click", function () {
+      birthEditTs = Date.now();
       showBirthState("editing");
     });
-    // En touch: ✕ → ✓ (confirmar); en desktop: ✕ (cancelar)
-    if (isTouch && birthCancel) {
-      birthCancel.textContent = "\u2713";
-      birthCancel.setAttribute("aria-label", "Confirmar");
-    }
     if (birthCancel) birthCancel.addEventListener("click", function () {
-      if (isTouch) {
-        // Touch: confirmar la fecha seleccionada
-        if (calBirth && calBirth.value) {
-          var year = parseInt(calBirth.value.split("-")[0], 10);
-          if (year >= 1900) {
-            localStorage.setItem("lgc_birth_date", calBirth.value);
-            updateBirthDisplay();
-            refresh();
-            return;
-          }
-        }
-        // Sin valor válido: volver a estado vacío
-        showBirthState("empty");
-      } else {
-        // Desktop: restaurar valor previo (cancelar)
-        var prev = localStorage.getItem("lgc_birth_date");
-        if (calBirth) calBirth.value = prev || "";
-        if (prev) updateBirthDisplay();
-        else showBirthState("empty");
-      }
+      var prev = localStorage.getItem("lgc_birth_date");
+      if (calBirth) calBirth.value = prev || "";
+      if (prev) updateBirthDisplay();
+      else showBirthState("empty");
     });
     if (birthClear) birthClear.addEventListener("click", function () {
       if (calBirth) calBirth.value = "";
