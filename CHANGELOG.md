@@ -1,6 +1,34 @@
 # CHANGELOG
 
 
+## [2.1.0] - 2026-03-15
+
+### Nuevas funcionalidades
+
+- **Mi Perfil** — Nueva página `/dashboard/perfil` donde cada usuario puede editar nombre, fecha de nacimiento, lugar de nacimiento, lugar de residencia y zona horaria. Datos persistidos en DB con campos estructurados.
+- **Autocomplete de países** — Input con autocompletado para los 196 países del mundo (en español). Muestra nombre + indicativo telefónico. Búsqueda tolerante a acentos ("bogota" encuentra "Bogotá"). Validación estricta.
+- **Autocomplete de ciudades** — 68,107 ciudades del mundo (GeoNames cities5000) con departamento/región incluido ("Miraflores, Boyacá"). Se cargan bajo demanda por país vía XHR. Permite texto libre si la ciudad no está en la lista.
+- **Códigos de área regionales** — 20 países con indicativos regionales (424 regiones). Se muestra debajo del campo de ciudad al seleccionar. Países cubiertos: CO, MX, AR, BR, CL, PE, EC, VE, BO, PY, UY, CU, ES, FR, DE, IT, PT, GB, US, CA.
+- **Campos estructurados de ubicación** — País almacenado como código ISO (ej. "CO"), ciudad como texto libre. Indicativo telefónico del país derivado del código ISO.
+- **Protección de nombre** — Flag `nombre_custom`: si el usuario edita su nombre en el perfil, Google OAuth no lo sobreescribe al re-loguearse.
+- **Sidebar: herramientas próximas** — Calculadora, TUMI, Bandas Etarias, Otras visibles pero deshabilitadas en el menú lateral.
+- **Numeración de usuarios** — En Centro de Control, los usuarios se numeran desde 0 en orden de registro.
+
+### Mejorado
+
+- **Fecha de nacimiento** — Input `type="text"` con `inputmode="numeric"` y auto-formato DD/MM/AAAA en vez de `<input type="date">`. Resuelve bug de auto-selección en móviles.
+- **Fecha de consulta (Calendaria)** — Mismo tratamiento DD/MM/AAAA con auto-formato, consistente con fecha de nacimiento.
+- **Sincronización birth_date** — El servidor siembra `localStorage` con la fecha de nacimiento del perfil, para que Calendaria la use sin modificar su código.
+
+### Infraestructura
+
+- **PostgreSQL** — Migración de SQLite a PostgreSQL en producción (Render). Alembic para migraciones, `_ensure_profile_columns()` como safety net.
+- **Google OAuth** — Implementado con Authlib. Login/logout con Flask-Login.
+- **Widget autocomplete** (`static/js/autocomplete.js`) — Componente ES5 reutilizable con glass-morphism, navegación por teclado, debounce, normalización de acentos.
+- **Scripts de datos** — `scripts/generate_cities.py` (GeoNames) y `scripts/generate_area_codes.py` para regenerar datos geográficos.
+
+---
+
 ## [2.0.1] - 2026-03-10
 ### Mejorado
 - **Comparar — Labels**: Labels actualizados a "Primera palabra o frase" / "Segunda palabra o frase" con placeholder "Escribe aquí..." consistente con Conversor.
