@@ -63,6 +63,47 @@
     return y + "-" + m + "-" + d;
   }
 
+  // ── Timezone label ──
+  function getTimezoneLabel() {
+    try {
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      var offset = new Date().getTimezoneOffset();
+      var sign = offset <= 0 ? "+" : "\u2212";
+      var h = Math.floor(Math.abs(offset) / 60);
+      var m = Math.abs(offset) % 60;
+      var utc = "UTC" + sign + h + (m ? ":" + String(m).padStart(2, "0") : "");
+      var city = tz.split("/").pop().replace(/_/g, " ");
+      return city + " \u00b7 " + utc;
+    } catch (e) { return ""; }
+  }
+
+  // ── Birth date: 3 estados (empty / editing / set) ──
+  function fmtBirthDisplay(dateStr) {
+    var p = dateStr.split("-").map(Number);
+    return p[2] + " " + MESES[p[1] - 1] + " " + p[0];
+  }
+
+  function showBirthState(state) {
+    var el = {
+      empty:   document.getElementById("cal-birth-empty"),
+      editing: document.getElementById("cal-birth-editing"),
+      set:     document.getElementById("cal-birth-set")
+    };
+    for (var k in el) if (el[k]) el[k].classList.toggle("hidden", k !== state);
+  }
+
+  function updateBirthDisplay() {
+    var calBirth  = document.getElementById("cal-birth");
+    var birthText = document.getElementById("cal-birth-text");
+    if (!calBirth) return;
+    if (calBirth.value) {
+      if (birthText) birthText.textContent = fmtBirthDisplay(calBirth.value);
+      showBirthState("set");
+    } else {
+      showBirthState("empty");
+    }
+  }
+
   // ── Toast de navegación ──
   function showNavToast(msg) {
     var existing = document.getElementById("cal-nav-toast");
@@ -571,10 +612,12 @@
     // Event listeners
     calDate.addEventListener("input", refresh);
     if (calBirth) {
-      calBirth.addEventListener("input", function () {
-        if (calBirth.value) localStorage.setItem("lgc_birth_date", calBirth.value);
-        else localStorage.removeItem("lgc_birth_date");
-        refresh();
+      calBirth.addEventListener("change", function () {
+        if (calBirth.value) {
+          localStorage.setItem("lgc_birth_date", calBirth.value);
+          updateBirthDisplay();
+          refresh();
+        }
       });
     }
     if (btnPrev) btnPrev.addEventListener("click", function () { shiftDate(-1); });
@@ -583,6 +626,40 @@
       calDate.value = toDateStr(new Date());
       refresh();
     });
+
+    // Birth date: handlers de estado
+    var birthAdd    = document.getElementById("cal-birth-add");
+    var birthEdit   = document.getElementById("cal-birth-edit");
+    var birthCancel = document.getElementById("cal-birth-cancel");
+    var birthClear  = document.getElementById("cal-birth-clear");
+
+    if (birthAdd) birthAdd.addEventListener("click", function () {
+      showBirthState("editing");
+    });
+    if (birthEdit) birthEdit.addEventListener("click", function () {
+      showBirthState("editing");
+    });
+    if (birthCancel) birthCancel.addEventListener("click", function () {
+      if (calBirth && calBirth.value) updateBirthDisplay();
+      else showBirthState("empty");
+    });
+    if (birthClear) birthClear.addEventListener("click", function () {
+      if (calBirth) calBirth.value = "";
+      localStorage.removeItem("lgc_birth_date");
+      showBirthState("empty");
+      refresh();
+    });
+
+    // Timezone indicator
+    var tzEl = document.getElementById("cal-tz");
+    if (tzEl) {
+      var label = getTimezoneLabel();
+      if (label) tzEl.querySelector("span").textContent = label;
+      else tzEl.classList.add("hidden");
+    }
+
+    // Estado inicial birth date
+    updateBirthDisplay();
 
     // Toggle Cuadrantes/Cardinalidad (event delegation)
     document.addEventListener("click", function (e) {

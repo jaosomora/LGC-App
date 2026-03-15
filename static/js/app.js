@@ -124,7 +124,7 @@
   function focusCurrentInput() {
     if (currentMode === "conversor") $("#word-input").focus();
     else if (currentMode === "comparar") $("#word1-input").focus();
-    else if (currentMode === "calendaria") $("#cal-date").focus();
+    // calendaria: sin auto-focus — en mobile abre el picker
   }
 
   // ── Listeners de input ──
