@@ -29,10 +29,24 @@
         </section>
 
         <!-- Selector de modo -->
-        <div id="mode-selector" class="flex justify-center gap-2">
-            <button data-mode="conversor" class="glass-pill active" aria-pressed="true">Conversor</button>
-            <button data-mode="comparar" class="glass-pill" aria-pressed="false">Comparar</button>
-            <button data-mode="calendaria" class="glass-pill" aria-pressed="false">Calendaria</button>
+        <div id="mode-selector" class="flex justify-center items-start gap-6">
+            <!-- Dominio: Palabra -->
+            <div class="flex flex-col items-center gap-1.5">
+                <div class="flex gap-2">
+                    <button data-mode="conversor" class="glass-pill active" aria-pressed="true">Conversor</button>
+                    <button data-mode="comparar" class="glass-pill" aria-pressed="false">Comparar</button>
+                </div>
+                <span class="text-[9px] uppercase tracking-widest text-th-text/20 font-medium">Palabra</span>
+            </div>
+            <!-- Separador -->
+            <div class="w-px h-10 mt-1" style="background:var(--glass-border)"></div>
+            <!-- Dominio: Tiempo -->
+            <div class="flex flex-col items-center gap-1.5">
+                <div class="flex gap-2">
+                    <button data-mode="calendaria" class="glass-pill" aria-pressed="false">Calendaria</button>
+                </div>
+                <span class="text-[9px] uppercase tracking-widest text-th-text/20 font-medium">Tiempo</span>
+            </div>
         </div>
 
         <!-- Área de input -->
