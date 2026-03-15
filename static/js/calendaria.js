@@ -13,6 +13,7 @@
   var MEMORIAS  = ["","RAM","REM","ROM","RUM"];
   var FASES     = ["","Asume","Asimila","Desafía","Decide"];
   var MESES     = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  var MESES_FULL = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
   var DIAS      = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
   var DIAS_FULL = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
   var QUAD_INFO = {
@@ -61,6 +62,44 @@
     var m = String(date.getMonth() + 1).padStart(2, "0");
     var d = String(date.getDate()).padStart(2, "0");
     return y + "-" + m + "-" + d;
+  }
+
+  // ── Display de fecha humanizado ──
+  function fmtDisplayDate(dateStr) {
+    var d = new Date(dateStr + "T12:00:00");
+    return DIAS_FULL[d.getDay()] + ", " + d.getDate() + " de " + MESES_FULL[d.getMonth()] + " " + d.getFullYear();
+  }
+
+  function fmtBirthDisplay(dateStr) {
+    var p = dateStr.split("-").map(Number);
+    return p[2] + " " + MESES[p[1] - 1] + " " + p[0];
+  }
+
+  function updateDateDisplay() {
+    var calDate = document.getElementById("cal-date");
+    var dateText = document.getElementById("cal-date-text");
+    var todayLabel = document.getElementById("cal-today-label");
+    var todayBtn = document.getElementById("cal-today");
+    if (!calDate || !calDate.value || !dateText) return;
+
+    dateText.textContent = fmtDisplayDate(calDate.value);
+
+    var isToday = calDate.value === toDateStr(new Date());
+    if (todayLabel) todayLabel.classList.toggle("hidden", !isToday);
+    if (todayBtn) todayBtn.classList.toggle("hidden", isToday);
+  }
+
+  function updateBirthDisplay() {
+    var calBirth = document.getElementById("cal-birth");
+    var birthAdd = document.getElementById("cal-birth-add");
+    var birthBadge = document.getElementById("cal-birth-badge");
+    var birthText = document.getElementById("cal-birth-text");
+    if (!calBirth) return;
+
+    var hasBirth = !!calBirth.value;
+    if (birthAdd) birthAdd.classList.toggle("hidden", hasBirth);
+    if (birthBadge) birthBadge.classList.toggle("hidden", !hasBirth);
+    if (birthText && hasBirth) birthText.textContent = fmtBirthDisplay(calBirth.value);
   }
 
   // ── Toast de navegación ──
@@ -553,11 +592,15 @@
 
   // ── Inicialización ──
   function init() {
-    var calDate  = document.getElementById("cal-date");
-    var calBirth = document.getElementById("cal-birth");
-    var btnPrev  = document.getElementById("cal-prev");
-    var btnNext  = document.getElementById("cal-next");
-    var btnToday = document.getElementById("cal-today");
+    var calDate    = document.getElementById("cal-date");
+    var calBirth   = document.getElementById("cal-birth");
+    var btnPrev    = document.getElementById("cal-prev");
+    var btnNext    = document.getElementById("cal-next");
+    var btnToday   = document.getElementById("cal-today");
+    var dateDisplay = document.getElementById("cal-date-display");
+    var birthAdd   = document.getElementById("cal-birth-add");
+    var birthEdit  = document.getElementById("cal-birth-edit");
+    var birthClear = document.getElementById("cal-birth-clear");
     if (!calDate) return;
 
     // Default: hoy (zona horaria local del usuario)
@@ -568,7 +611,7 @@
     var savedBirth = localStorage.getItem("lgc_birth_date");
     if (savedBirth && calBirth) calBirth.value = savedBirth;
 
-    // Event listeners
+    // Event listeners — native inputs
     calDate.addEventListener("input", refresh);
     if (calBirth) {
       calBirth.addEventListener("input", function () {
@@ -577,12 +620,40 @@
         refresh();
       });
     }
+
+    // Navegación día a día
     if (btnPrev) btnPrev.addEventListener("click", function () { shiftDate(-1); });
     if (btnNext) btnNext.addEventListener("click", function () { shiftDate(1); });
     if (btnToday) btnToday.addEventListener("click", function () {
       calDate.value = toDateStr(new Date());
       refresh();
     });
+
+    // Click en fecha display → abrir date picker nativo
+    if (dateDisplay) {
+      dateDisplay.addEventListener("click", function () {
+        try { calDate.showPicker(); } catch (e) { calDate.focus(); }
+      });
+    }
+
+    // Nacimiento: agregar / editar / quitar
+    if (birthAdd) {
+      birthAdd.addEventListener("click", function () {
+        try { calBirth.showPicker(); } catch (e) { calBirth.focus(); }
+      });
+    }
+    if (birthEdit) {
+      birthEdit.addEventListener("click", function () {
+        try { calBirth.showPicker(); } catch (e) { calBirth.focus(); }
+      });
+    }
+    if (birthClear) {
+      birthClear.addEventListener("click", function () {
+        calBirth.value = "";
+        localStorage.removeItem("lgc_birth_date");
+        refresh();
+      });
+    }
 
     // Toggle Cuadrantes/Cardinalidad (event delegation)
     document.addEventListener("click", function (e) {
@@ -667,6 +738,8 @@
 
     var data = calcular(year, month, day, nacY, nacM, nacD);
     render(data);
+    updateDateDisplay();
+    updateBirthDisplay();
   }
 
   document.addEventListener("DOMContentLoaded", init);
