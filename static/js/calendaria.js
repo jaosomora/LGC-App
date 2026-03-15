@@ -276,13 +276,36 @@
 
     var html = '<div class="mt-4 rounded-xl overflow-hidden" style="border:1px solid var(--glass-border)">';
 
-    // Header: nombre completo + concepto
-    html += '<div class="text-center py-2.5" style="background:rgb(var(--c-accent)/0.05);border-bottom:1px solid var(--glass-border)">';
+    // Header: flechas + nombre completo + concepto
+    // Calcular posiciones destino para prev/next cuadrante (misma posición relativa)
+    var stepInQuad = (data.pos - 1) % 4;
+    var qIdx = Math.floor((data.pos - 1) / 4);
+    var prevPos = ((qIdx + 3) % 4) * 4 + 1 + stepInQuad;
+    var nextPos = ((qIdx + 1) % 4) * 4 + 1 + stepInQuad;
+    var prevQuad = CARD_MAP[prevPos - 1];
+    var nextQuad = CARD_MAP[nextPos - 1];
+    var prevQI = QUAD_INFO[prevQuad];
+    var nextQI = QUAD_INFO[nextQuad];
+
+    html += '<div class="flex items-center justify-between px-3 py-2" style="background:rgb(var(--c-accent)/0.05);border-bottom:1px solid var(--glass-border)">';
+    // Flecha prev
+    html += '<button data-calquad-nav="prev" class="flex items-center gap-1 text-th-text/25 hover:text-th-accent transition-colors cursor-pointer" title="' + prevQuad + ' · ' + prevQI.concepto + '">';
+    html += '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>';
+    html += '<span class="text-[10px] font-semibold hidden sm:inline">' + prevQuad + '</span>';
+    html += '</button>';
+    // Centro
+    html += '<div class="text-center">';
     html += '<span class="text-sm font-bold text-th-accent">' + activeQuad.name + '</span>';
     html += '<span class="text-[10px] text-th-text/20 mx-2">·</span>';
     html += '<span class="text-xs text-th-text/50">' + qi.concepto + '</span>';
     html += '<span class="text-[10px] text-th-text/20 mx-2">·</span>';
     html += '<span class="text-xs text-th-text/30 italic">' + qi.full + '</span>';
+    html += '</div>';
+    // Flecha next
+    html += '<button data-calquad-nav="next" class="flex items-center gap-1 text-th-text/25 hover:text-th-accent transition-colors cursor-pointer" title="' + nextQuad + ' · ' + nextQI.concepto + '">';
+    html += '<span class="text-[10px] font-semibold hidden sm:inline">' + nextQuad + '</span>';
+    html += '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>';
+    html += '</button>';
     html += '</div>';
 
     // ── Desktop: tabla con columnas (hidden en mobile) ──
@@ -568,6 +591,32 @@
       var view = btn.getAttribute("data-calview");
       localStorage.setItem("lgc_cal_view", view);
       refresh();
+    });
+
+    // Navegación entre cardinalidades (flechas prev/next)
+    document.addEventListener("click", function (e) {
+      var nav = e.target.closest("[data-calquad-nav]");
+      if (!nav) return;
+      var dir = nav.getAttribute("data-calquad-nav");
+      var calDate = document.getElementById("cal-date");
+      if (!calDate || !calDate.value) return;
+      var p = calDate.value.split("-").map(Number);
+      var currentDoy = dFrom(dt(p[0],1,1), dt(p[0],p[1],p[2])) + 1;
+      if (currentDoy > 352) return;
+      var currentPos = (currentDoy - 1) % 16 + 1;
+      var stepInQ = (currentPos - 1) % 4;
+      var qI = Math.floor((currentPos - 1) / 4);
+      var newQI = dir === "next" ? (qI + 1) % 4 : (qI + 3) % 4;
+      var targetPos = newQI * 4 + 1 + stepInQ;
+      var offset = targetPos - currentPos;
+      if (offset === 0) return;
+
+      var targetQuad = CARD_MAP[targetPos - 1];
+      var tqi = QUAD_INFO[targetQuad];
+      var toastMsg = targetQuad + " · " + tqi.concepto;
+
+      shiftDate(offset);
+      showNavToast(toastMsg);
     });
 
     // Navegación por click en posición (event delegation)
