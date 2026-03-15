@@ -612,10 +612,13 @@
     // Event listeners
     calDate.addEventListener("input", refresh);
     if (calBirth) {
-      calBirth.addEventListener("change", function () {
+      calBirth.addEventListener("blur", function () {
         if (calBirth.value) {
           localStorage.setItem("lgc_birth_date", calBirth.value);
+          updateBirthDisplay();
           refresh();
+        } else {
+          showBirthState("empty");
         }
       });
     }
@@ -628,20 +631,12 @@
 
     // Birth date: handlers de estado
     var birthAdd    = document.getElementById("cal-birth-add");
-    var birthSave   = document.getElementById("cal-birth-save");
     var birthEdit   = document.getElementById("cal-birth-edit");
     var birthCancel = document.getElementById("cal-birth-cancel");
     var birthClear  = document.getElementById("cal-birth-clear");
 
     if (birthAdd) birthAdd.addEventListener("click", function () {
       showBirthState("editing");
-    });
-    if (birthSave) birthSave.addEventListener("click", function () {
-      if (calBirth && calBirth.value) {
-        localStorage.setItem("lgc_birth_date", calBirth.value);
-        updateBirthDisplay();
-        refresh();
-      }
     });
     if (birthEdit) birthEdit.addEventListener("click", function () {
       showBirthState("editing");
