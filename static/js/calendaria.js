@@ -612,11 +612,26 @@
     // Event listeners
     calDate.addEventListener("input", refresh);
     if (calBirth) {
+      // change: confirma automáticamente si el año tiene 4 dígitos (>= 1900)
+      calBirth.addEventListener("change", function () {
+        if (calBirth.value) {
+          var year = parseInt(calBirth.value.split("-")[0], 10);
+          if (year >= 1900) {
+            localStorage.setItem("lgc_birth_date", calBirth.value);
+            updateBirthDisplay();
+            refresh();
+          }
+        }
+      });
+      // blur: fallback para confirmar al salir del input
       calBirth.addEventListener("blur", function () {
         if (calBirth.value) {
-          localStorage.setItem("lgc_birth_date", calBirth.value);
-          updateBirthDisplay();
-          refresh();
+          var year = parseInt(calBirth.value.split("-")[0], 10);
+          if (year >= 1900) {
+            localStorage.setItem("lgc_birth_date", calBirth.value);
+            updateBirthDisplay();
+            refresh();
+          }
         } else {
           showBirthState("empty");
         }

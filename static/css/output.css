@@ -1879,6 +1879,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 0.5rem;
 }
 
+.rounded-md {
+  border-radius: 0.375rem;
+}
+
 .rounded-xl {
   border-radius: 0.75rem;
 }
@@ -1901,6 +1905,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .border-dashed {
   border-style: dashed;
+}
+
+.border-th-accent\/20 {
+  border-color: rgb(var(--c-accent) / 0.2);
 }
 
 .border-th-accent\/30 {
@@ -2239,10 +2247,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: rgb(var(--c-accent) / 0.5);
 }
 
-.text-th-accent\/60 {
-  color: rgb(var(--c-accent) / 0.6);
-}
-
 .text-th-accent\/70 {
   color: rgb(var(--c-accent) / 0.7);
 }
@@ -2400,6 +2404,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .hover\:border-th-accent\/30:hover {
   border-color: rgb(var(--c-accent) / 0.3);
+}
+
+.hover\:border-th-accent\/40:hover {
+  border-color: rgb(var(--c-accent) / 0.4);
 }
 
 .hover\:bg-\[var\(--glass-bg-hover\)\]:hover {
