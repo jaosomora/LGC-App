@@ -12,7 +12,7 @@ db = SQLAlchemy()
 class Palabra(db.Model):
     __tablename__ = "palabra"
     id = db.Column(db.Integer, primary_key=True)
-    palabra = db.Column(db.String(100), unique=True, nullable=False)
+    palabra = db.Column(db.Text, unique=True, nullable=False)
 
 
 class Ranking(db.Model):
