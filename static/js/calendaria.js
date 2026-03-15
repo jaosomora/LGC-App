@@ -14,6 +14,13 @@
   var FASES     = ["","Asume","Asimila","Desafía","Decide"];
   var MESES     = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   var DIAS      = ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"];
+  var DIAS_FULL = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+  var QUAD_INFO = {
+    "NO": { full: "Noroeste",  concepto: "Conciencia" },
+    "NE": { full: "Noreste",   concepto: "Mente" },
+    "SO": { full: "Suroeste",  concepto: "Soma" },
+    "SE": { full: "Sureste",   concepto: "Entorno" }
+  };
   var ms        = 86400000;
 
   // ── Grilla: estructura de cuadrantes ──
@@ -203,7 +210,7 @@
     return html;
   }
 
-  // ── Vista Foco: solo el cuadrante activo con fechas ──
+  // ── Vista Cardinalidad: cuadrante activo con info enriquecida ──
   function renderFocusView(data) {
     // Encontrar el cuadrante activo
     var activeQuad = null;
@@ -212,57 +219,146 @@
     }
     if (!activeQuad) return "";
 
+    var qi = QUAD_INFO[activeQuad.name];
+    var hasMems = activeQuad.name === "SO";
+
     // Fecha de consulta como referencia
     var refDate = new Date(data.year, data.month - 1, data.day, 12, 0, 0);
 
-    var html = '<div class="mt-4 rounded-xl overflow-hidden" style="border:1px solid var(--glass-border)">';
-
-    // Header del cuadrante
-    html += '<div class="text-center py-2.5" style="background:rgb(var(--c-accent)/0.05);border-bottom:1px solid var(--glass-border)">';
-    html += '<span class="text-xs uppercase tracking-wider text-th-accent font-bold">' + activeQuad.name + '</span>';
-    html += '</div>';
-
-    // 4 filas de posición con fecha
+    // Pre-calcular datos de cada posición
+    var rows = [];
     for (var i = 0; i < 4; i++) {
       var pos = activeQuad.start + i;
-      var isActive = data.pos === pos;
       var offset = pos - data.pos;
       var posDate = new Date(refDate.getTime() + offset * ms);
-      var dayName = DIAS[posDate.getDay()];
-      var dateStr = dayName + " " + posDate.getDate() + " " + MESES[posDate.getMonth()];
+      var posDoy = data.doy + offset;
+      var posDs = data.ds + offset;
+      rows.push({
+        pos: pos,
+        isActive: data.pos === pos,
+        paso: PASOS[i],
+        mem: activeQuad.mems[i],
+        date: posDate,
+        dayShort: DIAS[posDate.getDay()],
+        dayFull: DIAS_FULL[posDate.getDay()],
+        dateDay: posDate.getDate(),
+        dateMes: MESES[posDate.getMonth()],
+        ds: posDs,
+        doy: posDoy,
+        total: data.total
+      });
+    }
 
-      var rowBg = isActive ? "background:rgb(var(--c-accent)/0.08)" : "";
-      var borderB = i < 3 ? "border-bottom:1px solid var(--glass-border);" : "";
+    var html = '<div class="mt-4 rounded-xl overflow-hidden" style="border:1px solid var(--glass-border)">';
 
-      html += '<div class="flex items-center gap-3 px-3 py-2.5" style="' + borderB + rowBg + '">';
+    // Header: nombre completo + concepto
+    html += '<div class="text-center py-2.5" style="background:rgb(var(--c-accent)/0.05);border-bottom:1px solid var(--glass-border)">';
+    html += '<span class="text-xs uppercase tracking-wider text-th-accent font-bold">' + qi.full + '</span>';
+    html += '<span class="text-xs text-th-text/30 ml-1.5">· ' + qi.concepto + '</span>';
+    html += '</div>';
 
-      // Indicador activo
-      if (isActive) {
+    // ── Desktop: tabla con columnas (hidden en mobile) ──
+    html += '<div class="hidden sm:block">';
+
+    // Header de columnas
+    html += '<div class="grid gap-x-3 px-3 py-1.5 text-[10px] uppercase tracking-wider text-th-text/25" style="border-bottom:1px solid var(--glass-border);' +
+      'grid-template-columns:auto 1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
+    html += '<span>Posición</span>';
+    html += '<span></span>';
+    if (hasMems) html += '<span class="text-center">Mem</span>';
+    html += '<span class="text-right">Día Solar</span>';
+    html += '<span class="text-right">Día Año</span>';
+    html += '<span class="text-right">Fecha</span>';
+    html += '</div>';
+
+    // Filas desktop
+    for (var d = 0; d < 4; d++) {
+      var r = rows[d];
+      var rowBg = r.isActive ? "background:rgb(var(--c-accent)/0.08)" : "";
+      var borderB = d < 3 ? "border-bottom:1px solid var(--glass-border);" : "";
+
+      html += '<div class="grid gap-x-3 items-center px-3 py-2" style="' + borderB + rowBg +
+        ';grid-template-columns:auto 1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
+
+      // Posición (indicador + número)
+      var numCls = r.isActive ? "text-th-accent font-bold" : "text-th-text/50 font-semibold";
+      html += '<span class="text-sm ' + numCls + ' flex items-center gap-1.5">';
+      if (r.isActive) {
+        html += '<span class="inline-block w-1.5 h-1.5 rounded-full" style="background:rgb(var(--c-accent))"></span>';
+      } else {
+        html += '<span class="inline-block w-1.5"></span>';
+      }
+      html += r.pos + '</span>';
+
+      // Nombre de posición
+      var pasoCls = r.isActive ? "font-semibold" : "text-th-text/60";
+      html += '<span class="text-sm ' + pasoCls + '">' + r.paso + '</span>';
+
+      // Memoria (solo SO)
+      if (hasMems) {
+        var memCls = r.isActive ? "text-th-accent/70" : "text-th-text/30";
+        html += '<span class="text-[10px] uppercase font-semibold text-center ' + memCls + ' px-2">' + (r.mem || '') + '</span>';
+      }
+
+      // Día Solar
+      var dsCls = r.isActive ? "text-th-accent/80 font-semibold" : "text-th-text/35";
+      html += '<span class="text-xs tabular-nums text-right ' + dsCls + '">' + r.ds + '</span>';
+
+      // Día del Año
+      var doyCls = r.isActive ? "text-th-accent/80 font-semibold" : "text-th-text/35";
+      html += '<span class="text-xs tabular-nums text-right ' + doyCls + '">' + r.doy + '/' + r.total + '</span>';
+
+      // Fecha (día completo en desktop)
+      var dateCls = r.isActive ? "text-th-accent/80" : "text-th-text/30";
+      html += '<span class="text-xs tabular-nums text-right ' + dateCls + ' whitespace-nowrap">' +
+        r.dayFull + ' ' + r.dateDay + ' ' + r.dateMes + '</span>';
+
+      html += '</div>';
+    }
+
+    html += '</div>';
+
+    // ── Mobile: 2 líneas por fila (hidden en desktop) ──
+    html += '<div class="sm:hidden">';
+
+    for (var m = 0; m < 4; m++) {
+      var r = rows[m];
+      var rowBg = r.isActive ? "background:rgb(var(--c-accent)/0.08)" : "";
+      var borderB = m < 3 ? "border-bottom:1px solid var(--glass-border);" : "";
+
+      html += '<div class="px-3 py-2" style="' + borderB + rowBg + '">';
+
+      // Línea 1: indicador + posición + nombre + [mem] + fecha
+      html += '<div class="flex items-center gap-2">';
+      if (r.isActive) {
         html += '<div class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:rgb(var(--c-accent))"></div>';
       } else {
         html += '<div class="w-1.5 flex-shrink-0"></div>';
       }
-
-      // Número de posición
-      var numCls = isActive ? "text-th-accent font-bold" : "text-th-text/50 font-semibold";
-      html += '<span class="text-sm ' + numCls + ' w-5 text-right">' + pos + '</span>';
-
-      // Paso
-      var pasoCls = isActive ? "font-semibold" : "text-th-text/60";
-      html += '<span class="text-sm ' + pasoCls + ' flex-1">' + PASOS[i] + '</span>';
-
-      // Memoria (solo SO)
-      if (activeQuad.mems[i]) {
-        var memCls = isActive ? "text-th-accent/70" : "text-th-text/30";
-        html += '<span class="text-[10px] uppercase font-semibold ' + memCls + '">' + activeQuad.mems[i] + '</span>';
+      var numCls = r.isActive ? "text-th-accent font-bold" : "text-th-text/50 font-semibold";
+      html += '<span class="text-sm ' + numCls + ' w-5 text-right">' + r.pos + '</span>';
+      var pasoCls = r.isActive ? "font-semibold" : "text-th-text/60";
+      html += '<span class="text-sm ' + pasoCls + ' flex-1">' + r.paso;
+      if (r.mem) {
+        var memCls = r.isActive ? "text-th-accent/70" : "text-th-text/30";
+        html += ' <span class="text-[10px] uppercase font-semibold ' + memCls + '">· ' + r.mem + '</span>';
       }
+      html += '</span>';
+      var dateCls = r.isActive ? "text-th-accent/80" : "text-th-text/30";
+      html += '<span class="text-xs tabular-nums ' + dateCls + ' whitespace-nowrap">' +
+        r.dayShort + ' ' + r.dateDay + ' ' + r.dateMes + '</span>';
+      html += '</div>';
 
-      // Fecha
-      var dateCls = isActive ? "text-th-accent/80" : "text-th-text/30";
-      html += '<span class="text-xs tabular-nums ' + dateCls + ' whitespace-nowrap">' + dateStr + '</span>';
+      // Línea 2: DS + Día del Año
+      var subCls = r.isActive ? "text-th-accent/40" : "text-th-text/20";
+      html += '<div class="text-[10px] tabular-nums ' + subCls + ' ml-7 mt-0.5">';
+      html += 'DS ' + r.ds + ' · Día ' + r.doy + '/' + r.total;
+      html += '</div>';
 
       html += '</div>';
     }
+
+    html += '</div>';
 
     html += '</div>';
     return html;
@@ -309,7 +405,7 @@
       html += progressBar(data.diaAnillo, data.totalAnillo, "Anillo de Fuego");
       html += '</div>';
     } else {
-      var calView = localStorage.getItem("lgc_cal_view") || "plano";
+      var calView = localStorage.getItem("lgc_cal_view") || "cuadrantes";
 
       html += '<div class="glass-card p-5">';
       html += '<div class="text-center">';
@@ -321,22 +417,22 @@
       html += '</div>';
       html += progressBar(data.pos, 16, "Posición en la vuelta");
 
-      // Toggle Plano / Foco
-      var planoActive = calView === "plano";
-      var focoActive  = calView === "foco";
+      // Toggle Cuadrantes / Cardinalidad
+      var cuadActive = calView === "cuadrantes";
+      var cardActive = calView === "cardinalidad";
       html += '<div class="flex justify-center gap-1.5 mt-3 mb-1">';
-      html += '<button data-calview="plano" class="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all ' +
-        (planoActive ? 'text-th-accent' : 'text-th-text/30 hover:text-th-text/50') + '"' +
-        (planoActive ? ' style="background:rgb(var(--c-accent)/0.12)"' : '') +
-        '>Plano</button>';
-      html += '<button data-calview="foco" class="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all ' +
-        (focoActive ? 'text-th-accent' : 'text-th-text/30 hover:text-th-text/50') + '"' +
-        (focoActive ? ' style="background:rgb(var(--c-accent)/0.12)"' : '') +
-        '>Foco</button>';
+      html += '<button data-calview="cuadrantes" class="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all ' +
+        (cuadActive ? 'text-th-accent' : 'text-th-text/30 hover:text-th-text/50') + '"' +
+        (cuadActive ? ' style="background:rgb(var(--c-accent)/0.12)"' : '') +
+        '>Cuadrantes</button>';
+      html += '<button data-calview="cardinalidad" class="px-3 py-1 rounded-full text-[11px] font-semibold uppercase tracking-wider transition-all ' +
+        (cardActive ? 'text-th-accent' : 'text-th-text/30 hover:text-th-text/50') + '"' +
+        (cardActive ? ' style="background:rgb(var(--c-accent)/0.12)"' : '') +
+        '>Cardinalidad</button>';
       html += '</div>';
 
       // Renderizar según vista seleccionada
-      if (calView === "foco") {
+      if (calView === "cardinalidad") {
         html += renderFocusView(data);
       } else {
         html += renderGrid(data);
