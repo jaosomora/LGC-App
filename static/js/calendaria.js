@@ -63,6 +63,31 @@
     return y + "-" + m + "-" + d;
   }
 
+  // ── Toast de navegación ──
+  function showNavToast(msg) {
+    var existing = document.getElementById("cal-nav-toast");
+    if (existing) existing.remove();
+
+    var toast = document.createElement("div");
+    toast.id = "cal-nav-toast";
+    toast.className = "fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full text-sm font-medium shadow-lg pointer-events-none";
+    toast.style.cssText = "background:rgb(var(--c-accent));color:#fff;opacity:0;transform:translateX(-50%) translateY(10px);transition:opacity 0.3s,transform 0.3s";
+    toast.textContent = "✦ " + msg;
+    document.body.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(function () {
+      toast.style.opacity = "1";
+      toast.style.transform = "translateX(-50%) translateY(0)";
+    });
+
+    setTimeout(function () {
+      toast.style.opacity = "0";
+      toast.style.transform = "translateX(-50%) translateY(-10px)";
+      setTimeout(function () { toast.remove(); }, 300);
+    }, 1800);
+  }
+
   // ── Barra de progreso ──
   function progressBar(value, max, label) {
     var pct = Math.round((value / max) * 100);
@@ -184,7 +209,7 @@
         var pos = quad.start + i;
         var isActive = data.pos === pos;
         var cls = isActive ? "cal-grid-active" : "cal-grid-cell";
-        html += '<div class="' + cls + ' flex flex-col items-center justify-center py-2 rounded-lg">';
+        html += '<div class="' + cls + ' flex flex-col items-center justify-center py-2 rounded-lg cursor-pointer" data-calpos="' + pos + '">';
         html += '<span class="font-bold text-sm">' + pos + '</span>';
         if (quad.mems[i]) {
           html += '<span class="text-[8px] leading-tight mt-0.5 opacity-60">' + quad.mems[i] + '</span>';
@@ -277,7 +302,7 @@
       var rowBg = r.isActive ? "background:rgb(var(--c-accent)/0.08)" : "";
       var borderB = d < 3 ? "border-bottom:1px solid var(--glass-border);" : "";
 
-      html += '<div class="grid gap-x-3 items-center px-3 py-2" style="' + borderB + rowBg +
+      html += '<div class="grid gap-x-3 items-center px-3 py-2 cursor-pointer" data-calpos="' + r.pos + '" style="' + borderB + rowBg +
         ';grid-template-columns:auto 1fr' + (hasMems ? ' auto' : '') + ' auto auto auto">';
 
       // Posición (indicador + número)
@@ -326,7 +351,7 @@
       var rowBg = r.isActive ? "background:rgb(var(--c-accent)/0.08)" : "";
       var borderB = m < 3 ? "border-bottom:1px solid var(--glass-border);" : "";
 
-      html += '<div class="px-3 py-2" style="' + borderB + rowBg + '">';
+      html += '<div class="px-3 py-2 cursor-pointer" data-calpos="' + r.pos + '" style="' + borderB + rowBg + '">';
 
       // Línea 1: indicador + posición + nombre + [mem] + fecha
       html += '<div class="flex items-center gap-2">';
@@ -534,13 +559,40 @@
       refresh();
     });
 
-    // Toggle Plano/Foco (event delegation)
+    // Toggle Cuadrantes/Cardinalidad (event delegation)
     document.addEventListener("click", function (e) {
       var btn = e.target.closest("[data-calview]");
       if (!btn) return;
       var view = btn.getAttribute("data-calview");
       localStorage.setItem("lgc_cal_view", view);
       refresh();
+    });
+
+    // Navegación por click en posición (event delegation)
+    document.addEventListener("click", function (e) {
+      var cell = e.target.closest("[data-calpos]");
+      if (!cell) return;
+      if (cell.hasAttribute("data-calview")) return;
+      var targetPos = parseInt(cell.getAttribute("data-calpos"), 10);
+      if (isNaN(targetPos)) return;
+      var calDate = document.getElementById("cal-date");
+      if (!calDate || !calDate.value) return;
+      var p = calDate.value.split("-").map(Number);
+      var currentDoy = dFrom(dt(p[0],1,1), dt(p[0],p[1],p[2])) + 1;
+      if (currentDoy > 352) return;
+      var currentPos = (currentDoy - 1) % 16 + 1;
+      var offset = targetPos - currentPos;
+      if (offset === 0) return;
+
+      // Calcular info de la posición destino para el toast
+      var targetDate = new Date(p[0], p[1] - 1, p[2], 12, 0, 0);
+      targetDate.setDate(targetDate.getDate() + offset);
+      var step = (targetPos - 1) % 4;
+      var toastMsg = "Posición " + targetPos + " · " + PASOS[step] + " · " +
+        DIAS[targetDate.getDay()] + " " + targetDate.getDate() + " " + MESES[targetDate.getMonth()];
+
+      shiftDate(offset);
+      showNavToast(toastMsg);
     });
 
     // Render inicial
