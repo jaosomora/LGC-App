@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 # Nombre de la carpeta en Google Drive
 FOLDER_NAME = "Reactivos LGC"
 
+# Color gris para labels
+_GRAY = {"red": 0.5, "green": 0.5, "blue": 0.5}
+
 
 def get_credentials(user):
     """
@@ -134,24 +137,46 @@ def _format_fecha_larga(date_str):
         return date_str
 
 
-def _format_cabecera(date_str, hora, cabecera_data, user):
+def _build_cabecera_content(date_str, hora, cabecera_data, user):
     """
-    Formatea la cabecera del d\u00eda con layout organizado para el Google Doc.
-    cabecera_data es un dict con los datos Calendaria calculados en JS.
-    """
-    sep = "\u2500" * 50  # ──────────
-    sep_bold = "\u2501" * 50  # ━━━━━━
+    Construye el contenido de la cabecera y los requests de formato
+    para el Google Doc usando la API de formateo nativo.
 
-    lines = []
-    lines.append(sep_bold)
-    lines.append("REACTIVOS \u2014 {}".format(date_str))
+    Retorna (full_text, format_requests) donde:
+    - full_text: string plano a insertar
+    - format_requests: lista de requests para batchUpdate (estilos)
+    """
+    # Offset base: el texto se inserta en index=1 del doc
+    BASE = 1
+    cursor = [0]  # mutable para track offset
+    segments = []  # (start, end, opts) para formato
+
+    def add(text, bold=False, font_size=None, center=False, gray=False):
+        """Agrega texto y registra metadatos de formato."""
+        start = cursor[0]
+        cursor[0] += len(text)
+        end = cursor[0]
+        if bold or font_size or center or gray:
+            segments.append((start, end, {
+                "bold": bold,
+                "fontSize": font_size,
+                "center": center,
+                "gray": gray,
+            }))
+        return text
+
+    parts = []
+
+    # ── Título ──
     fecha_larga = _format_fecha_larga(date_str)
-    lines.append(fecha_larga)
-    lines.append(sep_bold)
-    lines.append("")
+    parts.append(add("Reactivos \u2014 {}\n".format(date_str),
+                      bold=True, font_size=14, center=True))
+    parts.append(add("{}\n".format(fecha_larga), font_size=10, center=True, gray=True))
+    parts.append(add("\n"))
 
-    # Datos del usuario
-    lines.append("{} ({})".format(user.nombre, user.email))
+    # ── Datos del usuario ──
+    parts.append(add("{}\n".format(user.nombre), bold=True, font_size=10))
+    parts.append(add("{}\n".format(user.email), font_size=8, gray=True))
     datos_user = []
     if user.birth_date:
         datos_user.append("Nacimiento: {}".format(
@@ -160,51 +185,57 @@ def _format_cabecera(date_str, hora, cabecera_data, user):
         datos_user.append("Derivaci\u00f3n: {}".format(
             user.fecha_derivacion.strftime("%d/%m/%Y")))
     if datos_user:
-        lines.append(" \u00b7 ".join(datos_user))
-    lines.append("")
+        parts.append(add("{}\n".format(" \u00b7 ".join(datos_user)),
+                          font_size=8, gray=True))
+    parts.append(add("\n"))
 
-    # Datos Calendaria
+    # ── Datos Calendaria ──
     if cabecera_data:
 
-        # D\u00eda Solar / Nativo / DDV
-        lines.append(sep)
+        # Día Solar / Nativo / DDV
         ds = cabecera_data.get("ds", "")
         ds_nativo = cabecera_data.get("dsNativo")
         ddv = cabecera_data.get("ddv")
-        solar_parts = []
-        if ds:
-            solar_parts.append("D\u00eda Solar: {}".format(ds))
-        if ds_nativo is not None:
-            solar_parts.append("Solar Nativo: {}".format(ds_nativo))
-        if ddv is not None:
-            solar_parts.append("D\u00edas de Vida: {}".format(ddv))
-        if solar_parts:
-            lines.append("    ".join(solar_parts))
-        lines.append("")
 
-        # Posici\u00f3n Calendaria
-        lines.append(sep)
-        lines.append("POSICI\u00d3N CALENDARIA")
+        solar_items = []
+        if ds:
+            solar_items.append(("D\u00eda Solar", str(ds)))
+        if ds_nativo is not None:
+            solar_items.append(("Solar Nativo", str(ds_nativo)))
+        if ddv is not None:
+            solar_items.append(("D\u00edas de Vida", str(ddv)))
+
+        if solar_items:
+            labels = "    ".join("{}: {}".format(lab, val)
+                                for lab, val in solar_items)
+            parts.append(add("{}\n".format(labels),
+                              font_size=10, center=True))
+            parts.append(add("\n"))
+
+        # Posición Calendaria
+        parts.append(add("POSICI\u00d3N CALENDARIA\n",
+                          bold=True, font_size=8, center=True, gray=True))
         if cabecera_data.get("esAnillo"):
             dia_anillo = cabecera_data.get("diaAnillo", "")
             total_anillo = cabecera_data.get("totalAnillo", "")
-            lines.append("Anillo de Fuego \u2014 D\u00eda {} de {}".format(
-                dia_anillo, total_anillo))
+            parts.append(add("Anillo de Fuego \u2014 D\u00eda {} de {}\n".format(
+                dia_anillo, total_anillo), bold=True, font_size=16, center=True))
         else:
             v_abs = cabecera_data.get("vAbs", "")
             pos = cabecera_data.get("pos", "")
             cuad = cabecera_data.get("cuad", "")
             paso = cabecera_data.get("paso", "")
             mem = cabecera_data.get("mem", "")
-            lines.append("Vuelta {}".format(v_abs))
+            parts.append(add("Vuelta {}\n".format(v_abs),
+                              bold=True, font_size=18, center=True))
             pos_detail = "{}/16 \u00b7 {} \u00b7 {}".format(pos, cuad, paso)
             if mem:
                 pos_detail += " \u00b7 {}".format(mem)
-            lines.append(pos_detail)
-        lines.append("")
+            parts.append(add("{}\n".format(pos_detail),
+                              font_size=10, center=True, gray=True))
+        parts.append(add("\n"))
 
-        # Aparato + A\u00f1o
-        lines.append(sep)
+        # Aparato + Año
         ap_num = cabecera_data.get("apNum", "")
         fase_name = cabecera_data.get("faseName", "")
         apos = cabecera_data.get("apos", "")
@@ -218,17 +249,23 @@ def _format_cabecera(date_str, hora, cabecera_data, user):
         year = cabecera_data.get("year", "")
 
         if ap_num:
-            lines.append("APARATO #{}".format(ap_num))
-            lines.append("{} \u00b7 D\u00eda {}/1461".format(fase_name, apos))
-            lines.append("+{} \u2212{} \u00b7 Anu: {}".format(apos, aneg, anu_ap))
-            lines.append("")
+            parts.append(add("APARATO #{}\n".format(ap_num),
+                              bold=True, font_size=9))
+            parts.append(add("{} \u00b7 D\u00eda {}/1461\n".format(
+                fase_name, apos), font_size=9))
+            parts.append(add("+{} \u2212{} \u00b7 Anu: {}\n".format(
+                apos, aneg, anu_ap), font_size=8, gray=True))
 
         if doy:
-            lines.append("A\u00d1O {}".format(year))
-            lines.append("D\u00eda {}/{}".format(doy, total))
-            lines.append("+{} \u2212{} \u00b7 Anu: {}".format(
-                frc_pos, frc_neg, anu_year))
-            lines.append("")
+            parts.append(add("A\u00d1O {}\n".format(year),
+                              bold=True, font_size=9))
+            parts.append(add("D\u00eda {}/{}\n".format(doy, total),
+                              font_size=9))
+            parts.append(add("+{} \u2212{} \u00b7 Anu: {}\n".format(
+                frc_pos, frc_neg, anu_year), font_size=8, gray=True))
+
+        if ap_num or doy:
+            parts.append(add("\n"))
 
         # Cuarentenas
         cuarentena = cabecera_data.get("cuarentena", {})
@@ -236,37 +273,88 @@ def _format_cabecera(date_str, hora, cabecera_data, user):
         cuarentena_personal = cabecera_data.get("cuarentenaPersonal")
         qpi = cuarentena_personal.get("qi", 0) if cuarentena_personal else 0
 
-        if qi or qpi:
-            lines.append(sep)
-
         if qi:
+            parts.append(add("CUARENTENA GLOBAL\n",
+                              bold=True, font_size=8, gray=True))
             q_dpos = cuarentena.get("qDpos", "")
             brick_idx = cuarentena.get("brickIdx", "")
             brick_day = cuarentena.get("brickDay", "")
-            lines.append("CUARENTENA GLOBAL")
-            lines.append("#{} \u00b7 D\u00eda {}/39 \u00b7 Ladrillo {} ({}/3)".format(
-                qi, q_dpos, brick_idx, brick_day))
-            lines.append("")
+            parts.append(add("#{} \u00b7 D\u00eda {}/39 \u00b7 Ladrillo {} ({}/3)\n".format(
+                qi, q_dpos, brick_idx, brick_day), font_size=9))
 
         if qpi:
+            parts.append(add("CUARENTENA PERSONAL\n",
+                              bold=True, font_size=8, gray=True))
             qp_dpos = cuarentena_personal.get("qDpos", "")
             qp_brick_idx = cuarentena_personal.get("brickIdx", "")
             qp_brick_day = cuarentena_personal.get("brickDay", "")
-            lines.append("CUARENTENA PERSONAL")
-            lines.append("#{} \u00b7 D\u00eda {}/39 \u00b7 Ladrillo {} ({}/3)".format(
-                qpi, qp_dpos, qp_brick_idx, qp_brick_day))
-            lines.append("")
+            parts.append(add("#{} \u00b7 D\u00eda {}/39 \u00b7 Ladrillo {} ({}/3)\n".format(
+                qpi, qp_dpos, qp_brick_idx, qp_brick_day), font_size=9))
 
-    lines.append(sep_bold)
-    lines.append("")
+        if qi or qpi:
+            parts.append(add("\n"))
 
-    return "\n".join(lines)
+    # Cierre
+    parts.append(add("\u00b7 \u00b7 \u00b7\n", center=True, gray=True))
+    parts.append(add("\n"))
+
+    full_text = "".join(parts)
+
+    # ── Construir requests de formato ──
+    format_requests = []
+
+    for start, end, opts in segments:
+        abs_start = BASE + start
+        abs_end = BASE + end
+        text_range = {
+            "startIndex": abs_start,
+            "endIndex": abs_end,
+        }
+
+        # Estilo de texto (bold, fontSize, color)
+        text_style = {}
+        fields = []
+        if opts.get("bold"):
+            text_style["bold"] = True
+            fields.append("bold")
+        if opts.get("fontSize"):
+            text_style["fontSize"] = {
+                "magnitude": opts["fontSize"],
+                "unit": "PT",
+            }
+            fields.append("fontSize")
+        if opts.get("gray"):
+            text_style["foregroundColor"] = {"color": {"rgbColor": _GRAY}}
+            fields.append("foregroundColor")
+
+        if fields:
+            format_requests.append({
+                "updateTextStyle": {
+                    "range": text_range,
+                    "textStyle": text_style,
+                    "fields": ",".join(fields),
+                }
+            })
+
+        # Estilo de párrafo (centrar)
+        if opts.get("center"):
+            format_requests.append({
+                "updateParagraphStyle": {
+                    "range": text_range,
+                    "paragraphStyle": {"alignment": "CENTER"},
+                    "fields": "alignment",
+                }
+            })
+
+    return full_text, format_requests
 
 
 def create_doc_with_header(docs_service, drive_service, folder_id,
                            date_str, hora, cabecera_data, user):
     """
-    Crea un Google Doc nuevo con la cabecera del día.
+    Crea un Google Doc nuevo con la cabecera del día formateada.
+    Usa la API de Google Docs para aplicar estilos (bold, tamaños,
+    alineación centrada, colores).
     Retorna el doc_id.
     """
     doc_name = "Reactivos \u2014 {}".format(date_str)
@@ -283,10 +371,13 @@ def create_doc_with_header(docs_service, drive_service, folder_id,
         fields="id, parents",
     ).execute()
 
-    # Insertar cabecera
-    header_text = _format_cabecera(date_str, hora, cabecera_data, user)
+    # Construir contenido + formato
+    header_text, format_requests = _build_cabecera_content(
+        date_str, hora, cabecera_data, user
+    )
 
-    requests = [
+    # Paso 1: Insertar texto plano
+    insert_requests = [
         {
             "insertText": {
                 "location": {"index": 1},
@@ -295,8 +386,14 @@ def create_doc_with_header(docs_service, drive_service, folder_id,
         }
     ]
     docs_service.documents().batchUpdate(
-        documentId=doc_id, body={"requests": requests}
+        documentId=doc_id, body={"requests": insert_requests}
     ).execute()
+
+    # Paso 2: Aplicar formato (si hay requests)
+    if format_requests:
+        docs_service.documents().batchUpdate(
+            documentId=doc_id, body={"requests": format_requests}
+        ).execute()
 
     logger.info("Created Google Doc '%s': %s", doc_name, doc_id)
     return doc_id
