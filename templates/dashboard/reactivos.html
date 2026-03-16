@@ -1,0 +1,999 @@
+{% extends "base_dashboard.html" %}
+
+{% block page_title %}Reactivos{% endblock %}
+
+{% block dashboard_content %}
+<div class="max-w-2xl mx-auto space-y-6">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="glass-card p-4 text-sm border {% if category == 'success' %}text-green-400 border-green-500/20{% else %}text-red-400 border-red-500/20{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if not gdocs_connected %}
+    <!-- Estado: Google Docs no conectado -->
+    <div class="glass-card p-8 text-center space-y-5">
+        <div class="w-16 h-16 mx-auto rounded-full bg-th-accent/10 flex items-center justify-center">
+            <svg class="w-8 h-8 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
+            </svg>
+        </div>
+        <div>
+            <h2 class="text-lg font-semibold mb-1">Reactivos</h2>
+            <p class="text-sm text-th-text/50 max-w-md mx-auto">
+                Un espacio para registrar tus procesos reactivos &mdash; emociones, desregulaciones, observaciones &mdash; mediante voz o texto.
+            </p>
+        </div>
+
+        <!-- C&oacute;mo funciona -->
+        <div class="text-left max-w-md mx-auto space-y-3 py-4 border-t border-b border-th">
+            <p class="text-[10px] font-semibold uppercase tracking-widest text-th-text/30 text-center mb-3">C&oacute;mo funciona</p>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium">Se crea una carpeta &ldquo;Reactivos LGC&rdquo;</p>
+                    <p class="text-xs text-th-text/40">En tu Google Drive, autom&aacute;ticamente. Ah&iacute; vivir&aacute;n todos tus documentos.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium">Un documento por d&iacute;a</p>
+                    <p class="text-xs text-th-text/40">Cada d&iacute;a se crea un Google Doc con la cabecera de datos Calendaria. Todos los reactivos del d&iacute;a van al mismo documento.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium">Graba o escribe</p>
+                    <p class="text-xs text-th-text/40">Usa el micr&oacute;fono para dictar o escribe directamente. Cada entrada queda con su hora y los temas detectados autom&aacute;ticamente.</p>
+                </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+                <div class="w-7 h-7 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <svg class="w-4 h-4 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium">Temas autom&aacute;ticos</p>
+                    <p class="text-xs text-th-text/40">Se extraen las palabras clave de lo que dices o escribes, para que puedas ver r&aacute;pidamente de qu&eacute; tratan tus reactivos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bot&oacute;n conectar -->
+        <div>
+            <a href="/auth/connect-gdocs"
+               class="inline-flex items-center gap-2 glass-button !bg-th-accent/20 !text-th-accent hover:!bg-th-accent/30 font-semibold px-6 py-3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"/></svg>
+                Conectar con Google Docs
+            </a>
+            <p class="text-[10px] text-th-text/25 mt-2">Solo necesitas autorizar una vez. Tus datos son tuyos, en tu Google Drive.</p>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Estado: Google Docs conectado -->
+
+    <!-- Link permanente a Google Drive -->
+    <div id="react-drive-link" class="glass-card p-4 hidden">
+        <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-9 h-9 rounded-lg bg-th-accent/10 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-th-accent" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-medium truncate">Reactivos LGC</p>
+                    <p class="text-[10px] text-th-text/30">Tu carpeta en Google Drive</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                <a id="react-doc-today-link" href="#" target="_blank" rel="noopener"
+                   class="hidden glass-button text-xs !px-3 !py-1.5">Doc de hoy</a>
+                <a id="react-folder-link" href="#" target="_blank" rel="noopener"
+                   class="glass-button text-xs !px-3 !py-1.5 !bg-th-accent/10 !text-th-accent">Abrir carpeta</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cabecera del d&iacute;a (datos Calendaria) — colapsable -->
+    <div class="glass-card overflow-hidden">
+        <button id="react-cabecera-toggle" type="button"
+            class="w-full flex items-center justify-between px-5 py-3 hover:bg-th-text/[0.02] transition-colors cursor-pointer">
+            <div class="flex items-center gap-2">
+                <svg id="react-chevron" class="w-4 h-4 text-th-text/25 transition-transform duration-200 -rotate-90" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                </svg>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-th-text/40">Cabecera del d&iacute;a</h3>
+            </div>
+            <span id="react-fecha" class="text-xs text-th-text/30"></span>
+        </button>
+        <div id="react-cabecera-wrapper" class="hidden">
+            <div id="react-cabecera" class="px-5 pb-5 pt-1 text-sm text-th-text/60 space-y-4">
+                <p class="text-th-text/20 text-xs">Calculando datos Calendaria...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grabaci&oacute;n / Entrada de texto -->
+    <div class="glass-card p-5 space-y-4">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-th-text/40">Nuevo reactivo</h3>
+
+        <!-- Bot&oacute;n de grabaci&oacute;n -->
+        <div class="flex items-center gap-3">
+            <button id="react-record-btn" type="button"
+                class="glass-button flex items-center gap-2 !px-5 !py-3 font-semibold transition-all">
+                <svg id="react-mic-icon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/>
+                </svg>
+                <span id="react-record-label">Grabar</span>
+            </button>
+            <div id="react-recording-indicator" class="hidden flex items-center gap-2">
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                <span class="text-sm text-red-400 font-medium">Grabando...</span>
+            </div>
+            <div id="react-no-speech" class="hidden text-xs text-th-text/30">
+                Tu navegador no soporta grabaci&oacute;n de voz. Escribe manualmente.
+            </div>
+        </div>
+
+        <!-- Textarea -->
+        <div>
+            <textarea id="react-texto" rows="6" maxlength="5000"
+                class="glass-input w-full resize-none"
+                placeholder="Escribe o graba tu reactivo..."></textarea>
+            <div class="flex justify-between mt-1">
+                <span id="react-char-count" class="text-[10px] text-th-text/20">0 / 5000</span>
+                <button id="react-clear-btn" type="button" class="text-[10px] text-th-text/20 hover:text-th-text/40 transition-colors hidden">Limpiar</button>
+            </div>
+        </div>
+
+        <!-- Tags autom&aacute;ticos -->
+        <div id="react-tags-container" class="hidden">
+            <p class="text-[10px] text-th-text/30 mb-1.5">Temas detectados</p>
+            <div id="react-tags" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <!-- Bot&oacute;n guardar -->
+        <div class="flex items-center gap-3">
+            <button id="react-save-btn" type="button" disabled
+                class="glass-button !bg-th-accent/20 !text-th-accent hover:!bg-th-accent/30 font-semibold px-6 disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+                Guardar en Google Docs
+            </button>
+            <div id="react-save-status" class="text-sm hidden"></div>
+        </div>
+    </div>
+
+    <!-- Historial de hoy -->
+    <div class="glass-card p-5">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-th-text/40 mb-3">Historial de hoy</h3>
+        <div id="react-historial" class="space-y-3">
+            <p class="text-xs text-th-text/20">A&uacute;n no hay reactivos hoy.</p>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block dashboard_scripts %}
+{% if gdocs_connected %}
+<script src="/static/js/calendaria.js"></script>
+<script>
+(function () {
+    "use strict";
+
+    // ── Elementos del DOM ──
+    var fechaEl = document.getElementById("react-fecha");
+    var cabeceraEl = document.getElementById("react-cabecera");
+    var recordBtn = document.getElementById("react-record-btn");
+    var recordLabel = document.getElementById("react-record-label");
+    var micIcon = document.getElementById("react-mic-icon");
+    var recordingIndicator = document.getElementById("react-recording-indicator");
+    var noSpeechEl = document.getElementById("react-no-speech");
+    var textareaEl = document.getElementById("react-texto");
+    var charCount = document.getElementById("react-char-count");
+    var clearBtn = document.getElementById("react-clear-btn");
+    var saveBtn = document.getElementById("react-save-btn");
+    var saveStatus = document.getElementById("react-save-status");
+    var historialEl = document.getElementById("react-historial");
+    var tagsContainer = document.getElementById("react-tags-container");
+    var tagsEl = document.getElementById("react-tags");
+    var driveLinkCard = document.getElementById("react-drive-link");
+    var folderLink = document.getElementById("react-folder-link");
+    var docTodayLink = document.getElementById("react-doc-today-link");
+    var cabeceraToggle = document.getElementById("react-cabecera-toggle");
+    var cabeceraWrapper = document.getElementById("react-cabecera-wrapper");
+    var chevronIcon = document.getElementById("react-chevron");
+
+    // ── Estado ──
+    var recognition = null;
+    var isRecording = false;
+    var cabeceraData = null;
+    var historialItems = [];
+    var currentTags = [];
+    var tagsDebounceTimer = null;
+
+    // ── Helpers de fecha/hora ──
+    function padZero(n) { return n < 10 ? "0" + n : "" + n; }
+
+    function getTodayDmy() {
+        var d = new Date();
+        return padZero(d.getDate()) + "/" + padZero(d.getMonth() + 1) + "/" + d.getFullYear();
+    }
+
+    function getNowTime() {
+        var d = new Date();
+        return padZero(d.getHours()) + ":" + padZero(d.getMinutes());
+    }
+
+    function getDayName(d) {
+        var days = ["Domingo", "Lunes", "Martes", "Mi\u00e9rcoles", "Jueves", "Viernes", "S\u00e1bado"];
+        return days[d.getDay()];
+    }
+
+    function getMonthName(m) {
+        var months = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                      "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+        return months[m];
+    }
+
+    // ── Tags: extracci\u00f3n de palabras clave ──
+    // Stop words normalizadas (sin acentos). Incluye:
+    // - Art\u00edculos, pronombres, preposiciones, conjunciones
+    // - Verbos comunes (infinitivos + conjugaciones frecuentes)
+    // - Adverbios y adjetivos gen\u00e9ricos
+    // - Sustantivos conversacionales no tem\u00e1ticos
+    var STOP_WORDS_STR = [
+        // Articulos, pronombres, preposiciones, conjunciones
+        "el la los las un una unos unas de del al ante con en entre para por sin sobre tras",
+        "que es son fue ser era esta esto este eso ese esa como mas pero muy ya solo hay",
+        "no si me te se le lo nos les su sus mi mis tu tus yo ella ellos ellas",
+        "todo toda todos todas otro otra otros otras cual cuales donde quien quienes",
+        "siendo sido cuando porque aunque sino pues luego entonces cuanto mientras",
+        "tambien tampoco ademas apenas asi mismo misma mismos mismas",
+        // Verbos comunes
+        "tener tiene tienen tenia tenemos tenian tenido",
+        "hacer hace hacen hacia hicieron hecho haciendo hice hizo",
+        "poder puede pueden pudo podia podemos pudiera",
+        "decir dice dicen dijo decia diciendo dicho",
+        "estar estaba estaban estuve estuvo estoy estamos estado estando estuviera estuvieran estuvieron",
+        "haber habia habido habiendo hubiera hubieran hubiese",
+        "ser seria serian fuera fueran fuese fuesen",
+        "querer quiere quieren quiso queria queremos",
+        "saber sabe sabia sabemos sabiendo",
+        "dar daba dando dieron dado damos",
+        "llegar llega llego llegue llegaba llegando",
+        "pasar pasa paso pasado pasaba pasando pase",
+        "llamar llama llamo llamaba llamando llamado",
+        "llevar lleva llevo llevaba llevando llevado",
+        "dejar deja dejo dejaba dejando dejado",
+        "seguir sigue siguio seguia siguiendo",
+        "encontrar encuentra encontre encontrado",
+        "venir viene vino venia viniendo",
+        "salir sale salio salia saliendo",
+        "quedar queda quedo quedaba quedando",
+        "creer cree creia creemos creo creido",
+        "pensar piensa penso pensaba pensando pensarlo pienso",
+        "mirar mira miraba mirando",
+        "hablar habla hablo hablaba hablando",
+        "escuchar escucha escuchaba escuchando escucharlo escuche",
+        "buscar busca buscaba buscando",
+        "tratar trata trataba tratando",
+        "intentar intenta intente intentaba",
+        "empezar empieza empezo empece",
+        "acabar acabo acaba acababa acabado acabamos",
+        "sonar suena sonaba sonando",
+        "parecer parece parecia parecido pareciera",
+        "aparecer aparece aparecen aparecio aparecia apareciendo",
+        "abrir abre abrio abriendo abierto abierta",
+        "cambiar cambia cambio cambiando cambiado",
+        "mostrar muestra mostro mostrando",
+        "explicar explica explico explicaba",
+        "observar observa observaba observando",
+        "detener detiene detienes detenido",
+        "se\u00f1alar se\u00f1alando se\u00f1ala se\u00f1alaba se\u00f1alado",
+        "tomar toma tomo tomaba",
+        "poner pone puso poniendo puesto",
+        "contar cuenta cuento cuentas contaba",
+        "ver veo vio veia viendo visto vemos",
+        "ir voy fue fui iba vamos",
+        "siento sentia sentir siente",
+        // Adverbios
+        "siempre nunca bastante definitivamente simplemente normalmente realmente",
+        "completamente exactamente obviamente practicamente generalmente solamente",
+        "totalmente absolutamente especialmente claramente ciertamente basicamente",
+        "literalmente finalmente todavia aun casi tanto tanta tantos tantas demasiado",
+        "mucho poco bien mal mejor peor aqui alla ahi despues antes ahora",
+        "solo apenas realmente verdaderamente",
+        "detras encima debajo delante fuera dentro lejos cerca arriba abajo",
+        // Adjetivos genericos
+        "bueno buena buenos buenas malo mala malos malas",
+        "grande grandes peque\u00f1o peque\u00f1a simple obvio obvia",
+        "claro clara cierto cierta nuevo nueva",
+        "primero primera segundo segunda tercero tercera",
+        "ultimo ultima propio propia completo completa",
+        "interesante importante posible imposible diferente suficiente",
+        "unico unica verdadero verdadera necesario necesaria",
+        // Sustantivos genericos / conversacionales
+        "cosa cosas tipo parte partes manera maneras forma formas",
+        "momento momentos tiempo dia dias hoy",
+        "principio final idea ideas ejemplo ejemplos punto puntos",
+        "tema lado caso efecto resultado pregunta respuesta",
+        "lugar mundo gente persona personas cuenta",
+        "hecho vez veces algo nada cada razon razones",
+        "a\u00f1o a\u00f1os verdad historia cuestion asunto aspecto aspectos detalle detalles opinion"
+    ].join(" ");
+
+    var STOP_WORDS = {};
+    (function () {
+        var words = STOP_WORDS_STR.split(/\s+/);
+        for (var i = 0; i < words.length; i++) {
+            if (words[i]) STOP_WORDS[words[i]] = true;
+        }
+    })();
+
+    function normalizeWord(w) {
+        // Normaliza una palabra: min\u00fasculas, quita acentos, preserva \u00f1
+        return w.replace(/\u00f1/g, "\u0001")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\u0001/g, "\u00f1");
+    }
+
+    function extractTags(text) {
+        if (!text || text.trim().length < 10) return [];
+
+        // Separar en palabras preservando acentos originales para display
+        var rawWords = text.toLowerCase()
+            .replace(/[^a-z\u00e1\u00e9\u00ed\u00f3\u00fa\u00fc\u00f1\s]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .split(" ");
+
+        var freq = {};  // key normalizada \u2192 {count, display}
+
+        for (var i = 0; i < rawWords.length; i++) {
+            var original = rawWords[i];
+            if (original.length < 4) continue;
+
+            var key = normalizeWord(original);
+            if (STOP_WORDS[key]) continue;
+
+            if (!freq[key]) {
+                freq[key] = { count: 0, display: original };
+            }
+            freq[key].count += 1;
+        }
+
+        // Convertir a array y ordenar por frecuencia desc
+        var entries = [];
+        for (var key in freq) {
+            if (freq.hasOwnProperty(key)) {
+                entries.push({ word: freq[key].display, count: freq[key].count });
+            }
+        }
+        entries.sort(function (a, b) { return b.count - a.count; });
+
+        // Tomar top 6 tags
+        var tags = [];
+        for (var j = 0; j < Math.min(entries.length, 6); j++) {
+            tags.push(entries[j].word);
+        }
+        return tags;
+    }
+
+    function renderTags(tags) {
+        if (!tagsContainer || !tagsEl) return;
+
+        if (tags.length === 0) {
+            tagsContainer.classList.add("hidden");
+            return;
+        }
+
+        tagsContainer.classList.remove("hidden");
+        var html = "";
+        for (var i = 0; i < tags.length; i++) {
+            html += '<span class="px-2 py-0.5 rounded-full text-[11px] font-medium bg-th-accent/10 text-th-accent">' +
+                escapeHtml(tags[i]) + '</span>';
+        }
+        tagsEl.innerHTML = html;
+    }
+
+    function updateTags() {
+        if (!textareaEl) return;
+        currentTags = extractTags(textareaEl.value);
+        renderTags(currentTags);
+    }
+
+    function debounceTags() {
+        if (tagsDebounceTimer) clearTimeout(tagsDebounceTimer);
+        tagsDebounceTimer = setTimeout(updateTags, 500);
+    }
+
+    // ── Google Drive links (localStorage) ──
+    function restoreDriveLinks() {
+        var folderUrl = localStorage.getItem("lgc_reactivos_folder_url");
+        var docUrl = localStorage.getItem("lgc_reactivos_doc_url_" + getTodayDmy());
+
+        if (folderUrl) {
+            if (driveLinkCard) driveLinkCard.classList.remove("hidden");
+            if (folderLink) folderLink.href = folderUrl;
+            if (docUrl && docTodayLink) {
+                docTodayLink.href = docUrl;
+                docTodayLink.classList.remove("hidden");
+            }
+        }
+    }
+
+    function saveDriveLinks(folderUrl, docUrl) {
+        if (folderUrl) {
+            localStorage.setItem("lgc_reactivos_folder_url", folderUrl);
+        }
+        if (docUrl) {
+            localStorage.setItem("lgc_reactivos_doc_url_" + getTodayDmy(), docUrl);
+        }
+        restoreDriveLinks();
+    }
+
+    // ── Historial persistente (localStorage) ──
+    function loadHistorial() {
+        var key = "lgc_reactivos_" + getTodayDmy();
+        var saved = localStorage.getItem(key);
+        if (saved) {
+            try { historialItems = JSON.parse(saved); } catch (e) { historialItems = []; }
+        }
+        renderHistorial();
+    }
+
+    function saveHistorial() {
+        var key = "lgc_reactivos_" + getTodayDmy();
+        localStorage.setItem(key, JSON.stringify(historialItems));
+    }
+
+    function addToHistorial(hora, texto, tags, docUrl) {
+        historialItems.unshift({ hora: hora, texto: texto, tags: tags || [], docUrl: docUrl });
+        saveHistorial();
+        renderHistorial();
+    }
+
+    function renderHistorial() {
+        if (!historialEl) return;
+
+        if (historialItems.length === 0) {
+            historialEl.innerHTML = '<p class="text-xs text-th-text/20">A\u00fan no hay reactivos hoy.</p>';
+            return;
+        }
+
+        var html = "";
+        for (var i = 0; i < historialItems.length; i++) {
+            var item = historialItems[i];
+            var preview = item.texto.length > 120 ? item.texto.substring(0, 120) + "\u2026" : item.texto;
+            html += '<div class="py-2' + (i > 0 ? ' border-t border-th' : '') + '">';
+
+            // Linea 1: hora + preview + link
+            html += '<div class="flex items-start gap-3">';
+            html += '<span class="text-xs text-th-accent font-mono font-semibold mt-0.5 shrink-0">' + escapeHtml(item.hora) + '</span>';
+            html += '<p class="text-sm text-th-text/60 flex-1">' + escapeHtml(preview) + '</p>';
+            if (item.docUrl) {
+                html += '<a href="' + item.docUrl + '" target="_blank" rel="noopener" class="text-th-text/20 hover:text-th-accent transition-colors shrink-0 mt-0.5" title="Abrir en Google Docs">';
+                html += '<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"/></svg>';
+                html += '</a>';
+            }
+            html += '</div>';
+
+            // Linea 2: tags
+            if (item.tags && item.tags.length > 0) {
+                html += '<div class="flex flex-wrap gap-1 mt-1.5 ml-12">';
+                for (var j = 0; j < item.tags.length; j++) {
+                    html += '<span class="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-th-accent/5 text-th-accent/60">' +
+                        escapeHtml(item.tags[j]) + '</span>';
+                }
+                html += '</div>';
+            }
+
+            html += '</div>';
+        }
+        historialEl.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        var div = document.createElement("div");
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
+    // ── Calcular cabecera del d\u00eda ──
+    function calcularCabecera() {
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = now.getMonth() + 1;
+        var day = now.getDate();
+
+        var fechaStr = getDayName(now) + " " + day + " " + getMonthName(now.getMonth()) + " " + year;
+        if (fechaEl) fechaEl.textContent = fechaStr;
+
+        var nacY = null, nacM = null, nacD = null;
+        var savedBirth = localStorage.getItem("lgc_birth_date");
+        if (savedBirth) {
+            var bp = savedBirth.split("-");
+            nacY = parseInt(bp[0], 10);
+            nacM = parseInt(bp[1], 10);
+            nacD = parseInt(bp[2], 10);
+        }
+
+        var data = calcularLocal(year, month, day, nacY, nacM, nacD);
+        cabeceraData = data;
+        renderCabecera(data);
+    }
+
+    // ── Motor de c\u00e1lculo local (subset de calendaria.js) ──
+    var JDN_EPOCH = 1721424;
+    var CARD_MAP = ["SO","SO","SO","SO","NE","NE","NE","NE","NO","NO","NO","NO","SE","SE","SE","SE"];
+    var PASOS = ["L\u00f3gica","Inhumano","Humano","Contexto"];
+    var MEMORIAS = ["","RAM","REM","ROM","RUM"];
+    var FASES = ["","Asume","Asimila","Desaf\u00eda","Decide"];
+
+    function jdnG(y, m, d) {
+        var a = Math.floor((14 - m) / 12), Y = y + 4800 - a, M = m + 12 * a - 3;
+        return d + Math.floor((153 * M + 2) / 5) + 365 * Y + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
+    }
+    function jdnJ(y, m, d) {
+        var a = Math.floor((14 - m) / 12), Y = y + 4800 - a, M = m + 12 * a - 3;
+        return d + Math.floor((153 * M + 2) / 5) + 365 * Y + Math.floor(Y / 4) - 32083;
+    }
+    function jdnCut(y, m, d) {
+        if (y > 1582) return jdnG(y, m, d);
+        if (y < 1582) return jdnJ(y, m, d);
+        if (m > 10) return jdnG(y, m, d);
+        if (m < 10) return jdnJ(y, m, d);
+        return d >= 15 ? jdnG(y, m, d) : jdnJ(y, m, d);
+    }
+    function diaSolar(y, m, d) { return jdnCut(y, m, d) - JDN_EPOCH + 1; }
+    function isLeap(y) { return (y % 4 === 0) && ((y % 100) !== 0 || y % 400 === 0); }
+    function dtUTC(y, m, d) { var b = new Date(Date.UTC(2000, m - 1, d)); b.setUTCFullYear(y); return b; }
+    function dFrom(a, b) { return Math.floor((b - a) / 86400000); }
+
+    function calcularLocal(year, month, day, nacY, nacM, nacD) {
+        var leap = isLeap(year), total = leap ? 366 : 365;
+        var doy = dFrom(dtUTC(year, 1, 1), dtUTC(year, month, day)) + 1;
+        var apNum = Math.floor((year - 1) / 4) + 1;
+        var apStart = year - ((year - 1) % 4);
+        var apos = dFrom(dtUTC(apStart, 1, 1), dtUTC(year, month, day)) + 1;
+        var aneg = 1461 - apos;
+        var fase = Math.max(1, Math.min(4, year - apStart + 1));
+        var ds = diaSolar(year, month, day);
+        var dsNativo = (nacY != null) ? diaSolar(nacY, nacM, nacD) : null;
+        var ddv = (nacY != null) ? Math.max(0, jdnCut(year, month, day) - jdnCut(nacY, nacM, nacD)) : null;
+
+        // Cuarentena Global (desde 14/10/2012)
+        var Q = dtUTC(2012, 10, 14);
+        var qd = dFrom(Q, dtUTC(year, month, day));
+        var qi = qd > 0 ? Math.floor((qd - 1) / 39) + 1 : 0;
+        var qDpos = qd > 0 ? (qd - 1) % 39 + 1 : 0;
+        var brickIdx = qDpos > 0 ? Math.floor((qDpos - 1) / 3) + 1 : 0;
+        var brickDay = qDpos > 0 ? (qDpos - 1) % 3 + 1 : 0;
+
+        // Cuarentena Personal (desde fecha_derivacion)
+        var cuarentenaPersonal = null;
+        var savedDeriv = localStorage.getItem("lgc_fecha_derivacion");
+        if (savedDeriv) {
+            var dp = savedDeriv.split("-");
+            var derivY = parseInt(dp[0], 10);
+            var derivM = parseInt(dp[1], 10);
+            var derivD = parseInt(dp[2], 10);
+            if (!isNaN(derivY) && !isNaN(derivM) && !isNaN(derivD)) {
+                var QP = dtUTC(derivY, derivM, derivD);
+                var qpd = dFrom(QP, dtUTC(year, month, day));
+                var qpi = qpd > 0 ? Math.floor((qpd - 1) / 39) + 1 : 0;
+                var qpDpos = qpd > 0 ? (qpd - 1) % 39 + 1 : 0;
+                var qpBrickIdx = qpDpos > 0 ? Math.floor((qpDpos - 1) / 3) + 1 : 0;
+                var qpBrickDay = qpDpos > 0 ? (qpDpos - 1) % 3 + 1 : 0;
+                cuarentenaPersonal = {
+                    qd: qpd, qi: qpi, qDpos: qpDpos,
+                    brickIdx: qpBrickIdx, brickDay: qpBrickDay
+                };
+            }
+        }
+
+        var frcPos = doy, frcNeg = total - doy, anuAno = frcPos - frcNeg;
+
+        var base = {
+            doy: doy, total: total, ds: ds, dsNativo: dsNativo, ddv: ddv,
+            apNum: apNum, apStart: apStart, fase: fase, faseName: FASES[fase],
+            apos: apos, aneg: aneg, anuAp: apos - aneg,
+            frcPos: frcPos, frcNeg: frcNeg, anuAno: anuAno,
+            cuarentena: { qd: qd, qi: qi, qDpos: qDpos, brickIdx: brickIdx, brickDay: brickDay },
+            cuarentenaPersonal: cuarentenaPersonal,
+            year: year, month: month, day: day
+        };
+
+        if (doy > 352) {
+            base.esAnillo = true;
+            base.diaAnillo = doy - 352;
+            base.totalAnillo = leap ? 14 : 13;
+            return base;
+        }
+
+        base.esAnillo = false;
+        var pos = (doy - 1) % 16 + 1;
+        var cuad = CARD_MAP[pos - 1];
+        var step = (pos - 1) % 4 + 1;
+        base.pos = pos;
+        base.cuad = cuad;
+        base.paso = PASOS[step - 1];
+        base.mem = cuad === "SO" ? MEMORIAS[step] : null;
+        base.vAbs = Math.floor((doy - 1) / 16) + 1;
+        base.vRel = base.vAbs <= 11 ? base.vAbs : base.vAbs - 11;
+        return base;
+    }
+
+    // ── Render cabecera ──
+    function renderCabecera(data) {
+        if (!cabeceraEl) return;
+
+        var html = "";
+        var sep = '<div class="border-t border-th-text/5"></div>';
+
+        // ── 1. Fecha del d\u00eda ──
+        var now = new Date();
+        var fechaLarga = getDayName(now) + " " + now.getDate() + " de " + getMonthName(now.getMonth()) + " de " + now.getFullYear();
+        html += '<div class="text-center pb-3">';
+        html += '<p class="text-sm font-medium text-th-text/70">' + escapeHtml(fechaLarga) + '</p>';
+        html += '</div>';
+
+        html += sep;
+
+        // ── 2. D\u00eda Solar / Nativo / DDV ──
+        var cols = data.dsNativo !== null ? "repeat(3, 1fr)" : "1fr";
+        html += '<div class="grid gap-3 py-3" style="grid-template-columns:' + cols + '">';
+        html += '<div class="text-center">';
+        html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-0.5">D\u00eda Solar</div>';
+        html += '<div class="text-lg font-bold text-th-accent">' + data.ds + '</div>';
+        html += '</div>';
+        if (data.dsNativo !== null) {
+            html += '<div class="text-center">';
+            html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-0.5">Solar Nativo</div>';
+            html += '<div class="text-lg font-bold text-th-text/60">' + data.dsNativo + '</div>';
+            html += '</div>';
+            html += '<div class="text-center">';
+            html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-0.5">D\u00edas de Vida</div>';
+            html += '<div class="text-lg font-bold text-th-text/60">' + data.ddv + '</div>';
+            html += '</div>';
+        }
+        html += '</div>';
+
+        html += sep;
+
+        // ── 3. Posici\u00f3n Calendaria (VUELTA prominente) ──
+        html += '<div class="text-center py-3">';
+        html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Posici\u00f3n Calendaria</div>';
+        if (data.esAnillo) {
+            html += '<div class="text-xl font-bold text-th-accent">Anillo de Fuego</div>';
+            html += '<div class="text-sm text-th-text/50">D\u00eda ' + data.diaAnillo + ' de ' + data.totalAnillo + '</div>';
+        } else {
+            html += '<div class="text-xl font-bold text-th-accent">Vuelta ' + data.vAbs + '</div>';
+            html += '<div class="text-sm text-th-text/50">';
+            html += data.pos + '/16 \u00b7 ' + data.cuad + ' \u00b7 ' + data.paso;
+            if (data.mem) html += ' \u00b7 <span class="text-th-text/30">' + data.mem + '</span>';
+            html += '</div>';
+        }
+        html += '</div>';
+
+        html += sep;
+
+        // ── 4. Aparato + 5. A\u00f1o (grid 2 columnas) ──
+        html += '<div class="grid grid-cols-2 gap-4 py-3">';
+
+        // Aparato
+        html += '<div>';
+        html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Aparato #' + data.apNum + '</div>';
+        html += '<div class="text-sm font-semibold">' + data.faseName + '</div>';
+        html += '<div class="text-xs text-th-text/40">D\u00eda ' + data.apos + '/1461</div>';
+        html += '<div class="text-[10px] text-th-text/25 mt-0.5">+' + data.apos + ' \u2212' + data.aneg + ' \u00b7 Anu: ' + (data.anuAp >= 0 ? '+' : '') + data.anuAp + '</div>';
+        html += '</div>';
+
+        // A\u00f1o
+        html += '<div>';
+        html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">A\u00f1o ' + data.year + '</div>';
+        html += '<div class="text-sm font-semibold">D\u00eda ' + data.doy + '<span class="font-normal text-th-text/40">/' + data.total + '</span></div>';
+        html += '<div class="text-[10px] text-th-text/25 mt-0.5">+' + data.frcPos + ' \u2212' + data.frcNeg + ' \u00b7 Anu: ' + (data.anuAno >= 0 ? '+' : '') + data.anuAno + '</div>';
+        html += '</div>';
+
+        html += '</div>';
+
+        // ── 6. Cuarentenas (grid 2 columnas) ──
+        var showGlobal = data.cuarentena.qi > 0;
+        var showPersonal = data.cuarentenaPersonal && data.cuarentenaPersonal.qi > 0;
+        var hasDerivacion = !!localStorage.getItem("lgc_fecha_derivacion");
+
+        if (showGlobal || hasDerivacion) {
+            html += sep;
+            html += '<div class="grid grid-cols-2 gap-4 pt-3">';
+
+            // Cuarentena Global
+            if (showGlobal) {
+                html += '<div>';
+                html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Cuarentena Global</div>';
+                html += '<div class="text-sm font-semibold">#' + data.cuarentena.qi + '</div>';
+                html += '<div class="text-xs text-th-text/40">D\u00eda ' + data.cuarentena.qDpos + '/39</div>';
+                html += '<div class="text-[10px] text-th-text/25">Ladrillo ' + data.cuarentena.brickIdx + ' (' + data.cuarentena.brickDay + '/3)</div>';
+                html += '</div>';
+            } else {
+                html += '<div></div>';
+            }
+
+            // Cuarentena Personal
+            if (showPersonal) {
+                html += '<div>';
+                html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Cuarentena Personal</div>';
+                html += '<div class="text-sm font-semibold">#' + data.cuarentenaPersonal.qi + '</div>';
+                html += '<div class="text-xs text-th-text/40">D\u00eda ' + data.cuarentenaPersonal.qDpos + '/39</div>';
+                html += '<div class="text-[10px] text-th-text/25">Ladrillo ' + data.cuarentenaPersonal.brickIdx + ' (' + data.cuarentenaPersonal.brickDay + '/3)</div>';
+                html += '</div>';
+            } else if (hasDerivacion) {
+                html += '<div>';
+                html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Cuarentena Personal</div>';
+                html += '<div class="text-xs text-th-text/20 italic">A\u00fan no iniciada</div>';
+                html += '</div>';
+            }
+
+            html += '</div>';
+        }
+
+        cabeceraEl.innerHTML = html;
+    }
+
+    // ── Web Speech API ──
+    function initSpeech() {
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            if (recordBtn) recordBtn.classList.add("hidden");
+            if (noSpeechEl) noSpeechEl.classList.remove("hidden");
+            return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = "es";
+        recognition.maxAlternatives = 1;
+
+        var finalTranscript = "";
+
+        recognition.onresult = function (event) {
+            var interim = "";
+            for (var i = event.resultIndex; i < event.results.length; i++) {
+                var transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript + " ";
+                } else {
+                    interim += transcript;
+                }
+            }
+            if (textareaEl) {
+                textareaEl.value = finalTranscript + interim;
+                updateCharCount();
+                updateSaveBtn();
+                debounceTags();
+            }
+        };
+
+        recognition.onerror = function (event) {
+            if (event.error === "no-speech" || event.error === "aborted") return;
+            stopRecording();
+        };
+
+        recognition.onend = function () {
+            if (isRecording) {
+                try { recognition.start(); } catch (e) { stopRecording(); }
+            }
+        };
+
+        if (recordBtn) {
+            recordBtn.addEventListener("click", function () {
+                if (isRecording) {
+                    stopRecording();
+                } else {
+                    startRecording();
+                    finalTranscript = textareaEl ? textareaEl.value : "";
+                }
+            });
+        }
+    }
+
+    function startRecording() {
+        if (!recognition) return;
+        isRecording = true;
+        try {
+            recognition.start();
+        } catch (e) {
+            isRecording = false;
+            return;
+        }
+        if (recordBtn) recordBtn.classList.add("!bg-red-500/20", "!text-red-400");
+        if (recordLabel) recordLabel.textContent = "Detener";
+        if (micIcon) micIcon.classList.add("hidden");
+        if (recordingIndicator) recordingIndicator.classList.remove("hidden");
+    }
+
+    function stopRecording() {
+        isRecording = false;
+        if (recognition) {
+            try { recognition.stop(); } catch (e) {}
+        }
+        if (recordBtn) recordBtn.classList.remove("!bg-red-500/20", "!text-red-400");
+        if (recordLabel) recordLabel.textContent = "Grabar";
+        if (micIcon) micIcon.classList.remove("hidden");
+        if (recordingIndicator) recordingIndicator.classList.add("hidden");
+    }
+
+    // ── Textarea helpers ──
+    function updateCharCount() {
+        if (!charCount || !textareaEl) return;
+        charCount.textContent = textareaEl.value.length + " / 5000";
+    }
+
+    function updateSaveBtn() {
+        if (!saveBtn || !textareaEl) return;
+        var hasText = textareaEl.value.trim().length > 0;
+        saveBtn.disabled = !hasText;
+        if (clearBtn) {
+            if (hasText) clearBtn.classList.remove("hidden");
+            else clearBtn.classList.add("hidden");
+        }
+    }
+
+    if (textareaEl) {
+        textareaEl.addEventListener("input", function () {
+            updateCharCount();
+            updateSaveBtn();
+            debounceTags();
+        });
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener("click", function () {
+            if (textareaEl) textareaEl.value = "";
+            updateCharCount();
+            updateSaveBtn();
+            currentTags = [];
+            renderTags([]);
+        });
+    }
+
+    // ── Guardar reactivo ──
+    function guardarReactivo() {
+        if (!textareaEl || !textareaEl.value.trim()) return;
+
+        var texto = textareaEl.value.trim();
+        var fecha = getTodayDmy();
+        var hora = getNowTime();
+
+        // Actualizar tags finales antes de guardar
+        currentTags = extractTags(texto);
+
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.textContent = "Guardando...";
+        }
+        if (saveStatus) {
+            saveStatus.classList.remove("hidden");
+            saveStatus.textContent = "";
+            saveStatus.className = "text-sm";
+        }
+
+        var payload = {
+            texto: texto,
+            fecha: fecha,
+            hora: hora,
+            cabecera: cabeceraData || {},
+            tags: currentTags
+        };
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/api/reactivo");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                try {
+                    var resp = JSON.parse(xhr.responseText);
+                    if (resp.ok) {
+                        if (saveStatus) {
+                            saveStatus.className = "text-sm text-green-400";
+                            saveStatus.innerHTML = 'Guardado <a href="' + resp.doc_url + '" target="_blank" rel="noopener" class="underline hover:text-green-300">\u2192 Abrir doc</a>';
+                        }
+                        // Guardar links de Drive
+                        saveDriveLinks(resp.folder_url, resp.doc_url);
+                        // Agregar al historial (con tags)
+                        addToHistorial(hora, texto, currentTags, resp.doc_url);
+                        // Limpiar
+                        if (textareaEl) textareaEl.value = "";
+                        updateCharCount();
+                        currentTags = [];
+                        renderTags([]);
+                    } else {
+                        showSaveError(resp.error || "Error desconocido");
+                    }
+                } catch (e) {
+                    showSaveError("Error procesando respuesta");
+                }
+            } else if (xhr.status === 403) {
+                showSaveError("Google Docs no conectado. Reconecta tu cuenta.");
+            } else {
+                try {
+                    var errResp = JSON.parse(xhr.responseText);
+                    showSaveError(errResp.error || "Error del servidor");
+                } catch (e) {
+                    showSaveError("Error del servidor (" + xhr.status + ")");
+                }
+            }
+            if (saveBtn) saveBtn.textContent = "Guardar en Google Docs";
+            updateSaveBtn();
+        };
+        xhr.onerror = function () {
+            showSaveError("Error de conexi\u00f3n");
+            if (saveBtn) saveBtn.textContent = "Guardar en Google Docs";
+            updateSaveBtn();
+        };
+        xhr.send(JSON.stringify(payload));
+    }
+
+    function showSaveError(msg) {
+        if (saveStatus) {
+            saveStatus.classList.remove("hidden");
+            saveStatus.className = "text-sm text-red-400";
+            saveStatus.textContent = msg;
+        }
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener("click", guardarReactivo);
+    }
+
+    // ── Toggle cabecera (colapsable) ──
+    if (cabeceraToggle) {
+        cabeceraToggle.addEventListener("click", function () {
+            var isOpen = !cabeceraWrapper.classList.contains("hidden");
+            if (isOpen) {
+                cabeceraWrapper.classList.add("hidden");
+                if (chevronIcon) chevronIcon.classList.add("-rotate-90");
+            } else {
+                cabeceraWrapper.classList.remove("hidden");
+                if (chevronIcon) chevronIcon.classList.remove("-rotate-90");
+            }
+        });
+    }
+
+    // ── Inicializaci\u00f3n ──
+    calcularCabecera();
+    initSpeech();
+    updateCharCount();
+    updateSaveBtn();
+    restoreDriveLinks();
+    loadHistorial();
+})();
+</script>
+{% endif %}
+{% endblock %}

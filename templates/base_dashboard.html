@@ -52,6 +52,14 @@
                             Mi Perfil
                         </a>
                     </li>
+                    {% if current_user.is_owner or current_user.plan == 'paid' %}
+                    <li>
+                        <a href="/dashboard/reactivos" class="sidebar-link {% if request.endpoint == 'dashboard.reactivos' %}active{% endif %}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z"/></svg>
+                            Reactivos
+                        </a>
+                    </li>
+                    {% endif %}
                     <li>
                         <span class="sidebar-link disabled">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -193,6 +201,11 @@
 {% block scripts %}
     {% if current_user.is_authenticated and current_user.birth_date %}
     <script>(function(){localStorage.setItem("lgc_birth_date","{{ current_user.birth_date.isoformat() }}")})();</script>
+    {% endif %}
+    {% if current_user.is_authenticated and current_user.fecha_derivacion %}
+    <script>(function(){localStorage.setItem("lgc_fecha_derivacion","{{ current_user.fecha_derivacion.isoformat() }}")})();</script>
+    {% elif current_user.is_authenticated %}
+    <script>(function(){localStorage.removeItem("lgc_fecha_derivacion")})();</script>
     {% endif %}
     <script src="/static/js/dashboard.js"></script>
     {% block dashboard_scripts %}{% endblock %}

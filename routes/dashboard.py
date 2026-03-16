@@ -37,6 +37,17 @@ def owner_required(f):
     return decorated
 
 
+def paid_required(f):
+    """Decorator: login + (is_owner or plan=='paid') check."""
+    @wraps(f)
+    @login_required
+    def decorated(*args, **kwargs):
+        if not current_user.is_owner and current_user.plan != "paid":
+            abort(403)
+        return f(*args, **kwargs)
+    return decorated
+
+
 @dashboard_bp.route("/")
 @login_required
 def index():
@@ -100,6 +111,16 @@ def perfil():
         countries=COUNTRIES,
         country_name_nac=_country_name(current_user.pais_nacimiento),
         country_name_res=_country_name(current_user.pais_residencia),
+    )
+
+
+@dashboard_bp.route("/reactivos")
+@paid_required
+def reactivos():
+    gdocs_connected = bool(current_user.google_refresh_token)
+    return render_template(
+        "dashboard/reactivos.html",
+        gdocs_connected=gdocs_connected,
     )
 
 
