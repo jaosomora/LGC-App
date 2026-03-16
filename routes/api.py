@@ -171,6 +171,8 @@ def stats():
 @api_bp.route("/reactivo", methods=["POST"])
 @login_required
 def guardar_reactivo():
+    if not current_user.is_owner and current_user.plan != "paid":
+        return jsonify({"error": "Acceso restringido"}), 403
     """Guarda un reactivo en Google Docs."""
     data = request.get_json(silent=True) or {}
     texto = data.get("texto", "").strip()
