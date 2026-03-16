@@ -44,3 +44,8 @@ class User(UserMixin, db.Model):
     ciudad_residencia = db.Column(db.String(200), nullable=True)
     user_timezone = db.Column(db.String(100), nullable=True)
     nombre_custom = db.Column(db.Boolean, nullable=False, default=False)
+
+    # Tokens Google Docs (flujo OAuth separado)
+    google_access_token = db.Column(db.Text, nullable=True)
+    google_refresh_token = db.Column(db.Text, nullable=True)
+    google_token_expires_at = db.Column(db.DateTime, nullable=True)

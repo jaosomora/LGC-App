@@ -119,6 +119,9 @@ def _ensure_profile_columns(app):
         ("ciudad_residencia", "VARCHAR(200)"),
         ("user_timezone", "VARCHAR(100)"),
         ("nombre_custom", "BOOLEAN DEFAULT FALSE NOT NULL"),
+        ("google_access_token", "TEXT"),
+        ("google_refresh_token", "TEXT"),
+        ("google_token_expires_at", "TIMESTAMP"),
     ]
     with db.engine.connect() as conn:
         for col_name, col_type in new_cols:

@@ -38,16 +38,19 @@ models.py                  # User, Palabra, Ranking
 calculos.py                # Lógica pura: calcular_potencial(), normalizar(), calcular_lupa()
 data.py                    # Caché de territorios.json y tabla_periodica.json
 routes/
-  api.py                   # /api/buscar, /api/guardar, /api/ranking, /api/stats
-  auth.py                  # Google OAuth: /auth/login, /auth/callback, /auth/logout
+  api.py                   # /api/buscar, /api/guardar, /api/ranking, /api/stats, /api/reactivo
+  auth.py                  # Google OAuth: /auth/login, /auth/callback, /auth/logout, /auth/connect-gdocs
   public.py                # / (SPA), /privacy-policy
-  dashboard.py             # /dashboard, /dashboard/perfil, /dashboard/usuarios
+  dashboard.py             # /dashboard, /dashboard/perfil, /dashboard/reactivos, /dashboard/usuarios
+services/
+  gdocs.py                 # Servicio Google Docs/Drive API para Reactivos
 templates/
   index.html               # SPA pública (extiende base_public.html)
   base_dashboard.html      # Layout dashboard: sidebar + topbar + user menu
   dashboard/
     control.html            # Centro de Control (owner only) — KPIs, top 10, recientes
     perfil.html             # Mi Perfil — nombre, fecha, país/ciudad con autocomplete
+    reactivos.html          # Reactivos — grabación voz + texto → Google Docs
     usuarios.html           # Lista de usuarios (owner only) — tabla con búsqueda
 static/
   js/app.js                # SPA completa (IIFE, ES6)
@@ -83,6 +86,10 @@ class User(UserMixin, db.Model):
     ciudad_residencia  # "Ciudad, Región" (texto libre)
     user_timezone   # IANA timezone ("America/Bogota")
     nombre_custom   # True si el usuario editó su nombre → Google no lo sobreescribe
+    # Tokens Google Docs (flujo OAuth separado del login)
+    google_access_token    # Access token para Google Docs/Drive API
+    google_refresh_token   # Refresh token (persistente, para renovar access tokens)
+    google_token_expires_at # Expiración del access token (DateTime)
 ```
 
 ## Conceptos del negocio
@@ -133,6 +140,39 @@ ENV                 # "PRODUCTION" o "LOCAL"
 - **Producción**: PostgreSQL, `SESSION_COOKIE_SECURE=True`, `SameSite=None`, CORS para `lgc.julianosoriom.com`
 - **Local**: SQLite, `SESSION_COOKIE_SECURE=False`, `SameSite=Lax`, puerto 8080
 - `_ensure_owner_columns()` y `_ensure_profile_columns()` agregan columnas faltantes en PostgreSQL existente sin necesidad de migraciones manuales
+
+## Reactivos
+
+Sistema de registro personal de procesos reactivos (emociones, desregulaciones). El usuario graba voz o escribe texto, y se guarda en **Google Docs** (un documento por día).
+
+### Flujo OAuth separado
+- El login normal usa scopes `openid email profile` y NO persiste tokens
+- Reactivos requiere scopes adicionales: `documents` y `drive.file`
+- Ruta `/auth/connect-gdocs` inicia un flujo OAuth separado con `access_type=offline`
+- Los tokens se guardan en `User.google_access_token`, `google_refresh_token`, `google_token_expires_at`
+- `services/gdocs.py` refresca automáticamente tokens expirados
+
+### Google Docs
+- Carpeta: "Reactivos LGC" (se crea automáticamente en el Drive del usuario)
+- Un doc por día: "Reactivos — DD/MM/AAAA"
+- Cada doc tiene una cabecera con datos Calendaria del día
+- Cada reactivo se agrega con timestamp `[HH:MM]`
+
+### Web Speech API
+- Transcripción de voz en el navegador (gratis, sin servidor)
+- `recognition.continuous = true` y `recognition.interimResults = true`
+- Idioma: `es` (español)
+- Fallback: textarea para escritura manual si el navegador no soporta Web Speech API
+
+### Dependencias extra
+- `google-api-python-client` — Google Docs/Drive API
+- `google-auth` — Credenciales y refresh de tokens
+
+### Configuración Google Cloud
+Para que Reactivos funcione, habilitar en Google Cloud Console:
+1. Google Docs API
+2. Google Drive API
+3. Redirect URIs: `/auth/gdocs-callback` (local + producción)
 
 ## Cosas a tener en cuenta
 
