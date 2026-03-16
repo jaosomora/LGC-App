@@ -260,52 +260,138 @@
     }
 
     // ── Tags: extracci\u00f3n de palabras clave ──
-    var STOP_WORDS_STR = "el la los las un una unos unas de del al a ante con en entre para por sin sobre tras que es son fue ser era esta esto este esta eso ese esa como mas pero muy ya solo hay no si me te se le lo nos les su sus mi mis tu tus yo el ella ellos ellas nos todo toda todos todas otro otra otros otras siendo sido tiene tienen tener hacer hecho puede pueden cuando donde quien porque como tambien bien mal mucho poco algo nada cada vez desde hasta durante despues antes ahora aqui alla mientras aunque sino pues luego entonces cuanto cual fue fui era estaba estoy soy eso esa esos esas ese ahi creo siento sentia voy dia dias cosa cosas tipo parte manera forma hoy momento tiempo";
+    // Stop words normalizadas (sin acentos). Incluye:
+    // - Art\u00edculos, pronombres, preposiciones, conjunciones
+    // - Verbos comunes (infinitivos + conjugaciones frecuentes)
+    // - Adverbios y adjetivos gen\u00e9ricos
+    // - Sustantivos conversacionales no tem\u00e1ticos
+    var STOP_WORDS_STR = [
+        // Articulos, pronombres, preposiciones, conjunciones
+        "el la los las un una unos unas de del al ante con en entre para por sin sobre tras",
+        "que es son fue ser era esta esto este eso ese esa como mas pero muy ya solo hay",
+        "no si me te se le lo nos les su sus mi mis tu tus yo ella ellos ellas",
+        "todo toda todos todas otro otra otros otras cual cuales donde quien quienes",
+        "siendo sido cuando porque aunque sino pues luego entonces cuanto mientras",
+        "tambien tampoco ademas apenas asi mismo misma mismos mismas",
+        // Verbos comunes
+        "tener tiene tienen tenia tenemos tenian tenido",
+        "hacer hace hacen hacia hicieron hecho haciendo hice hizo",
+        "poder puede pueden pudo podia podemos pudiera",
+        "decir dice dicen dijo decia diciendo dicho",
+        "estar estaba estaban estuve estuvo estoy estamos",
+        "haber habia habido habiendo",
+        "querer quiere quieren quiso queria queremos",
+        "saber sabe sabia sabemos sabiendo",
+        "dar daba dando dieron dado damos",
+        "llegar llega llego llegue llegaba llegando",
+        "pasar pasa paso pasado pasaba pasando pase",
+        "llamar llama llamo llamaba llamando llamado",
+        "llevar lleva llevo llevaba llevando llevado",
+        "dejar deja dejo dejaba dejando dejado",
+        "seguir sigue siguio seguia siguiendo",
+        "encontrar encuentra encontre encontrado",
+        "venir viene vino venia viniendo",
+        "salir sale salio salia saliendo",
+        "quedar queda quedo quedaba quedando",
+        "creer cree creia creemos creo creido",
+        "pensar piensa penso pensaba pensando pensarlo pienso",
+        "mirar mira miraba mirando",
+        "hablar habla hablo hablaba hablando",
+        "escuchar escucha escuchaba escuchando escucharlo escuche",
+        "buscar busca buscaba buscando",
+        "tratar trata trataba tratando",
+        "intentar intenta intente intentaba",
+        "empezar empieza empezo empece",
+        "acabar acabo acaba acababa acabado acabamos",
+        "sonar suena sonaba sonando",
+        "parecer parece parecia parecido",
+        "explicar explica explico explicaba",
+        "observar observa observaba observando",
+        "detener detiene detienes detenido",
+        "senalar senalando senala senalaba",
+        "tomar toma tomo tomaba",
+        "poner pone puso poniendo puesto",
+        "contar cuenta cuento cuentas contaba",
+        "ver veo vio veia viendo visto vemos",
+        "ir voy fue fui iba vamos",
+        "siento sentia sentir siente",
+        // Adverbios
+        "siempre nunca bastante definitivamente simplemente normalmente realmente",
+        "completamente exactamente obviamente practicamente generalmente solamente",
+        "totalmente absolutamente especialmente claramente ciertamente basicamente",
+        "literalmente finalmente todavia aun casi tanto tantos tantas demasiado",
+        "mucho poco bien mal mejor peor aqui alla ahi despues antes ahora",
+        "solo apenas realmente verdaderamente",
+        // Adjetivos genericos
+        "bueno buena buenos buenas malo mala malos malas",
+        "grande grandes pequeno pequena simple obvio obvia",
+        "claro clara cierto cierta nuevo nueva",
+        "primero primera segundo segunda tercero tercera",
+        "ultimo ultima propio propia completo completa",
+        "interesante importante posible imposible diferente suficiente",
+        "unico unica verdadero verdadera necesario necesaria",
+        // Sustantivos genericos / conversacionales
+        "cosa cosas tipo parte partes manera maneras forma formas",
+        "momento momentos tiempo dia dias hoy",
+        "principio final idea ideas ejemplo ejemplos punto puntos",
+        "tema lado caso efecto resultado pregunta respuesta",
+        "lugar mundo gente persona personas cuenta",
+        "hecho vez veces algo nada cada razon razones"
+    ].join(" ");
+
     var STOP_WORDS = {};
     (function () {
-        var words = STOP_WORDS_STR.split(" ");
+        var words = STOP_WORDS_STR.split(/\s+/);
         for (var i = 0; i < words.length; i++) {
-            STOP_WORDS[words[i]] = true;
+            if (words[i]) STOP_WORDS[words[i]] = true;
         }
     })();
 
-    function normalizeForTags(str) {
-        // Minusculas, eliminar acentos (excepto \u00f1), eliminar puntuacion
-        return str.toLowerCase()
-            .replace(/[^\w\s\u00f1]/g, " ")
-            .replace(/\d+/g, " ")
-            .replace(/\s+/g, " ")
-            .trim()
-            // NFD para quitar acentos
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    function normalizeWord(w) {
+        // Normaliza una palabra: min\u00fasculas, quita acentos, preserva \u00f1
+        return w.replace(/\u00f1/g, "\u0001")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/\u0001/g, "\u00f1");
     }
 
     function extractTags(text) {
         if (!text || text.trim().length < 10) return [];
 
-        var normalized = normalizeForTags(text);
-        var words = normalized.split(" ");
-        var freq = {};
+        // Separar en palabras preservando acentos originales para display
+        var rawWords = text.toLowerCase()
+            .replace(/[^a-z\u00e1\u00e9\u00ed\u00f3\u00fa\u00fc\u00f1\s]/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .split(" ");
 
-        for (var i = 0; i < words.length; i++) {
-            var w = words[i];
-            if (w.length < 4) continue;
-            if (STOP_WORDS[w]) continue;
-            freq[w] = (freq[w] || 0) + 1;
+        var freq = {};  // key normalizada \u2192 {count, display}
+
+        for (var i = 0; i < rawWords.length; i++) {
+            var original = rawWords[i];
+            if (original.length < 4) continue;
+
+            var key = normalizeWord(original);
+            if (STOP_WORDS[key]) continue;
+
+            if (!freq[key]) {
+                freq[key] = { count: 0, display: original };
+            }
+            freq[key].count += 1;
         }
 
         // Convertir a array y ordenar por frecuencia desc
         var entries = [];
         for (var key in freq) {
             if (freq.hasOwnProperty(key)) {
-                entries.push({ word: key, count: freq[key] });
+                entries.push({ word: freq[key].display, count: freq[key].count });
             }
         }
         entries.sort(function (a, b) { return b.count - a.count; });
 
-        // Tomar top 8 tags
+        // Tomar top 6 tags
         var tags = [];
-        for (var j = 0; j < Math.min(entries.length, 8); j++) {
+        for (var j = 0; j < Math.min(entries.length, 6); j++) {
             tags.push(entries[j].word);
         }
         return tags;
