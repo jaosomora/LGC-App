@@ -131,6 +131,8 @@ def _format_cabecera(date_str, hora, cabecera_data, user):
     lines.append("Usuario: {} ({})".format(user.nombre, user.email))
     if user.birth_date:
         lines.append("Nacimiento: {}".format(user.birth_date.strftime("%d/%m/%Y")))
+    if user.fecha_derivacion:
+        lines.append("Fecha derivacion: {}".format(user.fecha_derivacion.strftime("%d/%m/%Y")))
     lines.append("")
 
     # Datos Calendaria
@@ -160,7 +162,7 @@ def _format_cabecera(date_str, hora, cabecera_data, user):
             paso = cabecera_data.get("paso", "")
             mem = cabecera_data.get("mem", "")
             v_abs = cabecera_data.get("vAbs", "")
-            pos_str = "Posicion: V{} - {}/16 - {} - {}".format(
+            pos_str = "Posicion: Vuelta {} - {}/16 - {} - {}".format(
                 v_abs, pos, cuad, paso
             )
             if mem:
@@ -200,6 +202,18 @@ def _format_cabecera(date_str, hora, cabecera_data, user):
             lines.append("Cuarentena Global: #{} - Dia {}/39 - Ladrillo {} ({}/3)".format(
                 qi, q_dpos, brick_idx, brick_day
             ))
+
+        # Cuarentena Personal
+        cuarentena_personal = cabecera_data.get("cuarentenaPersonal")
+        if cuarentena_personal:
+            qpi = cuarentena_personal.get("qi", 0)
+            if qpi:
+                qp_dpos = cuarentena_personal.get("qDpos", "")
+                qp_brick_idx = cuarentena_personal.get("brickIdx", "")
+                qp_brick_day = cuarentena_personal.get("brickDay", "")
+                lines.append("Cuarentena Personal: #{} - Dia {}/39 - Ladrillo {} ({}/3)".format(
+                    qpi, qp_dpos, qp_brick_idx, qp_brick_day
+                ))
 
     lines.append("")
     lines.append("-" * 50)

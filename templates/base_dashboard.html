@@ -200,6 +200,11 @@
     {% if current_user.is_authenticated and current_user.birth_date %}
     <script>(function(){localStorage.setItem("lgc_birth_date","{{ current_user.birth_date.isoformat() }}")})();</script>
     {% endif %}
+    {% if current_user.is_authenticated and current_user.fecha_derivacion %}
+    <script>(function(){localStorage.setItem("lgc_fecha_derivacion","{{ current_user.fecha_derivacion.isoformat() }}")})();</script>
+    {% elif current_user.is_authenticated %}
+    <script>(function(){localStorage.removeItem("lgc_fecha_derivacion")})();</script>
+    {% endif %}
     <script src="/static/js/dashboard.js"></script>
     {% block dashboard_scripts %}{% endblock %}
 {% endblock %}

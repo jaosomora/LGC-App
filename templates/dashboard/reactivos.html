@@ -483,12 +483,35 @@
         var dsNativo = (nacY != null) ? diaSolar(nacY, nacM, nacD) : null;
         var ddv = (nacY != null) ? Math.max(0, jdnCut(year, month, day) - jdnCut(nacY, nacM, nacD)) : null;
 
+        // Cuarentena Global (desde 14/10/2012)
         var Q = dtUTC(2012, 10, 14);
         var qd = dFrom(Q, dtUTC(year, month, day));
         var qi = qd > 0 ? Math.floor((qd - 1) / 39) + 1 : 0;
         var qDpos = qd > 0 ? (qd - 1) % 39 + 1 : 0;
         var brickIdx = qDpos > 0 ? Math.floor((qDpos - 1) / 3) + 1 : 0;
         var brickDay = qDpos > 0 ? (qDpos - 1) % 3 + 1 : 0;
+
+        // Cuarentena Personal (desde fecha_derivacion)
+        var cuarentenaPersonal = null;
+        var savedDeriv = localStorage.getItem("lgc_fecha_derivacion");
+        if (savedDeriv) {
+            var dp = savedDeriv.split("-");
+            var derivY = parseInt(dp[0], 10);
+            var derivM = parseInt(dp[1], 10);
+            var derivD = parseInt(dp[2], 10);
+            if (!isNaN(derivY) && !isNaN(derivM) && !isNaN(derivD)) {
+                var QP = dtUTC(derivY, derivM, derivD);
+                var qpd = dFrom(QP, dtUTC(year, month, day));
+                var qpi = qpd > 0 ? Math.floor((qpd - 1) / 39) + 1 : 0;
+                var qpDpos = qpd > 0 ? (qpd - 1) % 39 + 1 : 0;
+                var qpBrickIdx = qpDpos > 0 ? Math.floor((qpDpos - 1) / 3) + 1 : 0;
+                var qpBrickDay = qpDpos > 0 ? (qpDpos - 1) % 3 + 1 : 0;
+                cuarentenaPersonal = {
+                    qd: qpd, qi: qpi, qDpos: qpDpos,
+                    brickIdx: qpBrickIdx, brickDay: qpBrickDay
+                };
+            }
+        }
 
         var frcPos = doy, frcNeg = total - doy, anuAno = frcPos - frcNeg;
 
@@ -498,6 +521,7 @@
             apos: apos, aneg: aneg, anuAp: apos - aneg,
             frcPos: frcPos, frcNeg: frcNeg, anuAno: anuAno,
             cuarentena: { qd: qd, qi: qi, qDpos: qDpos, brickIdx: brickIdx, brickDay: brickDay },
+            cuarentenaPersonal: cuarentenaPersonal,
             year: year, month: month, day: day
         };
 
@@ -526,46 +550,112 @@
         if (!cabeceraEl) return;
 
         var html = "";
-        html += '<div class="flex items-center gap-4 flex-wrap">';
-        html += '<span class="text-th-accent font-bold text-lg">DS ' + data.ds + '</span>';
+        var sep = '<div class="border-t border-th-text/5"></div>';
+
+        // ── 1. Fecha del d\u00eda ──
+        var now = new Date();
+        var fechaLarga = getDayName(now) + " " + now.getDate() + " de " + getMonthName(now.getMonth()) + " de " + now.getFullYear();
+        html += '<div class="text-center pb-3">';
+        html += '<p class="text-sm font-medium text-th-text/70">' + escapeHtml(fechaLarga) + '</p>';
+        html += '</div>';
+
+        html += sep;
+
+        // ── 2. D\u00eda Solar / Nativo / DDV ──
+        var cols = data.dsNativo !== null ? "repeat(3, 1fr)" : "1fr";
+        html += '<div class="grid gap-3 py-3" style="grid-template-columns:' + cols + '">';
+        html += '<div class="text-center">';
+        html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-0.5">D\u00eda Solar</div>';
+        html += '<div class="text-lg font-bold text-th-accent">' + data.ds + '</div>';
+        html += '</div>';
         if (data.dsNativo !== null) {
-            html += '<span class="text-th-text/40">\u00b7</span>';
-            html += '<span class="text-th-text/50">Nativo ' + data.dsNativo + '</span>';
-        }
-        if (data.ddv !== null) {
-            html += '<span class="text-th-text/40">\u00b7</span>';
-            html += '<span class="text-th-text/50">DDV ' + data.ddv + '</span>';
+            html += '<div class="text-center">';
+            html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-0.5">Solar Nativo</div>';
+            html += '<div class="text-lg font-bold text-th-text/60">' + data.dsNativo + '</div>';
+            html += '</div>';
+            html += '<div class="text-center">';
+            html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-0.5">D\u00edas de Vida</div>';
+            html += '<div class="text-lg font-bold text-th-text/60">' + data.ddv + '</div>';
+            html += '</div>';
         }
         html += '</div>';
 
+        html += sep;
+
+        // ── 3. Posici\u00f3n Calendaria (VUELTA prominente) ──
+        html += '<div class="text-center py-3">';
+        html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Posici\u00f3n Calendaria</div>';
         if (data.esAnillo) {
-            html += '<p class="text-th-accent">Anillo de Fuego ' + data.diaAnillo + '/' + data.totalAnillo + '</p>';
+            html += '<div class="text-xl font-bold text-th-accent">Anillo de Fuego</div>';
+            html += '<div class="text-sm text-th-text/50">D\u00eda ' + data.diaAnillo + ' de ' + data.totalAnillo + '</div>';
         } else {
-            html += '<p>';
-            html += '<span class="font-semibold">V' + data.vAbs + ' \u00b7 ' + data.pos + '/16</span>';
-            html += '<span class="text-th-text/40"> \u00b7 </span>';
-            html += '<span>' + data.cuad + ' \u00b7 ' + data.paso + '</span>';
-            if (data.mem) html += '<span class="text-th-text/30"> \u00b7 ' + data.mem + '</span>';
-            html += '</p>';
+            html += '<div class="text-xl font-bold text-th-accent">Vuelta ' + data.vAbs + '</div>';
+            html += '<div class="text-sm text-th-text/50">';
+            html += data.pos + '/16 \u00b7 ' + data.cuad + ' \u00b7 ' + data.paso;
+            if (data.mem) html += ' \u00b7 <span class="text-th-text/30">' + data.mem + '</span>';
+            html += '</div>';
         }
+        html += '</div>';
 
-        html += '<p class="text-th-text/40">';
-        html += 'Aparato #' + data.apNum + ' \u00b7 ' + data.faseName;
-        html += ' \u00b7 D\u00eda ' + data.apos + '/1461';
-        html += '</p>';
+        html += sep;
 
-        html += '<p class="text-th-text/30 text-xs">';
-        html += 'D\u00eda ' + data.doy + '/' + data.total;
-        html += ' \u00b7 +' + data.frcPos + ' \u2212' + data.frcNeg;
-        html += ' \u00b7 Anu: ' + (data.anuAno >= 0 ? '+' : '') + data.anuAno;
-        html += '</p>';
+        // ── 4. Aparato + 5. A\u00f1o (grid 2 columnas) ──
+        html += '<div class="grid grid-cols-2 gap-4 py-3">';
 
-        if (data.cuarentena.qi > 0) {
-            html += '<p class="text-th-text/30 text-xs">';
-            html += 'Cuarentena #' + data.cuarentena.qi;
-            html += ' \u00b7 D\u00eda ' + data.cuarentena.qDpos + '/39';
-            html += ' \u00b7 Ladrillo ' + data.cuarentena.brickIdx + ' (' + data.cuarentena.brickDay + '/3)';
-            html += '</p>';
+        // Aparato
+        html += '<div>';
+        html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Aparato #' + data.apNum + '</div>';
+        html += '<div class="text-sm font-semibold">' + data.faseName + '</div>';
+        html += '<div class="text-xs text-th-text/40">D\u00eda ' + data.apos + '/1461</div>';
+        html += '<div class="text-[10px] text-th-text/25 mt-0.5">+' + data.apos + ' \u2212' + data.aneg + ' \u00b7 Anu: ' + (data.anuAp >= 0 ? '+' : '') + data.anuAp + '</div>';
+        html += '</div>';
+
+        // A\u00f1o
+        html += '<div>';
+        html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">A\u00f1o ' + data.year + '</div>';
+        html += '<div class="text-sm font-semibold">D\u00eda ' + data.doy + '<span class="font-normal text-th-text/40">/' + data.total + '</span></div>';
+        html += '<div class="text-[10px] text-th-text/25 mt-0.5">+' + data.frcPos + ' \u2212' + data.frcNeg + ' \u00b7 Anu: ' + (data.anuAno >= 0 ? '+' : '') + data.anuAno + '</div>';
+        html += '</div>';
+
+        html += '</div>';
+
+        // ── 6. Cuarentenas (grid 2 columnas) ──
+        var showGlobal = data.cuarentena.qi > 0;
+        var showPersonal = data.cuarentenaPersonal && data.cuarentenaPersonal.qi > 0;
+        var hasDerivacion = !!localStorage.getItem("lgc_fecha_derivacion");
+
+        if (showGlobal || hasDerivacion) {
+            html += sep;
+            html += '<div class="grid grid-cols-2 gap-4 pt-3">';
+
+            // Cuarentena Global
+            if (showGlobal) {
+                html += '<div>';
+                html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Cuarentena Global</div>';
+                html += '<div class="text-sm font-semibold">#' + data.cuarentena.qi + '</div>';
+                html += '<div class="text-xs text-th-text/40">D\u00eda ' + data.cuarentena.qDpos + '/39</div>';
+                html += '<div class="text-[10px] text-th-text/25">Ladrillo ' + data.cuarentena.brickIdx + ' (' + data.cuarentena.brickDay + '/3)</div>';
+                html += '</div>';
+            } else {
+                html += '<div></div>';
+            }
+
+            // Cuarentena Personal
+            if (showPersonal) {
+                html += '<div>';
+                html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Cuarentena Personal</div>';
+                html += '<div class="text-sm font-semibold">#' + data.cuarentenaPersonal.qi + '</div>';
+                html += '<div class="text-xs text-th-text/40">D\u00eda ' + data.cuarentenaPersonal.qDpos + '/39</div>';
+                html += '<div class="text-[10px] text-th-text/25">Ladrillo ' + data.cuarentenaPersonal.brickIdx + ' (' + data.cuarentenaPersonal.brickDay + '/3)</div>';
+                html += '</div>';
+            } else if (hasDerivacion) {
+                html += '<div>';
+                html += '<div class="text-[10px] uppercase tracking-wider text-th-text/30 mb-1">Cuarentena Personal</div>';
+                html += '<div class="text-xs text-th-text/20 italic">A\u00fan no iniciada</div>';
+                html += '</div>';
+            }
+
+            html += '</div>';
         }
 
         cabeceraEl.innerHTML = html;
