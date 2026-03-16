@@ -250,21 +250,20 @@ def _build_cabecera_content(date_str, hora, cabecera_data, user):
 
         if ap_num:
             parts.append(add("APARATO #{}\n".format(ap_num),
-                              bold=True, font_size=9))
+                              bold=True, font_size=9, center=True, gray=True))
             parts.append(add("{} \u00b7 D\u00eda {}/1461\n".format(
-                fase_name, apos), font_size=9))
+                fase_name, apos), font_size=10, center=True))
             parts.append(add("+{} \u2212{} \u00b7 Anu: {}\n".format(
-                apos, aneg, anu_ap), font_size=8, gray=True))
+                apos, aneg, anu_ap), font_size=8, center=True, gray=True))
+            parts.append(add("\n"))
 
         if doy:
             parts.append(add("A\u00d1O {}\n".format(year),
-                              bold=True, font_size=9))
+                              bold=True, font_size=9, center=True, gray=True))
             parts.append(add("D\u00eda {}/{}\n".format(doy, total),
-                              font_size=9))
+                              font_size=10, center=True))
             parts.append(add("+{} \u2212{} \u00b7 Anu: {}\n".format(
-                frc_pos, frc_neg, anu_year), font_size=8, gray=True))
-
-        if ap_num or doy:
+                frc_pos, frc_neg, anu_year), font_size=8, center=True, gray=True))
             parts.append(add("\n"))
 
         # Cuarentenas
@@ -275,23 +274,22 @@ def _build_cabecera_content(date_str, hora, cabecera_data, user):
 
         if qi:
             parts.append(add("CUARENTENA GLOBAL\n",
-                              bold=True, font_size=8, gray=True))
+                              bold=True, font_size=8, center=True, gray=True))
             q_dpos = cuarentena.get("qDpos", "")
             brick_idx = cuarentena.get("brickIdx", "")
             brick_day = cuarentena.get("brickDay", "")
             parts.append(add("#{} \u00b7 D\u00eda {}/39 \u00b7 Ladrillo {} ({}/3)\n".format(
-                qi, q_dpos, brick_idx, brick_day), font_size=9))
+                qi, q_dpos, brick_idx, brick_day), font_size=9, center=True))
+            parts.append(add("\n"))
 
         if qpi:
             parts.append(add("CUARENTENA PERSONAL\n",
-                              bold=True, font_size=8, gray=True))
+                              bold=True, font_size=8, center=True, gray=True))
             qp_dpos = cuarentena_personal.get("qDpos", "")
             qp_brick_idx = cuarentena_personal.get("brickIdx", "")
             qp_brick_day = cuarentena_personal.get("brickDay", "")
             parts.append(add("#{} \u00b7 D\u00eda {}/39 \u00b7 Ladrillo {} ({}/3)\n".format(
-                qpi, qp_dpos, qp_brick_idx, qp_brick_day), font_size=9))
-
-        if qi or qpi:
+                qpi, qp_dpos, qp_brick_idx, qp_brick_day), font_size=9, center=True))
             parts.append(add("\n"))
 
     # Cierre
@@ -412,7 +410,7 @@ def append_reactivo(docs_service, doc_id, hora, texto, tags=None):
     if tags and len(tags) > 0:
         tags_line = " ".join("#{}".format(t) for t in tags) + "\n"
 
-    entry_text = "\n[{}]\n{}{}\n".format(hora, tags_line, texto)
+    entry_text = "\n[{}]\n{}\n{}\n".format(hora, texto, tags_line.rstrip("\n") if tags_line else "")
 
     requests = [
         {
