@@ -116,107 +116,148 @@ def find_doc_for_date(drive_service, folder_id, date_str):
     return files[0]["id"] if files else None
 
 
+def _format_fecha_larga(date_str):
+    """Convierte 'DD/MM/AAAA' a 'Domingo 15 de marzo de 2026'."""
+    dias = ["Lunes", "Martes", "Mi\u00e9rcoles", "Jueves",
+            "Viernes", "S\u00e1bado", "Domingo"]
+    meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+             "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+    try:
+        parts = date_str.split("/")
+        d, m, y = int(parts[0]), int(parts[1]), int(parts[2])
+        from datetime import date as dt_date
+        fecha = dt_date(y, m, d)
+        nombre_dia = dias[fecha.weekday()]
+        nombre_mes = meses[m - 1]
+        return "{} {} de {} de {}".format(nombre_dia, d, nombre_mes, y)
+    except (ValueError, IndexError):
+        return date_str
+
+
 def _format_cabecera(date_str, hora, cabecera_data, user):
     """
-    Formatea la cabecera del día como texto plano para el Google Doc.
+    Formatea la cabecera del d\u00eda con layout organizado para el Google Doc.
     cabecera_data es un dict con los datos Calendaria calculados en JS.
     """
+    sep = "\u2500" * 50  # ──────────
+    sep_bold = "\u2501" * 50  # ━━━━━━
+
     lines = []
-    lines.append("=" * 50)
+    lines.append(sep_bold)
     lines.append("REACTIVOS \u2014 {}".format(date_str))
-    lines.append("=" * 50)
+    fecha_larga = _format_fecha_larga(date_str)
+    lines.append(fecha_larga)
+    lines.append(sep_bold)
     lines.append("")
 
     # Datos del usuario
-    lines.append("Usuario: {} ({})".format(user.nombre, user.email))
+    lines.append("{} ({})".format(user.nombre, user.email))
+    datos_user = []
     if user.birth_date:
-        lines.append("Nacimiento: {}".format(user.birth_date.strftime("%d/%m/%Y")))
+        datos_user.append("Nacimiento: {}".format(
+            user.birth_date.strftime("%d/%m/%Y")))
     if user.fecha_derivacion:
-        lines.append("Fecha derivaci\u00f3n: {}".format(user.fecha_derivacion.strftime("%d/%m/%Y")))
+        datos_user.append("Derivaci\u00f3n: {}".format(
+            user.fecha_derivacion.strftime("%d/%m/%Y")))
+    if datos_user:
+        lines.append(" \u00b7 ".join(datos_user))
     lines.append("")
 
     # Datos Calendaria
     if cabecera_data:
+
+        # D\u00eda Solar / Nativo / DDV
+        lines.append(sep)
         ds = cabecera_data.get("ds", "")
-        if ds:
-            lines.append("D\u00eda Solar: {}".format(ds))
-
         ds_nativo = cabecera_data.get("dsNativo")
-        if ds_nativo is not None:
-            lines.append("D\u00eda Solar Nativo: {}".format(ds_nativo))
-
         ddv = cabecera_data.get("ddv")
+        solar_parts = []
+        if ds:
+            solar_parts.append("D\u00eda Solar: {}".format(ds))
+        if ds_nativo is not None:
+            solar_parts.append("Solar Nativo: {}".format(ds_nativo))
         if ddv is not None:
-            lines.append("D\u00edas de Vida: {}".format(ddv))
+            solar_parts.append("D\u00edas de Vida: {}".format(ddv))
+        if solar_parts:
+            lines.append("    ".join(solar_parts))
+        lines.append("")
 
-        # Posicion Calendaria
+        # Posici\u00f3n Calendaria
+        lines.append(sep)
+        lines.append("POSICI\u00d3N CALENDARIA")
         if cabecera_data.get("esAnillo"):
             dia_anillo = cabecera_data.get("diaAnillo", "")
             total_anillo = cabecera_data.get("totalAnillo", "")
-            lines.append("Posici\u00f3n: Anillo de Fuego {}/{}".format(
-                dia_anillo, total_anillo
-            ))
+            lines.append("Anillo de Fuego \u2014 D\u00eda {} de {}".format(
+                dia_anillo, total_anillo))
         else:
+            v_abs = cabecera_data.get("vAbs", "")
             pos = cabecera_data.get("pos", "")
             cuad = cabecera_data.get("cuad", "")
             paso = cabecera_data.get("paso", "")
             mem = cabecera_data.get("mem", "")
-            v_abs = cabecera_data.get("vAbs", "")
-            pos_str = "Posici\u00f3n: Vuelta {} - {}/16 - {} - {}".format(
-                v_abs, pos, cuad, paso
-            )
+            lines.append("Vuelta {}".format(v_abs))
+            pos_detail = "{}/16 \u00b7 {} \u00b7 {}".format(pos, cuad, paso)
             if mem:
-                pos_str += " - {}".format(mem)
-            lines.append(pos_str)
+                pos_detail += " \u00b7 {}".format(mem)
+            lines.append(pos_detail)
+        lines.append("")
 
-        # Aparato
+        # Aparato + A\u00f1o
+        lines.append(sep)
         ap_num = cabecera_data.get("apNum", "")
         fase_name = cabecera_data.get("faseName", "")
         apos = cabecera_data.get("apos", "")
         aneg = cabecera_data.get("aneg", "")
-        if ap_num:
-            lines.append("Aparato: #{} - {} - D\u00eda {}/1461".format(
-                ap_num, fase_name, apos
-            ))
-            anu_ap = cabecera_data.get("anuAp", "")
-            lines.append("  +{} -{} Anu: {}".format(apos, aneg, anu_ap))
-
-        # D\u00eda del A\u00f1o
+        anu_ap = cabecera_data.get("anuAp", "")
         doy = cabecera_data.get("doy", "")
         total = cabecera_data.get("total", "")
         frc_pos = cabecera_data.get("frcPos", "")
         frc_neg = cabecera_data.get("frcNeg", "")
         anu_year = cabecera_data.get("anuAno", "")
-        if doy:
-            lines.append("D\u00eda del A\u00f1o: {}/{} (+{} -{} Anu: {})".format(
-                doy, total, frc_pos, frc_neg, anu_year
-            ))
+        year = cabecera_data.get("year", "")
 
-        # Cuarentena Global
+        if ap_num:
+            lines.append("APARATO #{}".format(ap_num))
+            lines.append("{} \u00b7 D\u00eda {}/1461".format(fase_name, apos))
+            lines.append("+{} \u2212{} \u00b7 Anu: {}".format(apos, aneg, anu_ap))
+            lines.append("")
+
+        if doy:
+            lines.append("A\u00d1O {}".format(year))
+            lines.append("D\u00eda {}/{}".format(doy, total))
+            lines.append("+{} \u2212{} \u00b7 Anu: {}".format(
+                frc_pos, frc_neg, anu_year))
+            lines.append("")
+
+        # Cuarentenas
         cuarentena = cabecera_data.get("cuarentena", {})
         qi = cuarentena.get("qi", 0)
+        cuarentena_personal = cabecera_data.get("cuarentenaPersonal")
+        qpi = cuarentena_personal.get("qi", 0) if cuarentena_personal else 0
+
+        if qi or qpi:
+            lines.append(sep)
+
         if qi:
             q_dpos = cuarentena.get("qDpos", "")
             brick_idx = cuarentena.get("brickIdx", "")
             brick_day = cuarentena.get("brickDay", "")
-            lines.append("Cuarentena Global: #{} - D\u00eda {}/39 - Ladrillo {} ({}/3)".format(
-                qi, q_dpos, brick_idx, brick_day
-            ))
+            lines.append("CUARENTENA GLOBAL")
+            lines.append("#{} \u00b7 D\u00eda {}/39 \u00b7 Ladrillo {} ({}/3)".format(
+                qi, q_dpos, brick_idx, brick_day))
+            lines.append("")
 
-        # Cuarentena Personal
-        cuarentena_personal = cabecera_data.get("cuarentenaPersonal")
-        if cuarentena_personal:
-            qpi = cuarentena_personal.get("qi", 0)
-            if qpi:
-                qp_dpos = cuarentena_personal.get("qDpos", "")
-                qp_brick_idx = cuarentena_personal.get("brickIdx", "")
-                qp_brick_day = cuarentena_personal.get("brickDay", "")
-                lines.append("Cuarentena Personal: #{} - D\u00eda {}/39 - Ladrillo {} ({}/3)".format(
-                    qpi, qp_dpos, qp_brick_idx, qp_brick_day
-                ))
+        if qpi:
+            qp_dpos = cuarentena_personal.get("qDpos", "")
+            qp_brick_idx = cuarentena_personal.get("brickIdx", "")
+            qp_brick_day = cuarentena_personal.get("brickDay", "")
+            lines.append("CUARENTENA PERSONAL")
+            lines.append("#{} \u00b7 D\u00eda {}/39 \u00b7 Ladrillo {} ({}/3)".format(
+                qpi, qp_dpos, qp_brick_idx, qp_brick_day))
+            lines.append("")
 
-    lines.append("")
-    lines.append("-" * 50)
+    lines.append(sep_bold)
     lines.append("")
 
     return "\n".join(lines)

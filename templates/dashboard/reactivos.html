@@ -113,14 +113,22 @@
         </div>
     </div>
 
-    <!-- Cabecera del d&iacute;a (datos Calendaria) -->
-    <div class="glass-card p-5">
-        <div class="flex items-center justify-between mb-3">
-            <h3 class="text-xs font-semibold uppercase tracking-wider text-th-text/40">Cabecera del d&iacute;a</h3>
+    <!-- Cabecera del d&iacute;a (datos Calendaria) — colapsable -->
+    <div class="glass-card overflow-hidden">
+        <button id="react-cabecera-toggle" type="button"
+            class="w-full flex items-center justify-between px-5 py-3 hover:bg-th-text/[0.02] transition-colors cursor-pointer">
+            <div class="flex items-center gap-2">
+                <svg id="react-chevron" class="w-4 h-4 text-th-text/25 transition-transform duration-200 -rotate-90" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                </svg>
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-th-text/40">Cabecera del d&iacute;a</h3>
+            </div>
             <span id="react-fecha" class="text-xs text-th-text/30"></span>
-        </div>
-        <div id="react-cabecera" class="text-sm text-th-text/60 space-y-1">
-            <p class="text-th-text/20 text-xs">Calculando datos Calendaria...</p>
+        </button>
+        <div id="react-cabecera-wrapper" class="hidden">
+            <div id="react-cabecera" class="px-5 pb-5 pt-1 text-sm text-th-text/60 space-y-4">
+                <p class="text-th-text/20 text-xs">Calculando datos Calendaria...</p>
+            </div>
         </div>
     </div>
 
@@ -215,6 +223,9 @@
     var driveLinkCard = document.getElementById("react-drive-link");
     var folderLink = document.getElementById("react-folder-link");
     var docTodayLink = document.getElementById("react-doc-today-link");
+    var cabeceraToggle = document.getElementById("react-cabecera-toggle");
+    var cabeceraWrapper = document.getElementById("react-cabecera-wrapper");
+    var chevronIcon = document.getElementById("react-chevron");
 
     // ── Estado ──
     var recognition = null;
@@ -866,6 +877,20 @@
 
     if (saveBtn) {
         saveBtn.addEventListener("click", guardarReactivo);
+    }
+
+    // ── Toggle cabecera (colapsable) ──
+    if (cabeceraToggle) {
+        cabeceraToggle.addEventListener("click", function () {
+            var isOpen = !cabeceraWrapper.classList.contains("hidden");
+            if (isOpen) {
+                cabeceraWrapper.classList.add("hidden");
+                if (chevronIcon) chevronIcon.classList.add("-rotate-90");
+            } else {
+                cabeceraWrapper.classList.remove("hidden");
+                if (chevronIcon) chevronIcon.classList.remove("-rotate-90");
+            }
+        });
     }
 
     // ── Inicializaci\u00f3n ──
